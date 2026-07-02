@@ -1,0 +1,58 @@
+export type PositionType = 'staff' | 'faculty' | 'researcher' | 'administrator' | 'independent'
+
+export const positionTypes: PositionType[] = [
+  'staff',
+  'faculty',
+  'researcher',
+  'administrator',
+  'independent',
+]
+
+export interface CountryOption {
+  name: string
+  regions: string[]
+}
+
+/** Strict cascading country → region data. No free-text location input. */
+export const countries: CountryOption[] = [
+  { name: 'Argentina', regions: ['Buenos Aires', 'Córdoba', 'Mendoza', 'Santa Fe', 'Tucumán'] },
+  { name: 'Bolivia', regions: ['La Paz', 'Cochabamba', 'Santa Cruz', 'Tarija'] },
+  { name: 'Brasil', regions: ['São Paulo', 'Minas Gerais', 'Rio de Janeiro', 'Bahia', 'Paraná', 'Pernambuco'] },
+  { name: 'Chile', regions: ['Región Metropolitana', 'Valparaíso', 'Biobío', 'Antofagasta', 'Los Lagos'] },
+  { name: 'Colombia', regions: ['Bogotá D.C.', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Santander'] },
+  { name: 'Costa Rica', regions: ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste'] },
+  { name: 'Ecuador', regions: ['Pichincha', 'Guayas', 'Azuay', 'Manabí'] },
+  { name: 'El Salvador', regions: ['San Salvador', 'Santa Ana', 'San Miguel', 'La Libertad'] },
+  { name: 'España', regions: ['Madrid', 'Cataluña', 'Andalucía', 'País Vasco'] },
+  { name: 'Estados Unidos', regions: ['California', 'Texas', 'Nueva York', 'Florida'] },
+  { name: 'Guatemala', regions: ['Guatemala', 'Quetzaltenango', 'Sacatepéquez'] },
+  { name: 'México', regions: ['Ciudad de México', 'Jalisco', 'Puebla', 'Guanajuato', 'Coahuila', 'Sinaloa', 'Baja California'] },
+  { name: 'Nicaragua', regions: ['Managua', 'León', 'Granada'] },
+  { name: 'Panamá', regions: ['Panamá', 'Colón', 'Chiriquí'] },
+  { name: 'Paraguay', regions: ['Asunción', 'Central', 'Alto Paraná'] },
+  { name: 'Perú', regions: ['Lima', 'Arequipa', 'Cusco', 'La Libertad', 'Piura'] },
+  { name: 'Uruguay', regions: ['Montevideo', 'Canelones', 'Maldonado'] },
+  { name: 'Venezuela', regions: ['Distrito Capital', 'Zulia', 'Miranda', 'Carabobo'] },
+]
+
+export interface ResearchInterest {
+  id: string
+  es: string
+  en: string
+  pt: string
+}
+
+export const researchInterests: ResearchInterest[] = [
+  { id: 'metodologias', es: 'Metodologías frugales', en: 'Frugal methodologies', pt: 'Metodologias frugais' },
+  { id: 'educacion', es: 'Educación y formación', en: 'Education & training', pt: 'Educação e formação' },
+  { id: 'economia-circular', es: 'Economía circular', en: 'Circular economy', pt: 'Economia circular' },
+  { id: 'emprendimiento', es: 'Emprendimiento social', en: 'Social entrepreneurship', pt: 'Empreendedorismo social' },
+  { id: 'tecnologias', es: 'Tecnologías digitales', en: 'Digital technologies', pt: 'Tecnologias digitais' },
+  { id: 'salud', es: 'Salud frugal', en: 'Frugal healthcare', pt: 'Saúde frugal' },
+  { id: 'energia', es: 'Energía asequible', en: 'Affordable energy', pt: 'Energia acessível' },
+  { id: 'agua', es: 'Agua y saneamiento', en: 'Water & sanitation', pt: 'Água e saneamento' },
+  { id: 'agro', es: 'Agricultura sostenible', en: 'Sustainable agriculture', pt: 'Agricultura sustentável' },
+  { id: 'politicas', es: 'Políticas públicas', en: 'Public policy', pt: 'Políticas públicas' },
+  { id: 'diseno', es: 'Diseño centrado en comunidades', en: 'Community-centered design', pt: 'Design centrado em comunidades' },
+  { id: 'manufactura', es: 'Manufactura local', en: 'Local manufacturing', pt: 'Manufatura local' },
+]
