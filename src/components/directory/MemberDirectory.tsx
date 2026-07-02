@@ -14,14 +14,14 @@ function InstitutionConveyor() {
   // Track is duplicated so the loop is seamless; aria-hidden on the copy.
   const names = institutions.map((i) => i.name)
   return (
-    <div className="conveyor overflow-hidden border-y border-tinta/10 bg-white/50 py-4" aria-label={t.directory.institutionsTitle}>
+    <div className="conveyor overflow-hidden border-y border-carbon/10 bg-white/50 py-4" aria-label={t.directory.institutionsTitle}>
       <div className="conveyor-track flex w-max gap-3">
         {[false, true].map((isCopy) => (
           <ul key={String(isCopy)} className="flex gap-3" aria-hidden={isCopy}>
             {names.map((name) => (
               <li
                 key={name}
-                className="whitespace-nowrap rounded-full border border-tinta/10 bg-crema px-4 py-1.5 text-xs font-medium text-tinta-suave"
+                className="whitespace-nowrap rounded-full border border-carbon/10 bg-blanco px-4 py-1.5 text-xs font-medium text-pizarra"
               >
                 {name}
               </li>
@@ -88,7 +88,7 @@ export function MemberDirectory() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t.directory.searchPlaceholder}
             aria-label={t.directory.searchPlaceholder}
-            className="w-full max-w-md rounded-full border border-tinta/15 bg-white/70 px-5 py-3 text-sm outline-none transition-colors focus:border-terracota"
+            className="w-full max-w-md rounded-full border border-carbon/15 bg-white/70 px-5 py-3 text-sm outline-none transition-colors focus:border-teal"
           />
           <div className="flex flex-wrap gap-1.5" role="group" aria-label={t.map.filterTitle}>
             {positionFilters.map((filter) => (
@@ -99,8 +99,8 @@ export function MemberDirectory() {
                 aria-pressed={position === filter}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                   position === filter
-                    ? 'bg-tinta text-crema'
-                    : 'border border-tinta/15 text-tinta-suave hover:border-tinta/35'
+                    ? 'bg-carbon text-blanco'
+                    : 'border border-carbon/15 text-pizarra hover:border-carbon/35'
                 }`}
               >
                 {filter === 'all' ? t.directory.filterAll : t.onboarding.positions[filter]}
@@ -109,7 +109,7 @@ export function MemberDirectory() {
           </div>
         </div>
 
-        <p className="mb-4 text-sm text-tinta-suave" role="status">
+        <p className="mb-4 text-sm text-pizarra" role="status">
           {t.directory.showing} {filtered.length} {t.directory.people}
         </p>
 
@@ -124,7 +124,7 @@ export function MemberDirectory() {
             ))}
           </ul>
         ) : (
-          <p className="rounded-2xl border border-dashed border-tinta/20 p-10 text-center text-tinta-suave">
+          <p className="rounded-2xl border border-dashed border-carbon/20 p-10 text-center text-pizarra">
             {t.directory.noResults}
           </p>
         )}

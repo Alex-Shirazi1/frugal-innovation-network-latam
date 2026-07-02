@@ -23,23 +23,25 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
 
   return (
     <li
-      className={`flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-tinta/5 ${
+      className={`flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-carbon/5 ${
         highlighted
-          ? 'border-terracota bg-terracota/5 shadow-lg shadow-terracota/10'
-          : 'border-tinta/10 bg-white/70'
+          ? 'border-teal bg-teal/5 shadow-lg shadow-teal/10'
+          : 'border-carbon/10 bg-white/70'
       }`}
     >
       <div className="flex items-center gap-3.5">
         <span
           aria-hidden="true"
-          className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full font-display text-lg font-semibold text-crema"
-          style={{ background: `oklch(52% 0.1 ${member.avatarHue})` }}
+          className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full font-display text-lg font-semibold text-blanco"
+          style={{
+            background: ['#168599', '#8ebc41', '#f6a620', '#e94824', '#4d6a79'][member.avatarHue % 5],
+          }}
         >
           {initialsOf(member.fullName)}
         </span>
         <div className="min-w-0">
           <h3 className="truncate font-semibold leading-snug">{member.fullName}</h3>
-          <p className="truncate text-xs text-tinta-suave">{member.title}</p>
+          <p className="truncate text-xs text-pizarra">{member.title}</p>
         </div>
       </div>
 
@@ -50,7 +52,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
           </span>
         )}
         {affiliation ? (
-          <span className="block mt-0.5 text-tinta-suave font-normal">
+          <span className="block mt-0.5 text-pizarra font-normal">
             {member.region}, {member.country}
           </span>
         ) : null}
@@ -63,7 +65,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
           return (
             <li
               key={id}
-              className="rounded-full bg-arena px-2.5 py-1 text-[11px] font-medium text-tinta-suave"
+              className="rounded-full bg-niebla px-2.5 py-1 text-[11px] font-medium text-pizarra"
             >
               {interest[lang]}
             </li>
@@ -76,7 +78,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
           href={member.socialUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-auto pt-3 text-xs font-semibold text-terracota hover:underline"
+          className="mt-auto pt-3 text-xs font-semibold text-teal hover:underline"
         >
           ↗ {member.socialUrl.replace(/^https?:\/\//, '').split('/')[0]}
         </a>

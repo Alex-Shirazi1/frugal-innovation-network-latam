@@ -19,18 +19,18 @@ export function InitiativesSection() {
           {t.initiatives.items.map((item, index) => (
             <li
               key={item.title}
-              className={`group rounded-2xl border border-tinta/10 p-5 md:p-6 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-tinta/5 ${
-                index % 4 === 0 ? 'bg-verde-claro/60' : index % 4 === 3 ? 'bg-arena' : 'bg-white/60'
+              className={`group rounded-2xl border border-carbon/10 p-5 md:p-6 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-carbon/5 ${
+                index % 4 === 0 ? 'bg-verde-suave/60' : index % 4 === 3 ? 'bg-niebla' : 'bg-white/60'
               }`}
             >
               <span
-                className="text-2xl text-terracota transition-transform inline-block group-hover:scale-110"
+                className="text-2xl text-teal transition-transform inline-block group-hover:scale-110"
                 aria-hidden="true"
               >
                 {initiativeIcons[index % initiativeIcons.length]}
               </span>
               <h3 className="mt-3 font-display text-lg md:text-xl font-semibold">{item.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-tinta-suave">{item.text}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-pizarra">{item.text}</p>
             </li>
           ))}
         </ul>

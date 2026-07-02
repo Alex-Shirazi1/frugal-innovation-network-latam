@@ -20,7 +20,7 @@ const emptyForm: IntakeSubmission = {
 }
 
 const inputClass =
-  'w-full rounded-xl border border-tinta/15 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-terracota'
+  'w-full rounded-xl border border-carbon/15 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-teal'
 
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
@@ -28,7 +28,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
       <span className="mb-1.5 block text-sm font-semibold">{label}</span>
       {children}
       {error ? (
-        <span role="alert" className="mt-1 block text-xs font-medium text-terracota-deep">
+        <span role="alert" className="mt-1 block text-xs font-medium text-teal-deep">
           {error}
         </span>
       ) : null}
@@ -91,13 +91,13 @@ export function OnboardingForm() {
     return (
       <section id="unete" className="py-(--spacing-section)">
         <div className="mx-auto max-w-2xl px-4 text-center">
-          <div className="rounded-3xl border border-verde/25 bg-verde-claro/60 p-10 md:p-14 rise-in">
+          <div className="rounded-3xl border border-verde/25 bg-verde-suave/60 p-10 md:p-14 rise-in">
             <span className="text-5xl" aria-hidden="true">🌱</span>
             <h2 className="mt-4 font-display text-3xl font-semibold">{t.onboarding.successTitle}</h2>
-            <p className="mt-3 text-tinta-suave">{t.onboarding.successText}</p>
+            <p className="mt-3 text-pizarra">{t.onboarding.successText}</p>
             <a
               href="#miembros"
-              className="mt-6 inline-block rounded-full bg-verde px-6 py-3 text-sm font-semibold text-crema"
+              className="mt-6 inline-block rounded-full bg-verde px-6 py-3 text-sm font-semibold text-blanco"
             >
               {t.onboarding.successCta}
             </a>
@@ -108,7 +108,7 @@ export function OnboardingForm() {
   }
 
   return (
-    <section id="unete" aria-labelledby="unete-heading" className="bg-arena/60 py-(--spacing-section)">
+    <section id="unete" aria-labelledby="unete-heading" className="bg-niebla/60 py-(--spacing-section)">
       <div className="mx-auto max-w-3xl px-4 md:px-8">
         <SectionHeading
           id="unete-heading"
@@ -118,19 +118,19 @@ export function OnboardingForm() {
           align="center"
         />
 
-        <div className="rounded-3xl border border-tinta/10 bg-crema p-6 shadow-xl shadow-tinta/5 md:p-10">
+        <div className="rounded-3xl border border-carbon/10 bg-blanco p-6 shadow-xl shadow-carbon/5 md:p-10">
           {/* Stepper */}
           <ol className="mb-8 flex items-center gap-2" aria-label={`${t.onboarding.step} ${step + 1} ${t.onboarding.of} 3`}>
             {t.onboarding.steps.map((label, index) => (
               <li key={label} className="flex flex-1 flex-col gap-1.5">
                 <span
                   className={`h-1.5 rounded-full transition-colors ${
-                    index <= step ? 'bg-terracota' : 'bg-tinta/10'
+                    index <= step ? 'bg-teal' : 'bg-carbon/10'
                   }`}
                 />
                 <span
                   className={`hidden sm:block text-xs font-semibold ${
-                    index === step ? 'text-tinta' : 'text-tinta-suave/70'
+                    index === step ? 'text-carbon' : 'text-pizarra/70'
                   }`}
                 >
                   {index + 1}. {label}
@@ -228,9 +228,9 @@ export function OnboardingForm() {
               <>
                 <fieldset>
                   <legend className="mb-1 text-sm font-semibold">{t.onboarding.interests}</legend>
-                  <p className="mb-2.5 text-xs text-tinta-suave">{t.onboarding.interestsHint}</p>
+                  <p className="mb-2.5 text-xs text-pizarra">{t.onboarding.interestsHint}</p>
                   {errors.interests ? (
-                    <p role="alert" className="mb-2 text-xs font-medium text-terracota-deep">{errors.interests}</p>
+                    <p role="alert" className="mb-2 text-xs font-medium text-teal-deep">{errors.interests}</p>
                   ) : null}
                   <div className="flex flex-wrap gap-2">
                     {researchInterests.map((interest) => {
@@ -239,7 +239,7 @@ export function OnboardingForm() {
                         <label
                           key={interest.id}
                           className={`cursor-pointer rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
-                            checked ? 'bg-verde text-crema' : 'border border-tinta/15 text-tinta-suave hover:border-verde'
+                            checked ? 'bg-verde text-blanco' : 'border border-carbon/15 text-pizarra hover:border-verde'
                           }`}
                         >
                           <input
@@ -272,7 +272,7 @@ export function OnboardingForm() {
                 </Field>
                 <Field label={`${t.onboarding.cv} · ${t.onboarding.cvHint}`}>
                   <input
-                    className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-tinta file:px-4 file:py-1.5 file:text-xs file:font-semibold file:text-crema`}
+                    className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-carbon file:px-4 file:py-1.5 file:text-xs file:font-semibold file:text-blanco`}
                     type="file"
                     accept=".pdf"
                     onChange={(event) => update('cvFileName', event.target.files?.[0]?.name ?? null)}
@@ -286,14 +286,14 @@ export function OnboardingForm() {
                 type="button"
                 onClick={() => setStep(Math.max(0, step - 1))}
                 disabled={step === 0}
-                className="rounded-full border border-tinta/20 px-5 py-2.5 text-sm font-semibold disabled:opacity-40"
+                className="rounded-full border border-carbon/20 px-5 py-2.5 text-sm font-semibold disabled:opacity-40"
               >
                 ← {t.onboarding.back}
               </button>
               <button
                 type="submit"
                 disabled={status === 'submitting'}
-                className="rounded-full bg-terracota px-6 py-2.5 text-sm font-semibold text-crema transition-colors hover:bg-terracota-deep disabled:opacity-60"
+                className="rounded-full bg-teal px-6 py-2.5 text-sm font-semibold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-60"
               >
                 {status === 'submitting'
                   ? t.onboarding.submitting

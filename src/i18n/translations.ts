@@ -105,6 +105,7 @@ export const es = {
     beyond: 'Más allá del mapa',
     beyondText: 'La red también tiene nodos aliados en Europa y otras regiones:',
     nodesShown: 'nodos visibles',
+    legend: 'Leyenda',
     visit: 'Visitar sitio',
   },
   directory: {
@@ -307,6 +308,7 @@ export const en: Dictionary = {
     beyond: 'Beyond the map',
     beyondText: 'The network also has allied nodes in Europe and other regions:',
     nodesShown: 'nodes shown',
+    legend: 'Legend',
     visit: 'Visit website',
   },
   directory: {
@@ -501,6 +503,7 @@ export const pt: Dictionary = {
     beyond: 'Além do mapa',
     beyondText: 'A rede também tem nós aliados na Europa e em outras regiões:',
     nodesShown: 'nós visíveis',
+    legend: 'Legenda',
     visit: 'Visitar site',
   },
   directory: {

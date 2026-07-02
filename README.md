@@ -41,6 +41,8 @@ All structured content lives in `src/data/`:
 - `latamOutline.ts` — stylized SVG outline of Latin America
 - `onboardingOptions.ts` — countries/regions and research-interest taxonomies
 
-## Assets
+## Brand
 
-The logo is a new local SVG (`public/relif-mark.svg`) — deliberately not pulled from the live site, which uses an outdated mark.
+- Palette and typography (`#168599` teal, `#203236` slate, `#f6a620` / `#e94824` / `#8ebc41` accents; Oswald + Open Sans) were extracted read-only from the production stylesheet so the redesign stays visually faithful to the network's identity.
+- The official logo lockup lives locally at `public/logo-relif.png`; the favicon is a simplified ring-of-people mark in the same palette.
+- The map renders real Natural Earth country geometry (`src/data/countries-110m.json`, bundled locally) with d3-geo — no external tiles or Google Maps dependency.

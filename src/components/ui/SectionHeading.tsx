@@ -7,6 +7,10 @@ interface SectionHeadingProps {
   tone?: 'light' | 'dark'
 }
 
+/**
+ * Prod-style section heading: Oswald uppercase title with the site's
+ * signature underline bar (teal on light, orange on dark).
+ */
 export function SectionHeading({
   kicker,
   title,
@@ -20,24 +24,30 @@ export function SectionHeading({
   return (
     <header className={`max-w-3xl ${isCenter ? 'mx-auto text-center' : ''} mb-10 md:mb-14`}>
       <p
-        className={`text-xs md:text-sm font-semibold uppercase tracking-[0.22em] mb-3 ${
-          isDark ? 'text-ambar' : 'text-terracota'
+        className={`text-xs md:text-sm font-bold uppercase tracking-[0.22em] mb-2.5 ${
+          isDark ? 'text-naranja' : 'text-rojo'
         }`}
       >
         {kicker}
       </p>
       <h2
         id={id}
-        className={`font-display font-semibold leading-[1.05] text-(length:--text-section) ${
-          isDark ? 'text-crema' : 'text-tinta'
+        className={`font-display font-medium uppercase leading-[1.08] text-(length:--text-section) ${
+          isDark ? 'text-blanco' : 'text-carbon'
         }`}
       >
         {title}
       </h2>
+      <span
+        aria-hidden="true"
+        className={`mt-4 block h-1 w-16 rounded-full ${isCenter ? 'mx-auto' : ''} ${
+          isDark ? 'bg-naranja' : 'bg-teal'
+        }`}
+      />
       {subtitle ? (
         <p
           className={`mt-4 text-base md:text-lg leading-relaxed ${
-            isDark ? 'text-crema/70' : 'text-tinta-suave'
+            isDark ? 'text-blanco/70' : 'text-pizarra'
           }`}
         >
           {subtitle}

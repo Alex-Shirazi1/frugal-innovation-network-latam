@@ -17,7 +17,7 @@ function LanguageToggle() {
     <div
       role="group"
       aria-label={t.common.languageLabel}
-      className="flex items-center rounded-full border border-tinta/15 bg-crema/70 p-0.5 text-xs font-semibold"
+      className="flex items-center rounded-full border border-carbon/15 bg-blanco/70 p-0.5 text-xs font-semibold"
     >
       {options.map((option) => (
         <button
@@ -27,8 +27,8 @@ function LanguageToggle() {
           aria-pressed={lang === option}
           className={`rounded-full px-2.5 py-1 uppercase tracking-wide transition-colors ${
             lang === option
-              ? 'bg-tinta text-crema'
-              : 'text-tinta-suave hover:text-tinta'
+              ? 'bg-carbon text-blanco'
+              : 'text-pizarra hover:text-carbon'
           }`}
         >
           {option}
@@ -52,27 +52,30 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || menuOpen
-          ? 'bg-crema/90 backdrop-blur-md shadow-[0_1px_0_0] shadow-tinta/10'
-          : 'bg-transparent'
+      className={`fixed inset-x-0 top-0 z-50 bg-blanco transition-shadow duration-300 ${
+        scrolled || menuOpen ? 'shadow-md shadow-carbon/10' : ''
       }`}
     >
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-8"
+        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 md:px-8"
       >
-        <a href="#top" className="flex items-center gap-2.5 shrink-0">
-          <img src="/relif-mark.svg" alt="" width="36" height="36" className="rounded-xl" />
-          <span className="font-display text-lg font-semibold leading-none">RELIF</span>
+        <a href="#top" className="shrink-0">
+          <img
+            src="/logo-relif.png"
+            alt="Red Latinoamericana de Innovación Frugal"
+            width="1997"
+            height="503"
+            className="h-10 w-auto md:h-12"
+          />
         </a>
 
-        <ul className="hidden lg:flex items-center gap-6 text-sm font-medium text-tinta-suave">
+        <ul className="hidden lg:flex items-center gap-6 text-sm font-medium text-pizarra">
           {sections.map((section) => (
             <li key={section.href}>
               <a
                 href={section.href}
-                className="transition-colors hover:text-terracota focus-visible:text-terracota"
+                className="transition-colors hover:text-teal focus-visible:text-teal"
               >
                 {t.nav[section.key]}
               </a>
@@ -84,13 +87,13 @@ export function Navbar() {
           <LanguageToggle />
           <a
             href="#unete"
-            className="hidden sm:inline-block rounded-full bg-terracota px-4 py-2 text-sm font-semibold text-crema transition-colors hover:bg-terracota-deep"
+            className="hidden sm:inline-block rounded-full bg-rojo px-4 py-2 text-sm font-bold text-blanco transition-colors hover:bg-naranja hover:text-carbon"
           >
             {t.nav.join}
           </a>
           <button
             type="button"
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-tinta/15"
+            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-carbon/15"
             aria-expanded={menuOpen}
             aria-label="Menu"
             onClick={() => setMenuOpen((open) => !open)}
@@ -105,16 +108,17 @@ export function Navbar() {
           </button>
         </div>
       </nav>
+      <span className="brand-stripe block h-1" aria-hidden="true" />
 
       {menuOpen ? (
-        <div className="lg:hidden border-t border-tinta/10 bg-crema/95 px-4 pb-6 pt-3 backdrop-blur-md">
+        <div className="lg:hidden border-t border-carbon/10 bg-blanco/95 px-4 pb-6 pt-3 backdrop-blur-md">
           <ul className="flex flex-col gap-1 text-base font-medium">
             {sections.map((section) => (
               <li key={section.href}>
                 <a
                   href={section.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block rounded-xl px-3 py-2.5 hover:bg-arena"
+                  className="block rounded-xl px-3 py-2.5 hover:bg-niebla"
                 >
                   {t.nav[section.key]}
                 </a>
@@ -124,7 +128,7 @@ export function Navbar() {
               <a
                 href="#unete"
                 onClick={() => setMenuOpen(false)}
-                className="mt-2 block rounded-xl bg-terracota px-3 py-2.5 text-center font-semibold text-crema"
+                className="mt-2 block rounded-xl bg-teal px-3 py-2.5 text-center font-semibold text-blanco"
               >
                 {t.nav.join}
               </a>

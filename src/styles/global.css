@@ -1,22 +1,24 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Warm editorial palette — crema paper, ink green, terracotta accent */
-  --color-crema: oklch(97.5% 0.015 85);
-  --color-arena: oklch(93% 0.025 85);
-  --color-tinta: oklch(24% 0.02 150);
-  --color-tinta-suave: oklch(38% 0.02 150);
-  --color-terracota: oklch(58% 0.14 40);
-  --color-terracota-deep: oklch(48% 0.14 38);
-  --color-verde: oklch(42% 0.08 155);
-  --color-verde-claro: oklch(90% 0.045 150);
-  --color-ambar: oklch(78% 0.14 80);
+  /* Official RELIF brand palette, extracted from redinnovacionfrugal.lat/css/main.css */
+  --color-teal: #168599;
+  --color-teal-deep: #0e6478;
+  --color-teal-tint: #e3f1f4;
+  --color-carbon: #203236;
+  --color-pizarra: #4d6a79;
+  --color-blanco: #ffffff;
+  --color-niebla: #f2f4f5;
+  --color-naranja: #f6a620;
+  --color-rojo: #e94824;
+  --color-verde: #8ebc41;
+  --color-verde-suave: #edf4e0;
 
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: 'Open Sans', system-ui, sans-serif;
 
-  --text-hero: clamp(2.75rem, 1rem + 6.5vw, 6.5rem);
-  --text-section: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+  --text-hero: clamp(2.6rem, 1rem + 6vw, 5.75rem);
+  --text-section: clamp(1.9rem, 1.2rem + 2.2vw, 3.1rem);
 
   --spacing-section: clamp(4.5rem, 3rem + 5vw, 9rem);
 
@@ -41,26 +43,26 @@ html {
 }
 
 body {
-  background: var(--color-crema);
-  color: var(--color-tinta);
+  background: var(--color-blanco);
+  color: var(--color-carbon);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--color-ambar);
-  color: var(--color-tinta);
+  background: var(--color-naranja);
+  color: var(--color-carbon);
 }
 
-/* Paper grain atmosphere over the whole page */
-.grain::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 60;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+/* Brand stripe — the four logo colors, used under the navbar and on covers */
+.brand-stripe {
+  background: linear-gradient(
+    to right,
+    var(--color-teal) 0 25%,
+    var(--color-verde) 25% 50%,
+    var(--color-naranja) 50% 75%,
+    var(--color-rojo) 75% 100%
+  );
 }
 
 /* Scrolling conveyor for member institutions */

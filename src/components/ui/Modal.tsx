@@ -4,10 +4,11 @@ interface ModalProps {
   open: boolean
   onClose: () => void
   labelledBy: string
+  wide?: boolean
   children: ReactNode
 }
 
-export function Modal({ open, onClose, labelledBy, children }: ModalProps) {
+export function Modal({ open, onClose, labelledBy, wide = false, children }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,14 +40,14 @@ export function Modal({ open, onClose, labelledBy, children }: ModalProps) {
         if (event.target === event.currentTarget) onClose()
       }}
     >
-      <div className="absolute inset-0 bg-tinta/60 backdrop-blur-sm" aria-hidden="true" />
+      <div className="absolute inset-0 bg-carbon/60 backdrop-blur-sm" aria-hidden="true" />
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
         tabIndex={-1}
-        className="relative w-full sm:max-w-2xl max-h-[88dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-crema shadow-2xl outline-none rise-in"
+        className={`relative w-full ${wide ? 'sm:max-w-4xl' : 'sm:max-w-2xl'} max-h-[88dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-blanco shadow-2xl outline-none rise-in`}
       >
         {children}
       </div>

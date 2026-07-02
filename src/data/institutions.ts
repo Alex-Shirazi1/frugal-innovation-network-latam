@@ -41,9 +41,9 @@ export const institutions: Institution[] = [
   { id: 'uao', name: 'Universidad Autónoma de Occidente', category: 'universidad', city: 'Cali', country: 'Colombia', url: 'https://www.uao.edu.co', coords: [3.35, -76.52] },
   { id: 'unad', name: 'Universidad Nacional Abierta y a Distancia (UNAD)', category: 'universidad', city: 'Bogotá', country: 'Colombia', url: 'https://www.unad.edu.co/', coords: [4.58, -74.11] },
   { id: 'usb-cali', name: 'Universidad de San Buenaventura', category: 'universidad', city: 'Cali', country: 'Colombia', url: 'https://usbcali.edu.co/', coords: [3.37, -76.55] },
-  { id: 'comillas', name: 'Universidad Pontificia de Comillas', category: 'universidad', city: 'Madrid', country: 'España', url: 'https://www.comillas.edu/' },
-  { id: 'utt', name: 'University of Technology of Troyes', category: 'universidad', city: 'Troyes', country: 'Francia', url: 'https://www.utt.fr/study-at-utt' },
-  { id: 'aalto', name: 'Aalto University', category: 'universidad', city: 'Espoo', country: 'Finlandia', url: 'https://www.aalto.fi/en' },
+  { id: 'comillas', name: 'Universidad Pontificia de Comillas', category: 'universidad', city: 'Madrid', country: 'España', url: 'https://www.comillas.edu/', coords: [40.42, -3.7] },
+  { id: 'utt', name: 'University of Technology of Troyes', category: 'universidad', city: 'Troyes', country: 'Francia', url: 'https://www.utt.fr/study-at-utt', coords: [48.3, 4.08] },
+  { id: 'aalto', name: 'Aalto University', category: 'universidad', city: 'Espoo', country: 'Finlandia', url: 'https://www.aalto.fi/en', coords: [60.19, 24.83] },
 
   { id: 'up-innovation', name: 'Up Innovation Consulting', category: 'consultora', city: 'Ciudad de México', country: 'México', url: 'https://www.upinnovation.mx/', coords: [19.43, -99.13] },
   { id: 'frugal-lab', name: 'Frugal Lab', category: 'consultora', city: 'Lima', country: 'Perú', url: 'https://www.linkedin.com/in/christianjbw/', coords: [-12.05, -77.03] },
@@ -52,7 +52,7 @@ export const institutions: Institution[] = [
   { id: 'acpo', name: 'Fundación Acción Cultural Popular (ACPO)', category: 'organizacion', city: 'Bogotá', country: 'Colombia', url: 'https://fundacionacpo.org/', coords: [4.61, -74.08] },
   { id: 'camara-verde', name: 'Cámara Verde de Comercio', category: 'organizacion', city: 'Bogotá', country: 'Colombia', url: 'https://camaraverde.org/', coords: [4.65, -74.05] },
   { id: 'rebrif', name: 'REBRIF · Rede Brasileira de Inovação Frugal', category: 'organizacion', city: 'Belo Horizonte', country: 'Brasil', url: 'https://redinnovacionfrugal.lat/rebrif.php', coords: [-19.92, -43.93] },
-  { id: 'world-entrepreneurs', name: 'World Entrepreneurs', category: 'organizacion', city: 'Ginebra', country: 'Suiza', url: 'https://worldentrepreneurs.org/' },
+  { id: 'world-entrepreneurs', name: 'World Entrepreneurs', category: 'organizacion', city: 'Ginebra', country: 'Suiza', url: 'https://worldentrepreneurs.org/', coords: [46.2, 6.14] },
 
   { id: 'ecoins', name: 'Ecoins', category: 'empresa', city: 'San José', country: 'Costa Rica', url: 'https://ecoins.eco/', coords: [9.93, -84.08] },
   { id: 'captanda', name: 'Captanda', category: 'empresa', city: 'Santiago', country: 'Chile', url: 'https://captanda.com/', coords: [-33.46, -70.65] },

@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#22301F"/>
-  <!-- frugal seed / spark: a leaf grown from a single dot -->
-  <circle cx="20" cy="44" r="5" fill="#E7A33B"/>
-  <path d="M24 40C30 26 42 18 52 16c-2 12-10 26-26 30-1-2-2-4-2-6z" fill="#C4622F"/>
-  <path d="M26 42c6-10 14-17 22-21" stroke="#F7F1E4" stroke-width="2.4" stroke-linecap="round"/>
-</svg>

@@ -4,43 +4,48 @@ export function Footer() {
   const { t } = useI18n()
 
   return (
-    <footer id="contacto" className="bg-tinta text-crema">
+    <footer id="contacto" className="bg-carbon text-blanco">
       <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
         <div className="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <img src="/relif-mark.svg" alt="" width="40" height="40" className="rounded-xl" />
-              <span className="font-display text-xl font-semibold">RELIF</span>
+            <div className="inline-block rounded-xl bg-blanco p-3">
+              <img
+                src="/logo-relif.png"
+                alt="Red Latinoamericana de Innovación Frugal"
+                width="1997"
+                height="503"
+                className="h-10 w-auto"
+              />
             </div>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-crema/70">{t.footer.tagline}</p>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-blanco/70">{t.footer.tagline}</p>
           </div>
 
           <nav aria-label={t.footer.sitemap}>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-ambar">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-naranja">
               {t.footer.sitemap}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-crema/80">
-              <li><a className="hover:text-ambar" href="#origen">{t.nav.origin}</a></li>
-              <li><a className="hover:text-ambar" href="#congreso">{t.nav.conference}</a></li>
-              <li><a className="hover:text-ambar" href="#mapa">{t.nav.map}</a></li>
-              <li><a className="hover:text-ambar" href="#miembros">{t.nav.members}</a></li>
-              <li><a className="hover:text-ambar" href="#recursos">{t.nav.library}</a></li>
+            <ul className="mt-4 space-y-2 text-sm text-blanco/80">
+              <li><a className="hover:text-naranja" href="#origen">{t.nav.origin}</a></li>
+              <li><a className="hover:text-naranja" href="#congreso">{t.nav.conference}</a></li>
+              <li><a className="hover:text-naranja" href="#mapa">{t.nav.map}</a></li>
+              <li><a className="hover:text-naranja" href="#miembros">{t.nav.members}</a></li>
+              <li><a className="hover:text-naranja" href="#recursos">{t.nav.library}</a></li>
             </ul>
           </nav>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-ambar">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-naranja">
               {t.footer.contact}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-crema/80">
+            <ul className="mt-4 space-y-2 text-sm text-blanco/80">
               <li>
-                <a className="hover:text-ambar" href="mailto:contacto@redinnovacionfrugal.lat">
+                <a className="hover:text-naranja" href="mailto:contacto@redinnovacionfrugal.lat">
                   contacto@redinnovacionfrugal.lat
                 </a>
               </li>
               <li>
                 <a
-                  className="hover:text-ambar"
+                  className="hover:text-naranja"
                   href="https://linktr.ee/redinnovacionfrugal"
                   target="_blank"
                   rel="noreferrer"
@@ -52,7 +57,7 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-12 border-t border-crema/15 pt-6 text-xs text-crema/50">
+        <p className="mt-12 border-t border-blanco/15 pt-6 text-xs text-blanco/50">
           © {new Date().getFullYear()} RELIF · {t.footer.rights}
         </p>
       </div>
