@@ -1,5 +1,7 @@
 # Red Latinoamericana de Innovación Frugal — Redesign
 
+🚀 **Live Demo:** [https://raif-af800.firebaseapp.com/](https://raif-af800.firebaseapp.com/)
+
 Modern React redesign of [redinnovacionfrugal.lat](https://redinnovacionfrugal.lat/), built fully **local-first** as an isolated dev environment.
 
 > ⚠️ **Guardrail:** this project never touches the live production site, its cPanel, or its APIs. All data is local mock data or content transcribed from public pages. Nothing here reads from or writes to the production backend.
