@@ -1,5 +1,5 @@
 import { useI18n } from '../../i18n/I18nContext'
-import { institutions, memberCountries } from '../../data/institutions'
+import { useApiData } from '../../api/ApiDataContext'
 
 const FOUNDING_YEAR = 2020
 
@@ -27,6 +27,7 @@ function LogoRing() {
 
 export function Hero() {
   const { t } = useI18n()
+  const { institutions, memberCountries } = useApiData()
   const years = new Date().getFullYear() - FOUNDING_YEAR
 
   const stats = [

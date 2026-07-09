@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
-import { institutionName, type Member } from '../../data/members'
-import { researchInterests } from '../../data/onboardingOptions'
+import { useApiData } from '../../api/ApiDataContext'
+import type { Member } from '../../api/types'
 
 interface MemberCardProps {
   member: Member
@@ -19,6 +19,7 @@ function initialsOf(fullName: string): string {
 
 export const MemberCard = memo(function MemberCard({ member, highlighted }: MemberCardProps) {
   const { lang, t } = useI18n()
+  const { institutionName, options } = useApiData()
   const affiliation = institutionName(member.affiliationId)
 
   return (
@@ -60,7 +61,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
 
       <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={t.directory.interests}>
         {member.interestIds.slice(0, 3).map((id) => {
-          const interest = researchInterests.find((entry) => entry.id === id)
+          const interest = options.researchInterests.find((entry) => entry.id === id)
           if (!interest) return null
           return (
             <li

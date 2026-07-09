@@ -1,14 +1,8 @@
 import { useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
+import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
-import {
-  agendaDay1,
-  agendaDay2,
-  speakers,
-  conferenceVideos,
-  galleryTiles,
-  type AgendaItem,
-} from '../../data/conference'
+import type { AgendaItem } from '../../api/types'
 
 type Tab = 'agenda' | 'speakers' | 'gallery' | 'videos'
 
@@ -41,6 +35,7 @@ function AgendaColumn({ label, items }: { label: string; items: AgendaItem[] }) 
 
 function SpeakerGrid() {
   const { lang } = useI18n()
+  const { conference: { speakers } } = useApiData()
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3">
       {speakers.map((speaker) => (
@@ -66,6 +61,7 @@ function SpeakerGrid() {
 
 function Gallery() {
   const { lang, t } = useI18n()
+  const { conference: { galleryTiles } } = useApiData()
   const spanClass = { wide: 'sm:col-span-2', tall: 'sm:row-span-2', square: '' } as const
   return (
     <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3 auto-rows-[minmax(7rem,1fr)]">
@@ -94,6 +90,7 @@ function Gallery() {
 
 function VideoWall() {
   const { lang, t } = useI18n()
+  const { conference: { conferenceVideos } } = useApiData()
   const [activeId, setActiveId] = useState<string | null>(null)
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -140,6 +137,7 @@ function VideoWall() {
 
 export function ConferenceArchive() {
   const { t } = useI18n()
+  const { conference: { agendaDay1, agendaDay2 } } = useApiData()
   const [tab, setTab] = useState<Tab>('agenda')
 
   const tabs: { id: Tab; label: string }[] = [

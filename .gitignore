@@ -28,3 +28,8 @@ dist-ssr
 serviceAccountKey*.json
 .firebase/
 firebase-debug.log
+
+# Backend runtime artifacts
+server/*.db
+server/*.db-journal
+.env

@@ -1,10 +1,8 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
-import { useDirectory } from '../../store/DirectoryContext'
+import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
-import { processIntake, type IntakeSubmission } from '../../lib/intake'
-import { institutions } from '../../data/institutions'
-import { countries, positionTypes, researchInterests, type PositionType } from '../../data/onboardingOptions'
+import type { IntakeSubmission, PositionType } from '../../api/types'
 
 type Errors = Partial<Record<'fullName' | 'position' | 'country' | 'region' | 'interests' | 'socialUrl', string>>
 
@@ -38,15 +36,15 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 
 export function OnboardingForm() {
   const { t, lang } = useI18n()
-  const { addMember } = useDirectory()
+  const { addMember, submitIntake, institutions, options } = useApiData()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<IntakeSubmission>(emptyForm)
   const [errors, setErrors] = useState<Errors>({})
   const [status, setStatus] = useState<'idle' | 'submitting' | 'done'>('idle')
 
   const regions = useMemo(
-    () => countries.find((c) => c.name === form.country)?.regions ?? [],
-    [form.country],
+    () => options.countries.find((c) => c.name === form.country)?.regions ?? [],
+    [options.countries, form.country],
   )
 
   function update<K extends keyof IntakeSubmission>(key: K, value: IntakeSubmission[K]) {
@@ -77,7 +75,7 @@ export function OnboardingForm() {
   async function submit() {
     if (!validateStep(2)) return
     setStatus('submitting')
-    const result = await processIntake(form)
+    const result = await submitIntake(form)
     if (result.success && result.data) {
       addMember(result.data)
       setStatus('done')
@@ -169,7 +167,7 @@ export function OnboardingForm() {
                     onChange={(event) => update('position', event.target.value as PositionType)}
                   >
                     <option value="" disabled>—</option>
-                    {positionTypes.map((type) => (
+                    {options.positionTypes.map((type) => (
                       <option key={type} value={type}>{t.onboarding.positions[type]}</option>
                     ))}
                   </select>
@@ -202,7 +200,7 @@ export function OnboardingForm() {
                       }}
                     >
                       <option value="" disabled>{t.onboarding.selectCountry}</option>
-                      {countries.map((country) => (
+                      {options.countries.map((country) => (
                         <option key={country.name} value={country.name}>{country.name}</option>
                       ))}
                     </select>
@@ -233,7 +231,7 @@ export function OnboardingForm() {
                     <p role="alert" className="mb-2 text-xs font-medium text-teal-deep">{errors.interests}</p>
                   ) : null}
                   <div className="flex flex-wrap gap-2">
-                    {researchInterests.map((interest) => {
+                    {options.researchInterests.map((interest) => {
                       const checked = form.interestIds.includes(interest.id)
                       return (
                         <label

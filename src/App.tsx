@@ -1,5 +1,5 @@
 import { I18nProvider } from './i18n/I18nContext'
-import { DirectoryProvider } from './store/DirectoryContext'
+import { ApiDataProvider } from './api/ApiDataContext'
 import { Navbar } from './components/layout/Navbar'
 import { Hero } from './components/hero/Hero'
 import { OriginSection } from './components/sections/OriginSection'
@@ -15,7 +15,7 @@ import { Footer } from './components/layout/Footer'
 export default function App() {
   return (
     <I18nProvider>
-      <DirectoryProvider>
+      <ApiDataProvider>
         <div className="grain">
           <Navbar />
           <main>
@@ -32,7 +32,7 @@ export default function App() {
           </main>
           <Footer />
         </div>
-      </DirectoryProvider>
+      </ApiDataProvider>
     </I18nProvider>
   )
 }

@@ -2,11 +2,8 @@ import { useMemo, useRef, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { SectionHeading } from '../ui/SectionHeading'
-import {
-  mappedInstitutions,
-  type Institution,
-  type InstitutionCategory,
-} from '../../data/institutions'
+import { useApiData } from '../../api/ApiDataContext'
+import type { Institution, InstitutionCategory } from '../../api/types'
 import { countryPaths, projectLatLon } from './geo'
 import {
   INITIAL_VIEW,
@@ -35,6 +32,7 @@ const PIN_PATH =
 
 export function NetworkMap() {
   const { t } = useI18n()
+  const { mappedInstitutions } = useApiData()
   const reducedMotion = useReducedMotion()
   const [view, setView] = useState<ViewState>(INITIAL_VIEW)
   const [active, setActive] = useState<Set<InstitutionCategory>>(new Set(allCategories))
@@ -45,7 +43,7 @@ export function NetworkMap() {
 
   const visibleNodes = useMemo(
     () => mappedInstitutions.filter((node) => active.has(node.category)),
-    [active],
+    [mappedInstitutions, active],
   )
 
   function animateTo(target: ViewState) {

@@ -1,25 +1,24 @@
-import type { Member } from '../data/members'
-import type { Localized } from '../data/conference'
-import { countries, researchInterests, type PositionType } from '../data/onboardingOptions'
+/**
+ * Bundled adapter: serves the data compiled into the app. Keeps the whole
+ * site fully functional with no backend (static hosting, offline dev) and
+ * acts as the automatic fallback when the HTTP source is unreachable.
+ * Intake submissions are validated locally and only live in page state.
+ */
+import { mockMembers } from '../../data/members'
+import { institutions } from '../../data/institutions'
+import { resources } from '../../data/resources'
+import {
+  agendaDay1,
+  agendaDay2,
+  conferenceVideos,
+  galleryTiles,
+  speakers,
+} from '../../data/conference'
+import { countries, positionTypes, researchInterests } from '../../data/onboardingOptions'
+import type { RelifDataSource } from '../dataSource'
+import type { IntakeResult, IntakeSubmission, Localized, Member, PositionType } from '../types'
 
-export interface IntakeSubmission {
-  fullName: string
-  position: PositionType | ''
-  affiliationId: string | null
-  country: string
-  region: string
-  interestIds: string[]
-  socialUrl: string
-  cvFileName: string | null
-}
-
-export interface IntakeResult {
-  success: boolean
-  data?: Member
-  error?: string
-}
-
-const SIMULATED_LATENCY_MS = 700
+const SIMULATED_LATENCY_MS = 400
 
 const positionTitles: Record<PositionType, Localized> = {
   staff: { es: 'Personal administrativo', en: 'Administrative staff', pt: 'Equipe administrativa' },
@@ -38,13 +37,8 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-/**
- * Mock intake API: validates a submission server-side-style and maps it into
- * a directory Member record. In production this becomes a POST to the intake
- * endpoint; the response shape (ApiResponse envelope) stays identical.
- * NOTE: nothing here ever talks to the live redinnovacionfrugal.lat backend.
- */
-export async function processIntake(submission: IntakeSubmission): Promise<IntakeResult> {
+/** Same rules as the server's validate.mjs — keep the two in lockstep. */
+export async function processIntakeLocally(submission: IntakeSubmission): Promise<IntakeResult> {
   await new Promise((resolve) => setTimeout(resolve, SIMULATED_LATENCY_MS))
 
   if (!submission.fullName.trim() || !submission.position) {
@@ -76,10 +70,18 @@ export async function processIntake(submission: IntakeSubmission): Promise<Intak
     region: submission.region,
     interestIds,
     socialUrl: submission.socialUrl || undefined,
-    avatarHue: Math.abs(
-      [...submission.fullName].reduce((acc, ch) => acc + ch.charCodeAt(0), 0),
-    ) % 360,
+    avatarHue:
+      Math.abs([...submission.fullName].reduce((acc, ch) => acc + ch.charCodeAt(0), 0)) % 360,
   }
 
   return { success: true, data: member }
+}
+
+export const bundledDataSource: RelifDataSource = {
+  getInstitutions: async () => institutions,
+  getMembers: async () => mockMembers,
+  getResources: async () => resources,
+  getConference: async () => ({ agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles }),
+  getOnboardingOptions: async () => ({ countries, positionTypes, researchInterests }),
+  submitIntake: processIntakeLocally,
 }

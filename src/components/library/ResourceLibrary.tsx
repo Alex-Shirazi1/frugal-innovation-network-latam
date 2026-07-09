@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Modal } from '../ui/Modal'
-import { resources, type Resource } from '../../data/resources'
+import { useApiData } from '../../api/ApiDataContext'
+import type { Resource } from '../../api/types'
 
 const typeStyles: Record<Resource['type'], string> = {
   PDF: 'bg-teal/10 text-teal-deep',
@@ -184,6 +185,7 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
 
 export function ResourceLibrary() {
   const { lang, t } = useI18n()
+  const { resources } = useApiData()
   const [query, setQuery] = useState('')
   const [previewing, setPreviewing] = useState<Resource | null>(null)
 
@@ -196,7 +198,7 @@ export function ResourceLibrary() {
         .toLowerCase()
         .includes(q),
     )
-  }, [query])
+  }, [resources, query])
 
   return (
     <section id="recursos" aria-labelledby="recursos-heading" className="py-(--spacing-section)">

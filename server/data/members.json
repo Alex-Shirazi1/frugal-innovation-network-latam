@@ -1,0 +1,848 @@
+[
+  {
+    "id": "mock-0",
+    "fullName": "Valentina Miranda Navarro",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "faculty",
+    "affiliationId": "iteso",
+    "country": "México",
+    "region": "Guadalajara",
+    "interestIds": [
+      "metodologias",
+      "salud"
+    ],
+    "socialUrl": "https://linkedin.com/in/valentina-miranda",
+    "avatarHue": 0
+  },
+  {
+    "id": "mock-1",
+    "fullName": "Mateo Ríos Ibarra",
+    "title": "Profesor de Ingeniería",
+    "position": "researcher",
+    "affiliationId": "uca-ni",
+    "country": "Nicaragua",
+    "region": "Managua",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion"
+    ],
+    "socialUrl": "https://scholar.example.org/mateo-ríos",
+    "avatarHue": 47
+  },
+  {
+    "id": "mock-2",
+    "fullName": "Camila Vergara Cortés",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "staff",
+    "affiliationId": "ibero-leon",
+    "country": "México",
+    "region": "León",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias",
+      "politicas"
+    ],
+    "avatarHue": 94
+  },
+  {
+    "id": "mock-3",
+    "fullName": "Santiago Bustos Quintero",
+    "title": "Consultor en Innovación Social",
+    "position": "administrator",
+    "affiliationId": "uic",
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "politicas",
+      "economia-circular"
+    ],
+    "socialUrl": "https://linkedin.com/in/santiago-bustos",
+    "avatarHue": 141
+  },
+  {
+    "id": "mock-4",
+    "fullName": "Lucía Cortés Ferreira",
+    "title": "Coordinadora de Vinculación",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno"
+    ],
+    "socialUrl": "https://scholar.example.org/lucía-cortés",
+    "avatarHue": 188
+  },
+  {
+    "id": "mock-5",
+    "fullName": "Sebastián Campos Ríos",
+    "title": "Estudiante de Doctorado",
+    "position": "researcher",
+    "affiliationId": "utt",
+    "country": "Francia",
+    "region": "Troyes",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion",
+      "energia"
+    ],
+    "avatarHue": 235
+  },
+  {
+    "id": "mock-6",
+    "fullName": "Isabella Cabrera Zamora",
+    "title": "Director de Emprendimiento",
+    "position": "staff",
+    "affiliationId": "acpo",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "energia",
+      "manufactura"
+    ],
+    "socialUrl": "https://linkedin.com/in/isabella-cabrera",
+    "avatarHue": 282
+  },
+  {
+    "id": "mock-7",
+    "fullName": "Diego Arriaga Aguilar",
+    "title": "Mtra. en Políticas Públicas",
+    "position": "administrator",
+    "affiliationId": "captanda",
+    "country": "Chile",
+    "region": "Santiago",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua"
+    ],
+    "socialUrl": "https://scholar.example.org/diego-arriaga",
+    "avatarHue": 329
+  },
+  {
+    "id": "mock-8",
+    "fullName": "Mariana Aguilar Molina",
+    "title": "Ingeniero de Producto",
+    "position": "faculty",
+    "affiliationId": "ucc",
+    "country": "Argentina",
+    "region": "Córdoba",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno",
+      "emprendimiento"
+    ],
+    "avatarHue": 16
+  },
+  {
+    "id": "mock-9",
+    "fullName": "Joaquín Delgado Restrepo",
+    "title": "Gestora de Proyectos Sociales",
+    "position": "researcher",
+    "affiliationId": "esan",
+    "country": "Perú",
+    "region": "Lima",
+    "interestIds": [
+      "emprendimiento",
+      "agro"
+    ],
+    "socialUrl": "https://linkedin.com/in/joaquín-delgado",
+    "avatarHue": 63
+  },
+  {
+    "id": "mock-10",
+    "fullName": "Fernanda Ochoa Campos",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "staff",
+    "affiliationId": "ibero-tijuana",
+    "country": "México",
+    "region": "Tijuana",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias"
+    ],
+    "socialUrl": "https://scholar.example.org/fernanda-ochoa",
+    "avatarHue": 110
+  },
+  {
+    "id": "mock-11",
+    "fullName": "Emiliano Ferreira Escobar",
+    "title": "Profesor de Ingeniería",
+    "position": "administrator",
+    "affiliationId": "duoc",
+    "country": "Chile",
+    "region": "Santiago",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua",
+      "metodologias"
+    ],
+    "avatarHue": 157
+  },
+  {
+    "id": "mock-12",
+    "fullName": "Antonia Paredes Paredes",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "faculty",
+    "affiliationId": "usb-cali",
+    "country": "Colombia",
+    "region": "Cali",
+    "interestIds": [
+      "metodologias",
+      "salud"
+    ],
+    "socialUrl": "https://linkedin.com/in/antonia-paredes",
+    "avatarHue": 204
+  },
+  {
+    "id": "mock-13",
+    "fullName": "Tomás Peña Vergara",
+    "title": "Consultor en Innovación Social",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion"
+    ],
+    "socialUrl": "https://scholar.example.org/tomás-peña",
+    "avatarHue": 251
+  },
+  {
+    "id": "mock-14",
+    "fullName": "Renata Ibarra Fuentes",
+    "title": "Coordinadora de Vinculación",
+    "position": "staff",
+    "affiliationId": "world-entrepreneurs",
+    "country": "Suiza",
+    "region": "Ginebra",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias",
+      "politicas"
+    ],
+    "avatarHue": 298
+  },
+  {
+    "id": "mock-15",
+    "fullName": "Gabriel Restrepo Delgado",
+    "title": "Estudiante de Doctorado",
+    "position": "administrator",
+    "affiliationId": "javeriana",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "politicas",
+      "economia-circular"
+    ],
+    "socialUrl": "https://linkedin.com/in/gabriel-restrepo",
+    "avatarHue": 345
+  },
+  {
+    "id": "mock-16",
+    "fullName": "Ximena Villanueva Tapia",
+    "title": "Director de Emprendimiento",
+    "position": "faculty",
+    "affiliationId": "scu",
+    "country": "Estados Unidos",
+    "region": "Santa Clara",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno"
+    ],
+    "socialUrl": "https://scholar.example.org/ximena-villanueva",
+    "avatarHue": 32
+  },
+  {
+    "id": "mock-17",
+    "fullName": "Andrés Sandoval Villanueva",
+    "title": "Mtra. en Políticas Públicas",
+    "position": "researcher",
+    "affiliationId": "ibero-puebla",
+    "country": "México",
+    "region": "Puebla",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion",
+      "energia"
+    ],
+    "avatarHue": 79
+  },
+  {
+    "id": "mock-18",
+    "fullName": "Paula Zamora Cabrera",
+    "title": "Ingeniero de Producto",
+    "position": "staff",
+    "affiliationId": "ubiobio",
+    "country": "Chile",
+    "region": "Concepción",
+    "interestIds": [
+      "energia",
+      "manufactura"
+    ],
+    "socialUrl": "https://linkedin.com/in/paula-zamora",
+    "avatarHue": 126
+  },
+  {
+    "id": "mock-19",
+    "fullName": "Rodrigo Fuentes Salazar",
+    "title": "Gestora de Proyectos Sociales",
+    "position": "administrator",
+    "affiliationId": "uao",
+    "country": "Colombia",
+    "region": "Cali",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua"
+    ],
+    "socialUrl": "https://scholar.example.org/rodrigo-fuentes",
+    "avatarHue": 173
+  },
+  {
+    "id": "mock-20",
+    "fullName": "Daniela Herrera Peña",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "faculty",
+    "affiliationId": "aalto",
+    "country": "Finlandia",
+    "region": "Espoo",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno",
+      "emprendimiento"
+    ],
+    "avatarHue": 220
+  },
+  {
+    "id": "mock-21",
+    "fullName": "Felipe Quintero Bustos",
+    "title": "Profesor de Ingeniería",
+    "position": "researcher",
+    "affiliationId": "camara-verde",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "emprendimiento",
+      "agro"
+    ],
+    "socialUrl": "https://linkedin.com/in/felipe-quintero",
+    "avatarHue": 267
+  },
+  {
+    "id": "mock-22",
+    "fullName": "Carolina Escobar Herrera",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias"
+    ],
+    "socialUrl": "https://scholar.example.org/carolina-escobar",
+    "avatarHue": 314
+  },
+  {
+    "id": "mock-23",
+    "fullName": "Nicolás Salazar Ochoa",
+    "title": "Consultor en Innovación Social",
+    "position": "administrator",
+    "affiliationId": "uca-sv",
+    "country": "El Salvador",
+    "region": "San Salvador",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua",
+      "metodologias"
+    ],
+    "avatarHue": 1
+  },
+  {
+    "id": "mock-24",
+    "fullName": "Alejandra Navarro Miranda",
+    "title": "Coordinadora de Vinculación",
+    "position": "faculty",
+    "affiliationId": "ibero-cdmx",
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "metodologias",
+      "salud"
+    ],
+    "socialUrl": "https://linkedin.com/in/alejandra-navarro",
+    "avatarHue": 48
+  },
+  {
+    "id": "mock-25",
+    "fullName": "Bruno Molina Sandoval",
+    "title": "Estudiante de Doctorado",
+    "position": "researcher",
+    "affiliationId": "uas",
+    "country": "México",
+    "region": "Culiacán",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion"
+    ],
+    "socialUrl": "https://scholar.example.org/bruno-molina",
+    "avatarHue": 95
+  },
+  {
+    "id": "mock-26",
+    "fullName": "Julieta Tapia Arriaga",
+    "title": "Director de Emprendimiento",
+    "position": "staff",
+    "affiliationId": "ufmg",
+    "country": "Brasil",
+    "region": "Belo Horizonte",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias",
+      "politicas"
+    ],
+    "avatarHue": 142
+  },
+  {
+    "id": "mock-27",
+    "fullName": "Valentina Miranda Navarro",
+    "title": "Mtra. en Políticas Públicas",
+    "position": "administrator",
+    "affiliationId": "comillas",
+    "country": "España",
+    "region": "Madrid",
+    "interestIds": [
+      "politicas",
+      "economia-circular"
+    ],
+    "socialUrl": "https://linkedin.com/in/valentina-miranda",
+    "avatarHue": 189
+  },
+  {
+    "id": "mock-28",
+    "fullName": "Mateo Ríos Ibarra",
+    "title": "Ingeniero de Producto",
+    "position": "faculty",
+    "affiliationId": "innodeva",
+    "country": "Brasil",
+    "region": "São Paulo",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno"
+    ],
+    "socialUrl": "https://scholar.example.org/mateo-ríos",
+    "avatarHue": 236
+  },
+  {
+    "id": "mock-29",
+    "fullName": "Camila Vergara Cortés",
+    "title": "Gestora de Proyectos Sociales",
+    "position": "researcher",
+    "affiliationId": "ecoins",
+    "country": "Costa Rica",
+    "region": "San José",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion",
+      "energia"
+    ],
+    "avatarHue": 283
+  },
+  {
+    "id": "mock-30",
+    "fullName": "Santiago Bustos Quintero",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "staff",
+    "affiliationId": "javeriana-cali",
+    "country": "Colombia",
+    "region": "Cali",
+    "interestIds": [
+      "energia",
+      "manufactura"
+    ],
+    "socialUrl": "https://linkedin.com/in/santiago-bustos",
+    "avatarHue": 330
+  },
+  {
+    "id": "mock-31",
+    "fullName": "Lucía Cortés Ferreira",
+    "title": "Profesor de Ingeniería",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua"
+    ],
+    "socialUrl": "https://scholar.example.org/lucía-cortés",
+    "avatarHue": 17
+  },
+  {
+    "id": "mock-32",
+    "fullName": "Sebastián Campos Ríos",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "faculty",
+    "affiliationId": "ibero-torreon",
+    "country": "México",
+    "region": "Torreón",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno",
+      "emprendimiento"
+    ],
+    "avatarHue": 64
+  },
+  {
+    "id": "mock-33",
+    "fullName": "Isabella Cabrera Zamora",
+    "title": "Consultor en Innovación Social",
+    "position": "researcher",
+    "affiliationId": "usach",
+    "country": "Chile",
+    "region": "Santiago",
+    "interestIds": [
+      "emprendimiento",
+      "agro"
+    ],
+    "socialUrl": "https://linkedin.com/in/isabella-cabrera",
+    "avatarHue": 111
+  },
+  {
+    "id": "mock-34",
+    "fullName": "Diego Arriaga Aguilar",
+    "title": "Coordinadora de Vinculación",
+    "position": "staff",
+    "affiliationId": "unad",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias"
+    ],
+    "socialUrl": "https://scholar.example.org/diego-arriaga",
+    "avatarHue": 158
+  },
+  {
+    "id": "mock-35",
+    "fullName": "Mariana Aguilar Molina",
+    "title": "Estudiante de Doctorado",
+    "position": "administrator",
+    "affiliationId": "up-innovation",
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua",
+      "metodologias"
+    ],
+    "avatarHue": 205
+  },
+  {
+    "id": "mock-36",
+    "fullName": "Joaquín Delgado Restrepo",
+    "title": "Director de Emprendimiento",
+    "position": "faculty",
+    "affiliationId": "rebrif",
+    "country": "Brasil",
+    "region": "Belo Horizonte",
+    "interestIds": [
+      "metodologias",
+      "salud"
+    ],
+    "socialUrl": "https://linkedin.com/in/joaquín-delgado",
+    "avatarHue": 252
+  },
+  {
+    "id": "mock-37",
+    "fullName": "Fernanda Ochoa Campos",
+    "title": "Mtra. en Políticas Públicas",
+    "position": "researcher",
+    "affiliationId": "iteso",
+    "country": "México",
+    "region": "Guadalajara",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion"
+    ],
+    "socialUrl": "https://scholar.example.org/fernanda-ochoa",
+    "avatarHue": 299
+  },
+  {
+    "id": "mock-38",
+    "fullName": "Emiliano Ferreira Escobar",
+    "title": "Ingeniero de Producto",
+    "position": "staff",
+    "affiliationId": "uca-ni",
+    "country": "Nicaragua",
+    "region": "Managua",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias",
+      "politicas"
+    ],
+    "avatarHue": 346
+  },
+  {
+    "id": "mock-39",
+    "fullName": "Antonia Paredes Paredes",
+    "title": "Gestora de Proyectos Sociales",
+    "position": "administrator",
+    "affiliationId": "ibero-leon",
+    "country": "México",
+    "region": "León",
+    "interestIds": [
+      "politicas",
+      "economia-circular"
+    ],
+    "socialUrl": "https://linkedin.com/in/antonia-paredes",
+    "avatarHue": 33
+  },
+  {
+    "id": "mock-40",
+    "fullName": "Tomás Peña Vergara",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno"
+    ],
+    "socialUrl": "https://scholar.example.org/tomás-peña",
+    "avatarHue": 80
+  },
+  {
+    "id": "mock-41",
+    "fullName": "Renata Ibarra Fuentes",
+    "title": "Profesor de Ingeniería",
+    "position": "researcher",
+    "affiliationId": "uarm",
+    "country": "Perú",
+    "region": "Lima",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion",
+      "energia"
+    ],
+    "avatarHue": 127
+  },
+  {
+    "id": "mock-42",
+    "fullName": "Gabriel Restrepo Delgado",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "staff",
+    "affiliationId": "utt",
+    "country": "Francia",
+    "region": "Troyes",
+    "interestIds": [
+      "energia",
+      "manufactura"
+    ],
+    "socialUrl": "https://linkedin.com/in/gabriel-restrepo",
+    "avatarHue": 174
+  },
+  {
+    "id": "mock-43",
+    "fullName": "Ximena Villanueva Tapia",
+    "title": "Consultor en Innovación Social",
+    "position": "administrator",
+    "affiliationId": "acpo",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua"
+    ],
+    "socialUrl": "https://scholar.example.org/ximena-villanueva",
+    "avatarHue": 221
+  },
+  {
+    "id": "mock-44",
+    "fullName": "Andrés Sandoval Villanueva",
+    "title": "Coordinadora de Vinculación",
+    "position": "faculty",
+    "affiliationId": "captanda",
+    "country": "Chile",
+    "region": "Santiago",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno",
+      "emprendimiento"
+    ],
+    "avatarHue": 268
+  },
+  {
+    "id": "mock-45",
+    "fullName": "Paula Zamora Cabrera",
+    "title": "Estudiante de Doctorado",
+    "position": "researcher",
+    "affiliationId": "ucc",
+    "country": "Argentina",
+    "region": "Córdoba",
+    "interestIds": [
+      "emprendimiento",
+      "agro"
+    ],
+    "socialUrl": "https://linkedin.com/in/paula-zamora",
+    "avatarHue": 315
+  },
+  {
+    "id": "mock-46",
+    "fullName": "Rodrigo Fuentes Salazar",
+    "title": "Director de Emprendimiento",
+    "position": "staff",
+    "affiliationId": "esan",
+    "country": "Perú",
+    "region": "Lima",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias"
+    ],
+    "socialUrl": "https://scholar.example.org/rodrigo-fuentes",
+    "avatarHue": 2
+  },
+  {
+    "id": "mock-47",
+    "fullName": "Daniela Herrera Peña",
+    "title": "Mtra. en Políticas Públicas",
+    "position": "administrator",
+    "affiliationId": "ibero-tijuana",
+    "country": "México",
+    "region": "Tijuana",
+    "interestIds": [
+      "politicas",
+      "economia-circular",
+      "agua",
+      "metodologias"
+    ],
+    "avatarHue": 49
+  },
+  {
+    "id": "mock-48",
+    "fullName": "Felipe Quintero Bustos",
+    "title": "Ingeniero de Producto",
+    "position": "faculty",
+    "affiliationId": "duoc",
+    "country": "Chile",
+    "region": "Santiago",
+    "interestIds": [
+      "metodologias",
+      "salud"
+    ],
+    "socialUrl": "https://linkedin.com/in/felipe-quintero",
+    "avatarHue": 96
+  },
+  {
+    "id": "mock-49",
+    "fullName": "Carolina Escobar Herrera",
+    "title": "Gestora de Proyectos Sociales",
+    "position": "independent",
+    "affiliationId": null,
+    "country": "México",
+    "region": "Ciudad de México",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion"
+    ],
+    "socialUrl": "https://scholar.example.org/carolina-escobar",
+    "avatarHue": 143
+  },
+  {
+    "id": "mock-50",
+    "fullName": "Nicolás Salazar Ochoa",
+    "title": "Dra. en Diseño e Innovación",
+    "position": "staff",
+    "affiliationId": "frugal-lab",
+    "country": "Perú",
+    "region": "Lima",
+    "interestIds": [
+      "energia",
+      "manufactura",
+      "tecnologias",
+      "politicas"
+    ],
+    "avatarHue": 190
+  },
+  {
+    "id": "mock-51",
+    "fullName": "Alejandra Navarro Miranda",
+    "title": "Profesor de Ingeniería",
+    "position": "administrator",
+    "affiliationId": "world-entrepreneurs",
+    "country": "Suiza",
+    "region": "Ginebra",
+    "interestIds": [
+      "politicas",
+      "economia-circular"
+    ],
+    "socialUrl": "https://linkedin.com/in/alejandra-navarro",
+    "avatarHue": 237
+  },
+  {
+    "id": "mock-52",
+    "fullName": "Bruno Molina Sandoval",
+    "title": "Investigadora en Sostenibilidad",
+    "position": "faculty",
+    "affiliationId": "javeriana",
+    "country": "Colombia",
+    "region": "Bogotá",
+    "interestIds": [
+      "metodologias",
+      "salud",
+      "diseno"
+    ],
+    "socialUrl": "https://scholar.example.org/bruno-molina",
+    "avatarHue": 284
+  },
+  {
+    "id": "mock-53",
+    "fullName": "Julieta Tapia Arriaga",
+    "title": "Consultor en Innovación Social",
+    "position": "researcher",
+    "affiliationId": "scu",
+    "country": "Estados Unidos",
+    "region": "Santa Clara",
+    "interestIds": [
+      "emprendimiento",
+      "agro",
+      "educacion",
+      "energia"
+    ],
+    "avatarHue": 331
+  }
+]

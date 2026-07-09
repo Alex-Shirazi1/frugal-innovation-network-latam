@@ -1,16 +1,15 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
-import { useDirectory } from '../../store/DirectoryContext'
+import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { MemberCard } from './MemberCard'
-import { institutions } from '../../data/institutions'
-import { institutionName } from '../../data/members'
-import { researchInterests, type PositionType } from '../../data/onboardingOptions'
+import type { PositionType } from '../../api/types'
 
 type PositionFilter = PositionType | 'all'
 
 function InstitutionConveyor() {
   const { t } = useI18n()
+  const { institutions } = useApiData()
   // Track is duplicated so the loop is seamless; aria-hidden on the copy.
   const names = institutions.map((i) => i.name)
   return (
@@ -35,7 +34,7 @@ function InstitutionConveyor() {
 
 export function MemberDirectory() {
   const { t, lang } = useI18n()
-  const { members, lastAddedId } = useDirectory()
+  const { members, lastAddedId, institutionName, options } = useApiData()
   const [query, setQuery] = useState('')
   const [position, setPosition] = useState<PositionFilter>('all')
   const deferredQuery = useDeferredValue(query)
@@ -47,7 +46,7 @@ export function MemberDirectory() {
       if (!q) return true
       const interests = member.interestIds
         .map((id) => {
-          const interest = researchInterests.find((entry) => entry.id === id)
+          const interest = options.researchInterests.find((entry) => entry.id === id)
           return interest ? `${interest.es} ${interest.en}` : ''
         })
         .join(' ')
@@ -56,7 +55,7 @@ export function MemberDirectory() {
         .toLowerCase()
         .includes(q)
     })
-  }, [members, deferredQuery, position])
+  }, [members, deferredQuery, position, options.researchInterests, institutionName])
 
   const positionFilters: PositionFilter[] = [
     'all',
