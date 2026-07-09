@@ -56,9 +56,10 @@ export function Navbar() {
         scrolled || menuOpen ? 'shadow-md shadow-carbon/10' : ''
       }`}
     >
+      {/* Fixed height so switching languages never changes the bar's size */}
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 md:px-8"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-18 md:px-8"
       >
         <a href="#top" className="shrink-0">
           <img
@@ -70,12 +71,12 @@ export function Navbar() {
           />
         </a>
 
-        <ul className="hidden lg:flex items-center gap-6 text-sm font-medium text-pizarra">
+        <ul className="hidden xl:flex items-center gap-5 text-sm font-medium text-pizarra">
           {sections.map((section) => (
             <li key={section.href}>
               <a
                 href={section.href}
-                className="transition-colors hover:text-teal focus-visible:text-teal"
+                className="whitespace-nowrap transition-colors hover:text-teal focus-visible:text-teal"
               >
                 {t.nav[section.key]}
               </a>
@@ -87,13 +88,13 @@ export function Navbar() {
           <LanguageToggle />
           <a
             href="#unete"
-            className="hidden sm:inline-block rounded-full bg-rojo px-4 py-2 text-sm font-bold text-blanco transition-colors hover:bg-naranja hover:text-carbon"
+            className="hidden sm:inline-block whitespace-nowrap rounded-full bg-rojo px-4 py-2 text-sm font-bold text-blanco transition-colors hover:bg-naranja hover:text-carbon"
           >
             {t.nav.join}
           </a>
           <button
             type="button"
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-carbon/15"
+            className="xl:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-carbon/15"
             aria-expanded={menuOpen}
             aria-label="Menu"
             onClick={() => setMenuOpen((open) => !open)}
@@ -111,7 +112,7 @@ export function Navbar() {
       <span className="brand-stripe block h-1" aria-hidden="true" />
 
       {menuOpen ? (
-        <div className="lg:hidden border-t border-carbon/10 bg-blanco/95 px-4 pb-6 pt-3 backdrop-blur-md">
+        <div className="xl:hidden border-t border-carbon/10 bg-blanco/95 px-4 pb-6 pt-3 backdrop-blur-md">
           <ul className="flex flex-col gap-1 text-base font-medium">
             {sections.map((section) => (
               <li key={section.href}>

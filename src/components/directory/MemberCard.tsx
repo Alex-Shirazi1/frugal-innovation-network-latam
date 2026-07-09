@@ -41,7 +41,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
         </span>
         <div className="min-w-0">
           <h3 className="truncate font-semibold leading-snug">{member.fullName}</h3>
-          <p className="truncate text-xs text-pizarra">{member.title}</p>
+          <p className="truncate text-xs text-pizarra">{member.title[lang]}</p>
         </div>
       </div>
 

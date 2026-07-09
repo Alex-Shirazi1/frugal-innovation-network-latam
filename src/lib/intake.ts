@@ -1,4 +1,5 @@
 import type { Member } from '../data/members'
+import type { Localized } from '../data/conference'
 import { countries, researchInterests, type PositionType } from '../data/onboardingOptions'
 
 export interface IntakeSubmission {
@@ -20,12 +21,12 @@ export interface IntakeResult {
 
 const SIMULATED_LATENCY_MS = 700
 
-const positionTitles: Record<PositionType, string> = {
-  staff: 'Personal administrativo',
-  faculty: 'Docente',
-  researcher: 'Investigador/a',
-  administrator: 'Directivo/a',
-  independent: 'Miembro independiente',
+const positionTitles: Record<PositionType, Localized> = {
+  staff: { es: 'Personal administrativo', en: 'Administrative staff', pt: 'Equipe administrativa' },
+  faculty: { es: 'Docente', en: 'Faculty', pt: 'Docente' },
+  researcher: { es: 'Investigador/a', en: 'Researcher', pt: 'Pesquisador/a' },
+  administrator: { es: 'Directivo/a', en: 'Administrator', pt: 'Gestor/a' },
+  independent: { es: 'Miembro independiente', en: 'Independent member', pt: 'Membro independente' },
 }
 
 function isValidUrl(value: string): boolean {

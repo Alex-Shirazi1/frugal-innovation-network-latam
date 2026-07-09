@@ -1,10 +1,11 @@
 import { institutions } from './institutions'
 import { researchInterests, type PositionType } from './onboardingOptions'
+import type { Localized } from './conference'
 
 export interface Member {
   id: string
   fullName: string
-  title: string
+  title: Localized
   position: PositionType
   /** Institution id, or null for independent members */
   affiliationId: string | null
@@ -35,17 +36,17 @@ const lastNames = [
   'Zamora', 'Escobar', 'Tapia', 'Bustos', 'Arriaga', 'Ferreira',
 ]
 
-const titlesEs = [
-  'Dra. en Diseño e Innovación',
-  'Profesor de Ingeniería',
-  'Investigadora en Sostenibilidad',
-  'Consultor en Innovación Social',
-  'Coordinadora de Vinculación',
-  'Estudiante de Doctorado',
-  'Director de Emprendimiento',
-  'Mtra. en Políticas Públicas',
-  'Ingeniero de Producto',
-  'Gestora de Proyectos Sociales',
+const titles: Localized[] = [
+  { es: 'Dra. en Diseño e Innovación', en: 'PhD in Design & Innovation', pt: 'Dra. em Design e Inovação' },
+  { es: 'Profesor de Ingeniería', en: 'Professor of Engineering', pt: 'Professor de Engenharia' },
+  { es: 'Investigadora en Sostenibilidad', en: 'Sustainability Researcher', pt: 'Pesquisadora em Sustentabilidade' },
+  { es: 'Consultor en Innovación Social', en: 'Social Innovation Consultant', pt: 'Consultor em Inovação Social' },
+  { es: 'Coordinadora de Vinculación', en: 'Outreach Coordinator', pt: 'Coordenadora de Articulação' },
+  { es: 'Estudiante de Doctorado', en: 'Doctoral Student', pt: 'Doutorando' },
+  { es: 'Director de Emprendimiento', en: 'Director of Entrepreneurship', pt: 'Diretor de Empreendedorismo' },
+  { es: 'Mtra. en Políticas Públicas', en: 'MA in Public Policy', pt: 'Mestra em Políticas Públicas' },
+  { es: 'Ingeniero de Producto', en: 'Product Engineer', pt: 'Engenheiro de Produto' },
+  { es: 'Gestora de Proyectos Sociales', en: 'Social Projects Manager', pt: 'Gestora de Projetos Sociais' },
 ]
 
 const anchoredInstitutions = institutions.filter((i) => i.coords !== undefined)
@@ -78,7 +79,7 @@ function buildMember(index: number): Member {
   return {
     id: `mock-${index}`,
     fullName: `${first} ${last} ${secondLast}`,
-    title: titlesEs[index % titlesEs.length],
+    title: titles[index % titles.length],
     position,
     affiliationId: institution?.id ?? null,
     country: institution?.country ?? 'México',

@@ -51,7 +51,7 @@ export function MemberDirectory() {
           return interest ? `${interest.es} ${interest.en}` : ''
         })
         .join(' ')
-      return [member.fullName, member.title, institutionName(member.affiliationId) ?? '', member.country, interests]
+      return [member.fullName, member.title.es, member.title.en, member.title.pt, institutionName(member.affiliationId) ?? '', member.country, interests]
         .join(' ')
         .toLowerCase()
         .includes(q)

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Modal } from '../ui/Modal'
@@ -20,7 +20,7 @@ const typeCoverColors: Record<Resource['type'], string> = {
 
 /** Stylized A4 cover sheet standing in for the real PDF's first page. */
 function DocumentCover({ resource }: { resource: Resource }) {
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   const accent = typeCoverColors[resource.type]
   return (
     <div className="relative mx-auto aspect-210/297 w-full max-w-xs overflow-hidden rounded-lg bg-white shadow-[0_12px_40px_-12px_rgba(32,50,54,0.45)] ring-1 ring-carbon/10">
@@ -50,7 +50,7 @@ function DocumentCover({ resource }: { resource: Resource }) {
             className="rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
             style={{ background: accent }}
           >
-            {resource.type} · {resource.language}
+            {t.library.types[resource.type]} · {resource.language}
           </span>
         </div>
       </div>
@@ -60,11 +60,31 @@ function DocumentCover({ resource }: { resource: Resource }) {
 
 function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
   const { lang, t } = useI18n()
+  // Only embed the live PDF viewer when the file actually exists and is a PDF —
+  // the dev server answers missing paths with the SPA's HTML, so check the type.
+  const [fileState, setFileState] = useState<'checking' | 'ready' | 'missing'>('checking')
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(resource.file, { method: 'HEAD' })
+      .then((response) => {
+        const isPdf =
+          response.ok && (response.headers.get('content-type') ?? '').includes('pdf')
+        if (!cancelled) setFileState(isPdf ? 'ready' : 'missing')
+      })
+      .catch(() => {
+        if (!cancelled) setFileState('missing')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [resource.file])
+
   const metadata = [
     { label: t.library.colAuthor, value: resource.author },
     { label: t.library.colYear, value: String(resource.year) },
     { label: t.library.colLanguage, value: resource.language },
-    { label: t.library.colType, value: resource.type },
+    { label: t.library.colType, value: t.library.types[resource.type] },
   ]
   return (
     <Modal open onClose={onClose} labelledBy="resource-preview-title" wide>
@@ -85,10 +105,34 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
       </div>
 
       <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] md:p-10">
-        {/* Cover preview */}
-        <div className="rounded-2xl bg-niebla p-6 md:p-8">
-          <DocumentCover resource={resource} />
-        </div>
+        {/* Document pane: embedded scrollable PDF when the file exists, styled cover otherwise */}
+        {fileState === 'ready' ? (
+          <div className="flex flex-col gap-2.5">
+            <object
+              data={resource.file}
+              type="application/pdf"
+              aria-label={resource.title[lang]}
+              className="h-[420px] w-full overflow-hidden rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[560px]"
+            >
+              <DocumentCover resource={resource} />
+            </object>
+            <a
+              href={resource.file}
+              target="_blank"
+              rel="noreferrer"
+              className="text-center text-xs font-semibold text-teal hover:underline"
+            >
+              ↗ {t.library.openInNewTab}
+            </a>
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-niebla p-6 md:p-8">
+            <DocumentCover resource={resource} />
+            {fileState === 'missing' ? (
+              <p className="mt-4 text-center text-xs text-pizarra">{t.library.previewMissing}</p>
+            ) : null}
+          </div>
+        )}
 
         {/* Metadata panel */}
         <div className="flex flex-col">
@@ -196,7 +240,7 @@ export function ResourceLibrary() {
                   <td className="px-3 py-4 text-pizarra">{resource.year}</td>
                   <td className="px-3 py-4">
                     <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${typeStyles[resource.type]}`}>
-                      {resource.type}
+                      {t.library.types[resource.type]}
                     </span>
                   </td>
                   <td className="px-5 py-4 text-right whitespace-nowrap">
@@ -227,7 +271,7 @@ export function ResourceLibrary() {
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-semibold leading-snug">{resource.title[lang]}</h3>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${typeStyles[resource.type]}`}>
-                  {resource.type}
+                  {t.library.types[resource.type]}
                 </span>
               </div>
               <p className="mt-1.5 text-xs text-pizarra">

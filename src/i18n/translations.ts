@@ -137,6 +137,14 @@ export const es = {
     close: 'Cerrar',
     searchPlaceholder: 'Buscar recursos…',
     previewNote: 'Vista previa del documento',
+    previewMissing: 'El documento aún no está disponible en línea; muy pronto podrás consultarlo aquí.',
+    openInNewTab: 'Abrir en pestaña nueva',
+    types: {
+      PDF: 'PDF',
+      Guía: 'Guía',
+      Artículo: 'Artículo',
+      Bibliografía: 'Bibliografía',
+    },
   },
   onboarding: {
     kicker: 'Únete',
@@ -340,6 +348,14 @@ export const en: Dictionary = {
     close: 'Close',
     searchPlaceholder: 'Search resources…',
     previewNote: 'Document preview',
+    previewMissing: 'This document isn’t available online yet; you’ll be able to read it here soon.',
+    openInNewTab: 'Open in new tab',
+    types: {
+      PDF: 'PDF',
+      Guía: 'Guide',
+      Artículo: 'Article',
+      Bibliografía: 'Bibliography',
+    },
   },
   onboarding: {
     kicker: 'Join us',
@@ -535,6 +551,14 @@ export const pt: Dictionary = {
     close: 'Fechar',
     searchPlaceholder: 'Buscar recursos…',
     previewNote: 'Pré-visualização do documento',
+    previewMissing: 'O documento ainda não está disponível on-line; em breve você poderá lê-lo aqui.',
+    openInNewTab: 'Abrir em nova guia',
+    types: {
+      PDF: 'PDF',
+      Guía: 'Guia',
+      Artículo: 'Artigo',
+      Bibliografía: 'Bibliografia',
+    },
   },
   onboarding: {
     kicker: 'Junte-se',
