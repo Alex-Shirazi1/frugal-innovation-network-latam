@@ -41,7 +41,7 @@ describe('bundledDataSource', () => {
   it('accepts a valid intake locally', async () => {
     const result = await bundledDataSource.submitIntake(validSubmission)
     expect(result.success).toBe(true)
-    expect(result.data?.title).toBe('Investigador/a')
+    expect(result.data?.title).toEqual({ es: 'Investigador/a', en: 'Researcher', pt: 'Pesquisador/a' })
   })
 
   it.each([

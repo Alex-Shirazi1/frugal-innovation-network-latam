@@ -2,7 +2,11 @@
   {
     "id": "mock-0",
     "fullName": "Valentina Miranda Navarro",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "faculty",
     "affiliationId": "iteso",
     "country": "México",
@@ -17,7 +21,11 @@
   {
     "id": "mock-1",
     "fullName": "Mateo Ríos Ibarra",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "researcher",
     "affiliationId": "uca-ni",
     "country": "Nicaragua",
@@ -33,7 +41,11 @@
   {
     "id": "mock-2",
     "fullName": "Camila Vergara Cortés",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "staff",
     "affiliationId": "ibero-leon",
     "country": "México",
@@ -49,7 +61,11 @@
   {
     "id": "mock-3",
     "fullName": "Santiago Bustos Quintero",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "administrator",
     "affiliationId": "uic",
     "country": "México",
@@ -64,7 +80,11 @@
   {
     "id": "mock-4",
     "fullName": "Lucía Cortés Ferreira",
-    "title": "Coordinadora de Vinculación",
+    "title": {
+      "es": "Coordinadora de Vinculación",
+      "en": "Outreach Coordinator",
+      "pt": "Coordenadora de Articulação"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -80,7 +100,11 @@
   {
     "id": "mock-5",
     "fullName": "Sebastián Campos Ríos",
-    "title": "Estudiante de Doctorado",
+    "title": {
+      "es": "Estudiante de Doctorado",
+      "en": "Doctoral Student",
+      "pt": "Doutorando"
+    },
     "position": "researcher",
     "affiliationId": "utt",
     "country": "Francia",
@@ -96,7 +120,11 @@
   {
     "id": "mock-6",
     "fullName": "Isabella Cabrera Zamora",
-    "title": "Director de Emprendimiento",
+    "title": {
+      "es": "Director de Emprendimiento",
+      "en": "Director of Entrepreneurship",
+      "pt": "Diretor de Empreendedorismo"
+    },
     "position": "staff",
     "affiliationId": "acpo",
     "country": "Colombia",
@@ -111,7 +139,11 @@
   {
     "id": "mock-7",
     "fullName": "Diego Arriaga Aguilar",
-    "title": "Mtra. en Políticas Públicas",
+    "title": {
+      "es": "Mtra. en Políticas Públicas",
+      "en": "MA in Public Policy",
+      "pt": "Mestra em Políticas Públicas"
+    },
     "position": "administrator",
     "affiliationId": "captanda",
     "country": "Chile",
@@ -127,7 +159,11 @@
   {
     "id": "mock-8",
     "fullName": "Mariana Aguilar Molina",
-    "title": "Ingeniero de Producto",
+    "title": {
+      "es": "Ingeniero de Producto",
+      "en": "Product Engineer",
+      "pt": "Engenheiro de Produto"
+    },
     "position": "faculty",
     "affiliationId": "ucc",
     "country": "Argentina",
@@ -143,7 +179,11 @@
   {
     "id": "mock-9",
     "fullName": "Joaquín Delgado Restrepo",
-    "title": "Gestora de Proyectos Sociales",
+    "title": {
+      "es": "Gestora de Proyectos Sociales",
+      "en": "Social Projects Manager",
+      "pt": "Gestora de Projetos Sociais"
+    },
     "position": "researcher",
     "affiliationId": "esan",
     "country": "Perú",
@@ -158,7 +198,11 @@
   {
     "id": "mock-10",
     "fullName": "Fernanda Ochoa Campos",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "staff",
     "affiliationId": "ibero-tijuana",
     "country": "México",
@@ -174,7 +218,11 @@
   {
     "id": "mock-11",
     "fullName": "Emiliano Ferreira Escobar",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "administrator",
     "affiliationId": "duoc",
     "country": "Chile",
@@ -190,7 +238,11 @@
   {
     "id": "mock-12",
     "fullName": "Antonia Paredes Paredes",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "faculty",
     "affiliationId": "usb-cali",
     "country": "Colombia",
@@ -205,7 +257,11 @@
   {
     "id": "mock-13",
     "fullName": "Tomás Peña Vergara",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -221,7 +277,11 @@
   {
     "id": "mock-14",
     "fullName": "Renata Ibarra Fuentes",
-    "title": "Coordinadora de Vinculación",
+    "title": {
+      "es": "Coordinadora de Vinculación",
+      "en": "Outreach Coordinator",
+      "pt": "Coordenadora de Articulação"
+    },
     "position": "staff",
     "affiliationId": "world-entrepreneurs",
     "country": "Suiza",
@@ -237,7 +297,11 @@
   {
     "id": "mock-15",
     "fullName": "Gabriel Restrepo Delgado",
-    "title": "Estudiante de Doctorado",
+    "title": {
+      "es": "Estudiante de Doctorado",
+      "en": "Doctoral Student",
+      "pt": "Doutorando"
+    },
     "position": "administrator",
     "affiliationId": "javeriana",
     "country": "Colombia",
@@ -252,7 +316,11 @@
   {
     "id": "mock-16",
     "fullName": "Ximena Villanueva Tapia",
-    "title": "Director de Emprendimiento",
+    "title": {
+      "es": "Director de Emprendimiento",
+      "en": "Director of Entrepreneurship",
+      "pt": "Diretor de Empreendedorismo"
+    },
     "position": "faculty",
     "affiliationId": "scu",
     "country": "Estados Unidos",
@@ -268,7 +336,11 @@
   {
     "id": "mock-17",
     "fullName": "Andrés Sandoval Villanueva",
-    "title": "Mtra. en Políticas Públicas",
+    "title": {
+      "es": "Mtra. en Políticas Públicas",
+      "en": "MA in Public Policy",
+      "pt": "Mestra em Políticas Públicas"
+    },
     "position": "researcher",
     "affiliationId": "ibero-puebla",
     "country": "México",
@@ -284,7 +356,11 @@
   {
     "id": "mock-18",
     "fullName": "Paula Zamora Cabrera",
-    "title": "Ingeniero de Producto",
+    "title": {
+      "es": "Ingeniero de Producto",
+      "en": "Product Engineer",
+      "pt": "Engenheiro de Produto"
+    },
     "position": "staff",
     "affiliationId": "ubiobio",
     "country": "Chile",
@@ -299,7 +375,11 @@
   {
     "id": "mock-19",
     "fullName": "Rodrigo Fuentes Salazar",
-    "title": "Gestora de Proyectos Sociales",
+    "title": {
+      "es": "Gestora de Proyectos Sociales",
+      "en": "Social Projects Manager",
+      "pt": "Gestora de Projetos Sociais"
+    },
     "position": "administrator",
     "affiliationId": "uao",
     "country": "Colombia",
@@ -315,7 +395,11 @@
   {
     "id": "mock-20",
     "fullName": "Daniela Herrera Peña",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "faculty",
     "affiliationId": "aalto",
     "country": "Finlandia",
@@ -331,7 +415,11 @@
   {
     "id": "mock-21",
     "fullName": "Felipe Quintero Bustos",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "researcher",
     "affiliationId": "camara-verde",
     "country": "Colombia",
@@ -346,7 +434,11 @@
   {
     "id": "mock-22",
     "fullName": "Carolina Escobar Herrera",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -362,7 +454,11 @@
   {
     "id": "mock-23",
     "fullName": "Nicolás Salazar Ochoa",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "administrator",
     "affiliationId": "uca-sv",
     "country": "El Salvador",
@@ -378,7 +474,11 @@
   {
     "id": "mock-24",
     "fullName": "Alejandra Navarro Miranda",
-    "title": "Coordinadora de Vinculación",
+    "title": {
+      "es": "Coordinadora de Vinculación",
+      "en": "Outreach Coordinator",
+      "pt": "Coordenadora de Articulação"
+    },
     "position": "faculty",
     "affiliationId": "ibero-cdmx",
     "country": "México",
@@ -393,7 +493,11 @@
   {
     "id": "mock-25",
     "fullName": "Bruno Molina Sandoval",
-    "title": "Estudiante de Doctorado",
+    "title": {
+      "es": "Estudiante de Doctorado",
+      "en": "Doctoral Student",
+      "pt": "Doutorando"
+    },
     "position": "researcher",
     "affiliationId": "uas",
     "country": "México",
@@ -409,7 +513,11 @@
   {
     "id": "mock-26",
     "fullName": "Julieta Tapia Arriaga",
-    "title": "Director de Emprendimiento",
+    "title": {
+      "es": "Director de Emprendimiento",
+      "en": "Director of Entrepreneurship",
+      "pt": "Diretor de Empreendedorismo"
+    },
     "position": "staff",
     "affiliationId": "ufmg",
     "country": "Brasil",
@@ -425,7 +533,11 @@
   {
     "id": "mock-27",
     "fullName": "Valentina Miranda Navarro",
-    "title": "Mtra. en Políticas Públicas",
+    "title": {
+      "es": "Mtra. en Políticas Públicas",
+      "en": "MA in Public Policy",
+      "pt": "Mestra em Políticas Públicas"
+    },
     "position": "administrator",
     "affiliationId": "comillas",
     "country": "España",
@@ -440,7 +552,11 @@
   {
     "id": "mock-28",
     "fullName": "Mateo Ríos Ibarra",
-    "title": "Ingeniero de Producto",
+    "title": {
+      "es": "Ingeniero de Producto",
+      "en": "Product Engineer",
+      "pt": "Engenheiro de Produto"
+    },
     "position": "faculty",
     "affiliationId": "innodeva",
     "country": "Brasil",
@@ -456,7 +572,11 @@
   {
     "id": "mock-29",
     "fullName": "Camila Vergara Cortés",
-    "title": "Gestora de Proyectos Sociales",
+    "title": {
+      "es": "Gestora de Proyectos Sociales",
+      "en": "Social Projects Manager",
+      "pt": "Gestora de Projetos Sociais"
+    },
     "position": "researcher",
     "affiliationId": "ecoins",
     "country": "Costa Rica",
@@ -472,7 +592,11 @@
   {
     "id": "mock-30",
     "fullName": "Santiago Bustos Quintero",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "staff",
     "affiliationId": "javeriana-cali",
     "country": "Colombia",
@@ -487,7 +611,11 @@
   {
     "id": "mock-31",
     "fullName": "Lucía Cortés Ferreira",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -503,7 +631,11 @@
   {
     "id": "mock-32",
     "fullName": "Sebastián Campos Ríos",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "faculty",
     "affiliationId": "ibero-torreon",
     "country": "México",
@@ -519,7 +651,11 @@
   {
     "id": "mock-33",
     "fullName": "Isabella Cabrera Zamora",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "researcher",
     "affiliationId": "usach",
     "country": "Chile",
@@ -534,7 +670,11 @@
   {
     "id": "mock-34",
     "fullName": "Diego Arriaga Aguilar",
-    "title": "Coordinadora de Vinculación",
+    "title": {
+      "es": "Coordinadora de Vinculación",
+      "en": "Outreach Coordinator",
+      "pt": "Coordenadora de Articulação"
+    },
     "position": "staff",
     "affiliationId": "unad",
     "country": "Colombia",
@@ -550,7 +690,11 @@
   {
     "id": "mock-35",
     "fullName": "Mariana Aguilar Molina",
-    "title": "Estudiante de Doctorado",
+    "title": {
+      "es": "Estudiante de Doctorado",
+      "en": "Doctoral Student",
+      "pt": "Doutorando"
+    },
     "position": "administrator",
     "affiliationId": "up-innovation",
     "country": "México",
@@ -566,7 +710,11 @@
   {
     "id": "mock-36",
     "fullName": "Joaquín Delgado Restrepo",
-    "title": "Director de Emprendimiento",
+    "title": {
+      "es": "Director de Emprendimiento",
+      "en": "Director of Entrepreneurship",
+      "pt": "Diretor de Empreendedorismo"
+    },
     "position": "faculty",
     "affiliationId": "rebrif",
     "country": "Brasil",
@@ -581,7 +729,11 @@
   {
     "id": "mock-37",
     "fullName": "Fernanda Ochoa Campos",
-    "title": "Mtra. en Políticas Públicas",
+    "title": {
+      "es": "Mtra. en Políticas Públicas",
+      "en": "MA in Public Policy",
+      "pt": "Mestra em Políticas Públicas"
+    },
     "position": "researcher",
     "affiliationId": "iteso",
     "country": "México",
@@ -597,7 +749,11 @@
   {
     "id": "mock-38",
     "fullName": "Emiliano Ferreira Escobar",
-    "title": "Ingeniero de Producto",
+    "title": {
+      "es": "Ingeniero de Producto",
+      "en": "Product Engineer",
+      "pt": "Engenheiro de Produto"
+    },
     "position": "staff",
     "affiliationId": "uca-ni",
     "country": "Nicaragua",
@@ -613,7 +769,11 @@
   {
     "id": "mock-39",
     "fullName": "Antonia Paredes Paredes",
-    "title": "Gestora de Proyectos Sociales",
+    "title": {
+      "es": "Gestora de Proyectos Sociales",
+      "en": "Social Projects Manager",
+      "pt": "Gestora de Projetos Sociais"
+    },
     "position": "administrator",
     "affiliationId": "ibero-leon",
     "country": "México",
@@ -628,7 +788,11 @@
   {
     "id": "mock-40",
     "fullName": "Tomás Peña Vergara",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -644,7 +808,11 @@
   {
     "id": "mock-41",
     "fullName": "Renata Ibarra Fuentes",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "researcher",
     "affiliationId": "uarm",
     "country": "Perú",
@@ -660,7 +828,11 @@
   {
     "id": "mock-42",
     "fullName": "Gabriel Restrepo Delgado",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "staff",
     "affiliationId": "utt",
     "country": "Francia",
@@ -675,7 +847,11 @@
   {
     "id": "mock-43",
     "fullName": "Ximena Villanueva Tapia",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "administrator",
     "affiliationId": "acpo",
     "country": "Colombia",
@@ -691,7 +867,11 @@
   {
     "id": "mock-44",
     "fullName": "Andrés Sandoval Villanueva",
-    "title": "Coordinadora de Vinculación",
+    "title": {
+      "es": "Coordinadora de Vinculación",
+      "en": "Outreach Coordinator",
+      "pt": "Coordenadora de Articulação"
+    },
     "position": "faculty",
     "affiliationId": "captanda",
     "country": "Chile",
@@ -707,7 +887,11 @@
   {
     "id": "mock-45",
     "fullName": "Paula Zamora Cabrera",
-    "title": "Estudiante de Doctorado",
+    "title": {
+      "es": "Estudiante de Doctorado",
+      "en": "Doctoral Student",
+      "pt": "Doutorando"
+    },
     "position": "researcher",
     "affiliationId": "ucc",
     "country": "Argentina",
@@ -722,7 +906,11 @@
   {
     "id": "mock-46",
     "fullName": "Rodrigo Fuentes Salazar",
-    "title": "Director de Emprendimiento",
+    "title": {
+      "es": "Director de Emprendimiento",
+      "en": "Director of Entrepreneurship",
+      "pt": "Diretor de Empreendedorismo"
+    },
     "position": "staff",
     "affiliationId": "esan",
     "country": "Perú",
@@ -738,7 +926,11 @@
   {
     "id": "mock-47",
     "fullName": "Daniela Herrera Peña",
-    "title": "Mtra. en Políticas Públicas",
+    "title": {
+      "es": "Mtra. en Políticas Públicas",
+      "en": "MA in Public Policy",
+      "pt": "Mestra em Políticas Públicas"
+    },
     "position": "administrator",
     "affiliationId": "ibero-tijuana",
     "country": "México",
@@ -754,7 +946,11 @@
   {
     "id": "mock-48",
     "fullName": "Felipe Quintero Bustos",
-    "title": "Ingeniero de Producto",
+    "title": {
+      "es": "Ingeniero de Producto",
+      "en": "Product Engineer",
+      "pt": "Engenheiro de Produto"
+    },
     "position": "faculty",
     "affiliationId": "duoc",
     "country": "Chile",
@@ -769,7 +965,11 @@
   {
     "id": "mock-49",
     "fullName": "Carolina Escobar Herrera",
-    "title": "Gestora de Proyectos Sociales",
+    "title": {
+      "es": "Gestora de Proyectos Sociales",
+      "en": "Social Projects Manager",
+      "pt": "Gestora de Projetos Sociais"
+    },
     "position": "independent",
     "affiliationId": null,
     "country": "México",
@@ -785,7 +985,11 @@
   {
     "id": "mock-50",
     "fullName": "Nicolás Salazar Ochoa",
-    "title": "Dra. en Diseño e Innovación",
+    "title": {
+      "es": "Dra. en Diseño e Innovación",
+      "en": "PhD in Design & Innovation",
+      "pt": "Dra. em Design e Inovação"
+    },
     "position": "staff",
     "affiliationId": "frugal-lab",
     "country": "Perú",
@@ -801,7 +1005,11 @@
   {
     "id": "mock-51",
     "fullName": "Alejandra Navarro Miranda",
-    "title": "Profesor de Ingeniería",
+    "title": {
+      "es": "Profesor de Ingeniería",
+      "en": "Professor of Engineering",
+      "pt": "Professor de Engenharia"
+    },
     "position": "administrator",
     "affiliationId": "world-entrepreneurs",
     "country": "Suiza",
@@ -816,7 +1024,11 @@
   {
     "id": "mock-52",
     "fullName": "Bruno Molina Sandoval",
-    "title": "Investigadora en Sostenibilidad",
+    "title": {
+      "es": "Investigadora en Sostenibilidad",
+      "en": "Sustainability Researcher",
+      "pt": "Pesquisadora em Sustentabilidade"
+    },
     "position": "faculty",
     "affiliationId": "javeriana",
     "country": "Colombia",
@@ -832,7 +1044,11 @@
   {
     "id": "mock-53",
     "fullName": "Julieta Tapia Arriaga",
-    "title": "Consultor en Innovación Social",
+    "title": {
+      "es": "Consultor en Innovación Social",
+      "en": "Social Innovation Consultant",
+      "pt": "Consultor em Inovação Social"
+    },
     "position": "researcher",
     "affiliationId": "scu",
     "country": "Estados Unidos",

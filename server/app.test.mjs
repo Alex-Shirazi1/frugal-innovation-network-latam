@@ -70,7 +70,7 @@ describe('intake pipeline', () => {
     const res = await request(app).post('/api/members/intake').send(validIntake)
     expect(res.status).toBe(201)
     expect(res.body.data.status).toBe('pending')
-    expect(res.body.data.title).toBe('Investigador/a')
+    expect(res.body.data.title).toEqual({ es: 'Investigador/a', en: 'Researcher', pt: 'Pesquisador/a' })
     expect(res.body.data.interestIds).toEqual(['salud', 'energia'])
   })
 

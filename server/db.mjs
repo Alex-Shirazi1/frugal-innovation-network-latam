@@ -30,7 +30,7 @@ function rowToMember(row) {
   return {
     id: row.id,
     fullName: row.full_name,
-    title: row.title,
+    title: JSON.parse(row.title),
     position: row.position,
     affiliationId: row.affiliation_id ?? null,
     country: row.country,
@@ -65,7 +65,8 @@ export function openDb(path = process.env.RELIF_DB_PATH ?? 'server/relif.db') {
       ).run(
         id,
         member.fullName,
-        member.title,
+        // Localized { es, en, pt } object — serialized like interest_ids
+        JSON.stringify(member.title),
         member.position,
         member.affiliationId,
         member.country,

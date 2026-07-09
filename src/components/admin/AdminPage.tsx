@@ -93,7 +93,7 @@ function PendingCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="font-semibold">{entry.fullName}</h3>
-          <p className="text-xs text-pizarra">{entry.title}</p>
+          <p className="text-xs text-pizarra">{entry.title.es}</p>
           <p className="mt-1 text-xs text-pizarra">
             {institutionLabel(entry.affiliationId)} · {entry.region}, {entry.country}
           </p>

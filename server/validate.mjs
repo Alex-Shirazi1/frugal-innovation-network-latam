@@ -15,12 +15,13 @@ const institutions = readJson('institutions')
 const knownInterestIds = new Set(researchInterests.map((i) => i.id))
 const knownInstitutionIds = new Set(institutions.map((i) => i.id))
 
+// Localized titles — keep in lockstep with src/api/adapters/bundled.ts
 const positionTitles = {
-  staff: 'Personal administrativo',
-  faculty: 'Docente',
-  researcher: 'Investigador/a',
-  administrator: 'Directivo/a',
-  independent: 'Miembro independiente',
+  staff: { es: 'Personal administrativo', en: 'Administrative staff', pt: 'Equipe administrativa' },
+  faculty: { es: 'Docente', en: 'Faculty', pt: 'Docente' },
+  researcher: { es: 'Investigador/a', en: 'Researcher', pt: 'Pesquisador/a' },
+  administrator: { es: 'Directivo/a', en: 'Administrator', pt: 'Gestor/a' },
+  independent: { es: 'Miembro independiente', en: 'Independent member', pt: 'Membro independente' },
 }
 
 const MAX_NAME_LENGTH = 120
