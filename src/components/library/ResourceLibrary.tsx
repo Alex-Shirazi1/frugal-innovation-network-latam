@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { usePostHog } from 'posthog-js/react'
 import { useI18n } from '../../i18n/I18nContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Modal } from '../ui/Modal'
@@ -184,8 +185,20 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
 
 export function ResourceLibrary() {
   const { lang, t } = useI18n()
+  const posthog = usePostHog()
   const [query, setQuery] = useState('')
   const [previewing, setPreviewing] = useState<Resource | null>(null)
+
+  function openResource(resource: Resource) {
+    posthog?.capture('resource_opened', {
+      resource_id: resource.id,
+      title: resource.title.es,
+      type: resource.type,
+      language: resource.language,
+      year: resource.year,
+    })
+    setPreviewing(resource)
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -246,7 +259,7 @@ export function ResourceLibrary() {
                   <td className="px-5 py-4 text-right whitespace-nowrap">
                     <button
                       type="button"
-                      onClick={() => setPreviewing(resource)}
+                      onClick={() => openResource(resource)}
                       className="mr-2 rounded-full border border-carbon/15 px-3.5 py-1.5 text-xs font-bold transition-colors hover:border-teal hover:text-teal"
                     >
                       {t.library.preview}
@@ -280,7 +293,7 @@ export function ResourceLibrary() {
               <div className="mt-3 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setPreviewing(resource)}
+                  onClick={() => openResource(resource)}
                   className="flex-1 rounded-full border border-carbon/15 px-3 py-2 text-xs font-bold"
                 >
                   {t.library.preview}
