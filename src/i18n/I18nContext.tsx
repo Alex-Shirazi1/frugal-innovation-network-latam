@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { usePostHog } from 'posthog-js/react'
 import { es, en, pt, type Dictionary } from './translations'
 
 export type Lang = 'es' | 'en' | 'pt'
@@ -21,18 +22,22 @@ function getInitialLang(): Lang {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(getInitialLang)
+  const posthog = usePostHog()
 
   const value = useMemo<I18nValue>(
     () => ({
       lang,
       setLang: (next: Lang) => {
+        if (next !== lang) {
+          posthog?.capture('language_switched', { from: lang, to: next })
+        }
         setLangState(next)
         window.localStorage.setItem(STORAGE_KEY, next)
         document.documentElement.lang = next
       },
       t: dictionaries[lang],
     }),
-    [lang],
+    [lang, posthog],
   )
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>

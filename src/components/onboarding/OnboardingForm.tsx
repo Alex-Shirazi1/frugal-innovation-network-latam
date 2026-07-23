@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { usePostHog } from 'posthog-js/react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useDirectory } from '../../store/DirectoryContext'
 import { SectionHeading } from '../ui/SectionHeading'
@@ -39,6 +40,7 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 export function OnboardingForm() {
   const { t, lang } = useI18n()
   const { addMember } = useDirectory()
+  const posthog = usePostHog()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<IntakeSubmission>(emptyForm)
   const [errors, setErrors] = useState<Errors>({})
@@ -80,6 +82,12 @@ export function OnboardingForm() {
     const result = await processIntake(form)
     if (result.success && result.data) {
       addMember(result.data)
+      posthog?.capture('onboarding_submitted', {
+        country: form.country,
+        region: form.region,
+        position: form.position,
+        interests: form.interestIds.length,
+      })
       setStatus('done')
     } else {
       setStatus('idle')
