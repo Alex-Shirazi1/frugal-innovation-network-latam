@@ -23,6 +23,11 @@ jobs:
 
       - name: Build project
         run: npm run build
+        env:
+          # PostHog project key (publishable, write-only). Stored as a repo
+          # Actions secret so it stays out of source. Vite bakes it into the
+          # bundle at build time; host falls back to US cloud when unset.
+          VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
