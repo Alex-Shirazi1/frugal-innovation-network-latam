@@ -30,10 +30,28 @@ describe('MemberCard', () => {
     expect(screen.getByText('Investigadora')).toBeInTheDocument()
   })
 
-  it('shows deterministic avatar initials from the first two names', () => {
-    renderWithI18n(<MemberCard member={makeMember({ fullName: 'Grace Brewster Hopper' })} />)
-    // Only the first two words are used -> "GB".
+  it('builds avatar initials from the first and last name fields', () => {
+    renderWithI18n(
+      <MemberCard member={makeMember({ firstName: 'Grace', lastName: 'Brewster Hopper' })} />,
+    )
+    // Initials come from the real name fields, not from splitting fullName,
+    // so a compound surname still yields one initial per field -> "GB".
     expect(screen.getByText('GB')).toBeInTheDocument()
+  })
+
+  it('exposes the member name as the profile trigger when onOpen is given', async () => {
+    const onOpen = vi.fn()
+    renderWithI18n(<MemberCard member={makeMember()} onOpen={onOpen} />)
+    const trigger = screen.getByRole('button', { name: 'Ada Lovelace' })
+    trigger.click()
+    expect(onOpen).toHaveBeenCalledTimes(1)
+    expect(onOpen.mock.calls[0][0].fullName).toBe('Ada Lovelace')
+  })
+
+  it('renders a plain heading with no trigger when onOpen is omitted', () => {
+    renderWithI18n(<MemberCard member={makeMember()} />)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ada Lovelace' })).toBeInTheDocument()
   })
 
   it('labels an unaffiliated member as independent and hides the location line', () => {

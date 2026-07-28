@@ -6,25 +6,25 @@ import type { Member } from '../../api/types'
 interface MemberCardProps {
   member: Member
   highlighted?: boolean
+  onOpen?: (member: Member) => void
 }
 
-function initialsOf(fullName: string): string {
-  return fullName
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part[0] ?? '')
-    .join('')
-    .toUpperCase()
+function initialsOf(firstName: string, lastName: string): string {
+  return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
 }
 
-export const MemberCard = memo(function MemberCard({ member, highlighted }: MemberCardProps) {
+export const MemberCard = memo(function MemberCard({
+  member,
+  highlighted,
+  onOpen,
+}: MemberCardProps) {
   const { lang, t } = useI18n()
   const { institutionName, options } = useApiData()
   const affiliation = institutionName(member.affiliationId)
 
   return (
     <li
-      className={`flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-carbon/5 ${
+      className={`group relative flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-carbon/5 ${
         highlighted
           ? 'border-teal bg-teal/5 shadow-lg shadow-teal/10'
           : 'border-carbon/10 bg-white/70'
@@ -38,10 +38,30 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
             background: ['#168599', '#8ebc41', '#f6a620', '#e94824', '#4d6a79'][member.avatarHue % 5],
           }}
         >
-          {initialsOf(member.fullName)}
+          {initialsOf(member.firstName, member.lastName)}
         </span>
         <div className="min-w-0">
-          <h3 className="truncate font-semibold leading-snug">{member.fullName}</h3>
+          <h3 className="truncate font-semibold leading-snug">
+            {onOpen ? (
+              /*
+               * The heading is the trigger, so the control's accessible name is
+               * the member's name. The `after` pseudo-element stretches the hit
+               * area to the whole card without nesting interactive elements;
+               * the social link below opts out via `relative z-1`.
+               */
+              <button
+                type="button"
+                onClick={() => onOpen(member)}
+                /* `truncate` has to live on the element holding the text — the
+                 * h3's own truncate cannot ellipsize a child element's text. */
+                className="block w-full truncate text-left outline-none after:absolute after:inset-0 after:rounded-2xl after:content-[''] group-hover:underline focus-visible:after:ring-2 focus-visible:after:ring-teal"
+              >
+                {member.fullName}
+              </button>
+            ) : (
+              member.fullName
+            )}
+          </h3>
           <p className="truncate text-xs text-pizarra">{member.title[lang]}</p>
         </div>
       </div>
@@ -79,7 +99,7 @@ export const MemberCard = memo(function MemberCard({ member, highlighted }: Memb
           href={member.socialUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-auto pt-3 text-xs font-semibold text-teal hover:underline"
+          className="relative z-1 mt-auto self-start pt-3 text-xs font-semibold text-teal hover:underline"
         >
           ↗ {member.socialUrl.replace(/^https?:\/\//, '').split('/')[0]}
         </a>

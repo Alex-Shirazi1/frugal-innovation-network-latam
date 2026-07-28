@@ -3,9 +3,13 @@ import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { MemberCard } from './MemberCard'
-import type { PositionType } from '../../api/types'
+import { MemberDetail } from './MemberDetail'
+import type { Member, PositionType } from '../../api/types'
 
 type PositionFilter = PositionType | 'all'
+
+/** Sentinel for "no filter applied", shared by all three filter controls. */
+const ALL = 'all'
 
 function InstitutionConveyor() {
   const { t } = useI18n()
@@ -36,26 +40,71 @@ export function MemberDirectory() {
   const { t, lang } = useI18n()
   const { members, lastAddedId, institutionName, options } = useApiData()
   const [query, setQuery] = useState('')
-  const [position, setPosition] = useState<PositionFilter>('all')
+  const [position, setPosition] = useState<PositionFilter>(ALL)
+  const [area, setArea] = useState<string>(ALL)
+  const [country, setCountry] = useState<string>(ALL)
+  const [selected, setSelected] = useState<Member | null>(null)
   const deferredQuery = useDeferredValue(query)
+
+  // Only offer countries that actually have members, so no filter yields zero.
+  const memberCountryOptions = useMemo(
+    () => [...new Set(members.map((m) => m.country))].sort((a, b) => a.localeCompare(b)),
+    [members],
+  )
 
   const filtered = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase()
-    return members.filter((member) => {
-      if (position !== 'all' && member.position !== position) return false
-      if (!q) return true
-      const interests = member.interestIds
+    const labelsFor = (ids: string[], list: { id: string; es: string; en: string; pt: string }[]) =>
+      ids
         .map((id) => {
-          const interest = options.researchInterests.find((entry) => entry.id === id)
-          return interest ? `${interest.es} ${interest.en}` : ''
+          const entry = list.find((item) => item.id === id)
+          return entry ? `${entry.es} ${entry.en} ${entry.pt}` : ''
         })
         .join(' ')
-      return [member.fullName, member.title.es, member.title.en, member.title.pt, institutionName(member.affiliationId) ?? '', member.country, interests]
+
+    return members.filter((member) => {
+      if (position !== ALL && member.position !== position) return false
+      if (area !== ALL && !member.generalAreaIds.includes(area)) return false
+      if (country !== ALL && member.country !== country) return false
+      if (!q) return true
+      // Search spans everything a visitor might reasonably type, including the
+      // free-text job title and biography Allan asked for.
+      return [
+        member.fullName,
+        member.title.es,
+        member.title.en,
+        member.title.pt,
+        member.jobPositionName,
+        member.biography,
+        institutionName(member.affiliationId) ?? '',
+        member.country,
+        member.region,
+        labelsFor(member.interestIds, options.researchInterests),
+        labelsFor(member.generalAreaIds, options.generalAreas),
+      ]
         .join(' ')
         .toLowerCase()
         .includes(q)
     })
-  }, [members, deferredQuery, position, options.researchInterests, institutionName])
+  }, [
+    members,
+    deferredQuery,
+    position,
+    area,
+    country,
+    options.researchInterests,
+    options.generalAreas,
+    institutionName,
+  ])
+
+  const hasActiveFilters = position !== ALL || area !== ALL || country !== ALL || query !== ''
+
+  function clearFilters() {
+    setPosition(ALL)
+    setArea(ALL)
+    setCountry(ALL)
+    setQuery('')
+  }
 
   const positionFilters: PositionFilter[] = [
     'all',
@@ -108,6 +157,44 @@ export function MemberDirectory() {
           </div>
         </div>
 
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 text-xs font-semibold text-pizarra">
+            {t.directory.filterArea}
+            <select
+              value={area}
+              onChange={(event) => setArea(event.target.value)}
+              className="rounded-full border border-carbon/15 bg-white/70 px-3.5 py-2 text-xs font-semibold text-carbon outline-none transition-colors focus:border-teal"
+            >
+              <option value={ALL}>{t.directory.allAreas}</option>
+              {options.generalAreas.map((option) => (
+                <option key={option.id} value={option.id}>{option[lang]}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-xs font-semibold text-pizarra">
+            {t.directory.filterCountry}
+            <select
+              value={country}
+              onChange={(event) => setCountry(event.target.value)}
+              className="rounded-full border border-carbon/15 bg-white/70 px-3.5 py-2 text-xs font-semibold text-carbon outline-none transition-colors focus:border-teal"
+            >
+              <option value={ALL}>{t.directory.allCountries}</option>
+              {memberCountryOptions.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </label>
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-full px-3 py-1.5 text-xs font-semibold text-teal underline-offset-2 hover:underline"
+            >
+              {t.directory.clearFilters}
+            </button>
+          ) : null}
+        </div>
+
         <p className="mb-4 text-sm text-pizarra" role="status">
           {t.directory.showing} {filtered.length} {t.directory.people}
         </p>
@@ -119,7 +206,12 @@ export function MemberDirectory() {
             lang={lang}
           >
             {filtered.map((member) => (
-              <MemberCard key={member.id} member={member} highlighted={member.id === lastAddedId} />
+              <MemberCard
+                key={member.id}
+                member={member}
+                highlighted={member.id === lastAddedId}
+                onOpen={setSelected}
+              />
             ))}
           </ul>
         ) : (
@@ -128,6 +220,8 @@ export function MemberDirectory() {
           </p>
         )}
       </div>
+
+      {selected ? <MemberDetail member={selected} onClose={() => setSelected(null)} /> : null}
     </section>
   )
 }
