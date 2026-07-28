@@ -21,6 +21,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Pushes to main deploy straight to the live channel, so a broken commit
+      # would otherwise reach production unchecked. The Firestore emulator
+      # suites skip themselves when no emulator is running.
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build project
         run: npm run build
         env:
@@ -28,6 +37,13 @@ jobs:
           # Actions secret so it stays out of source. Vite bakes it into the
           # bundle at build time; host falls back to US cloud when unset.
           VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+          # Firebase web config — publishable client identifiers, not secrets
+          # (firestore.rules is the security boundary). Until these are set the
+          # site serves bundled data and the join form honestly reports that
+          # nothing was saved. See docs/DEPLOYMENT.md.
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

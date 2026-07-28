@@ -54,7 +54,26 @@ export function createDataSource(): RelifDataSource {
     })
   }
 
-  return createFallbackDataSource(createHttpDataSource(), bundledDataSource, (method, error) => {
-    console.warn(`[relif-api] ${method} unreachable, using bundled data`, error)
-  })
+  return createFallbackDataSource(createHttpDataSource(), bundledDataSource, warnOnce)
 }
+
+/**
+ * All five content loads fail together when there is no backend, which produced
+ * five identical console warnings on every page load. One line is enough.
+ */
+function makeWarnOnce() {
+  let warned = false
+  return (method: string, error: unknown) => {
+    if (warned) return
+    warned = true
+    const noBackend = error instanceof Error && error.name === 'NoBackendError'
+    console.info(
+      noBackend
+        ? '[relif-api] no backend at this URL — serving bundled data. Submissions will report that nothing was saved.'
+        : `[relif-api] backend unreachable (${method}) — serving bundled data`,
+      noBackend ? '' : error,
+    )
+  }
+}
+
+const warnOnce = makeWarnOnce()

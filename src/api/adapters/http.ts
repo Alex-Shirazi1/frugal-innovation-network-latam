@@ -9,12 +9,28 @@ import type { ApiResponse, IntakeErrorCode, IntakeResult, IntakeSubmission, Memb
 
 const REQUEST_TIMEOUT_MS = 8000
 
+/** Thrown when the URL answered but not with an API response. */
+export class NoBackendError extends Error {
+  constructor(url: string) {
+    super(`no API at ${url}`)
+    this.name = 'NoBackendError'
+  }
+}
+
 async function requestJson<T>(url: string, init?: RequestInit): Promise<ApiResponse<T>> {
   const response = await fetch(url, {
     ...init,
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   })
+
+  // On static hosting the SPA catch-all rewrite answers /api/* with index.html,
+  // so a 200 proves nothing. Checking the content type first turns a confusing
+  // JSON parse error into a clear "there is no backend here".
+  const contentType = response.headers.get('content-type') ?? ''
+  if (!contentType.includes('json')) {
+    throw new NoBackendError(url)
+  }
   return (await response.json()) as ApiResponse<T>
 }
 

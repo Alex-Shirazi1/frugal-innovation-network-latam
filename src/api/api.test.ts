@@ -13,6 +13,13 @@ function jsonResponse(body: unknown): Response {
   })
 }
 
+/** What static hosting returns for /api/* — the SPA shell, with a 200. */
+function spaShellResponse(): Response {
+  return new Response('<!doctype html><html lang="es"><body></body></html>', {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  })
+}
+
 afterEach(() => {
   vi.unstubAllGlobals()
   vi.useRealTimers()
@@ -59,6 +66,37 @@ describe('createHttpDataSource', () => {
     const source = createHttpDataSource('/api')
     expect(await source.getInstitutions()).toEqual([{ id: 'x' }])
     expect(fetchMock).toHaveBeenCalledWith('/api/institutions', expect.anything())
+  })
+
+  /**
+   * On static hosting the SPA catch-all rewrite answers /api/* with index.html
+   * and a 200, so status alone proves nothing. Without the content-type check
+   * this surfaced as a confusing JSON parse error instead of "no backend".
+   */
+  it('treats an HTML response as no backend rather than a parse error', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(spaShellResponse()))
+    await expect(createHttpDataSource('/api').getMembers()).rejects.toThrow(/no API at/)
+  })
+
+  it('names the no-backend error so callers can distinguish it', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(spaShellResponse()))
+    await createHttpDataSource('/api')
+      .getMembers()
+      .catch((error: unknown) => {
+        expect(error).toBeInstanceOf(Error)
+        expect((error as Error).name).toBe('NoBackendError')
+      })
+  })
+
+  it('falls back to bundled data when the URL serves the SPA shell', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(spaShellResponse()))
+    const source = createFallbackDataSource(createHttpDataSource('/api'), bundledDataSource)
+    expect(await source.getMembers()).toHaveLength(54)
+
+    // And an intake against a non-existent backend must not claim persistence.
+    const result = await source.submitIntake(validSubmission)
+    expect(result.success).toBe(true)
+    expect(result.persisted).toBe(false)
   })
 
   it('throws when the envelope reports failure', async () => {
