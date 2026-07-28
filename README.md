@@ -10,8 +10,9 @@ Modern React redesign of [redinnovacionfrugal.lat](https://redinnovacionfrugal.l
 
 - React 19 + TypeScript + Vite + React Router
 - Tailwind CSS v4 (design tokens via `@theme` in `src/styles/global.css`)
-- Prototype backend: Express 5 + SQLite (`node:sqlite`, zero native deps) in `server/`
-- Tests: Vitest + Supertest
+- Production backend: Firestore (free Spark plan, no Cloud Functions) — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- Local dev backend: Express 5 + SQLite (`node:sqlite`, zero native deps) in `server/`
+- Tests: Vitest + Supertest + Firestore emulator (rules)
 
 ## Run it
 
@@ -20,7 +21,9 @@ npm install
 npm run dev:all    # frontend (:5173) + prototype API (:3001) together
 npm run dev        # frontend only (falls back to bundled data if no API)
 npm run dev:server # prototype API only
-npm run test       # backend + adapter test suite
+npm run test       # unit, integration, adapter and drift suites
+npm run test:rules # firestore.rules against the emulator (needs Java)
+npm run rules      # regenerate firestore.rules from canonical data
 npm run build      # type-check + production build
 npm run seed       # regenerate server/data/*.json from src/data (source of truth)
 ```
