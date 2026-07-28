@@ -8,6 +8,13 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
+    env:
+      # Firestore steps are skipped until the project is actually configured, so
+      # this workflow keeps working unchanged before the backend exists.
+      # `secrets` cannot be referenced from a step-level `if`, hence the promotion
+      # to a job-level env var here.
+      FIRESTORE_CONFIGURED: ${{ secrets.VITE_FIREBASE_PROJECT_ID != '' }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,6 +54,37 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      # firestore.rules is generated from src/data/onboardingOptions.ts, so it can
+      # only be trusted if it matches that data (checked by the drift test in
+      # `npm test`) AND actually behaves (checked here against the emulator).
+      # These 47 tests are the gate on auto-deploying security rules.
+      - name: Test Firestore rules against the emulator
+        if: env.FIRESTORE_CONFIGURED == 'true'
+        run: npm run test:rules
+
+      # Rules live inside Firestore, not in Hosting, so shipping the frontend
+      # does not update them. Without this step the enforced rules silently lag
+      # the code — e.g. adding a country would leave every signup from it
+      # rejected by stale rules. Deployed BEFORE hosting so the frontend never
+      # offers something the rules still refuse.
+      - name: Deploy Firestore rules and indexes
+        if: env.FIRESTORE_CONFIGURED == 'true'
+        env:
+          # Passed via env, never interpolated into the shell, so the JSON cannot
+          # break out of the command.
+          SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          CREDS="$RUNNER_TEMP/firebase-sa.json"
+          printf '%s' "$SERVICE_ACCOUNT_JSON" > "$CREDS"
+          trap 'rm -f "$CREDS"' EXIT
+          GOOGLE_APPLICATION_CREDENTIALS="$CREDS" \
+            npx firebase deploy \
+              --only firestore:rules,firestore:indexes \
+              --project "$FIREBASE_PROJECT_ID" \
+              --non-interactive
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

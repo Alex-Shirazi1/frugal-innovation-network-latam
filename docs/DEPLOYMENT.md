@@ -63,18 +63,32 @@ silently fails from unlisted domains.
 
 ### 4. Deploy the security rules
 
-The rules are generated from the canonical option data, so regenerate before
-deploying in case the data changed:
+**CI does this for you** once step 6 is done. The workflow deploys
+`firestore.rules` and `firestore.indexes.json` on every push to `main`, right
+before the hosting deploy, gated behind the 47 emulator tests.
+
+That matters because the rules are *generated* from
+`src/data/onboardingOptions.ts`. Without automatic deployment the enforced rules
+silently lag the code — add a country, and every signup from it gets rejected by
+stale rules with an error that gives no clue why.
+
+The service account in `FIREBASE_SERVICE_ACCOUNT` was created for Hosting only,
+so it likely needs one more role. In the Google Cloud console →
+**IAM & Admin → IAM**, find the service account and add **Firebase Rules Admin**
+(`roles/firebaserules.admin`). Without it the deploy step fails with a
+permissions error.
+
+To deploy by hand — for the very first time, or to check something ad hoc:
 
 ```bash
-npm run rules          # regenerates firestore.rules
+npm run rules          # regenerate from the canonical data
 npm test               # includes the drift guard
-npm run test:rules     # 26 behavioural tests against the emulator
+npm run test:rules     # behavioural tests against the emulator (needs Java)
 npx firebase deploy --only firestore:rules,firestore:indexes
 ```
 
-Do not hand-edit `firestore.rules` — it is generated and the drift test will
-fail the build.
+Do not hand-edit `firestore.rules` — it is generated, and the drift test will
+fail the build. Change `src/data/onboardingOptions.ts` and run `npm run rules`.
 
 ### 5. Grant Allan the admin claim
 
@@ -135,6 +149,11 @@ Then add them to the build step in
 
 With those present the site auto-selects the Firestore adapter. No code change
 is needed — `VITE_DATA_SOURCE` only exists to override the default.
+
+`VITE_FIREBASE_PROJECT_ID` also acts as the switch that turns on the Firestore
+steps in CI: until it is set, the rules tests and rules deploy skip themselves
+and the workflow behaves exactly as it does today. Setting it is what activates
+the backend half of the pipeline, so add all three at once and push.
 
 ### 7. Turn on App Check (recommended, free)
 
