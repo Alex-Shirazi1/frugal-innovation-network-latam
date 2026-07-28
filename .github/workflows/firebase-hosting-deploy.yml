@@ -15,7 +15,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # 22+ is required: @testing-library/jest-dom@7 and concurrently@10
+          # both declare engines >=22, and node:sqlite (used by the dev server
+          # and its tests) is only stable from 22.
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
