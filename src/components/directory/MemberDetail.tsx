@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { Modal } from '../ui/Modal'
+import { placeLabel } from '../../data/onboardingOptions'
 import type { Member, ResearchInterest } from '../../api/types'
 
 interface MemberDetailProps {
@@ -120,7 +121,7 @@ export function MemberDetail({ member, onClose }: MemberDetailProps) {
           </DetailRow>
 
           <DetailRow label={t.directory.location}>
-            {member.region}, {member.country}
+            {placeLabel(member.region, lang)}, {placeLabel(member.country, lang)}
           </DetailRow>
 
           <DetailRow label={t.directory.biography}>

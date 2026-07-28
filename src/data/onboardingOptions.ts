@@ -88,6 +88,74 @@ export const cityToRegion: Record<string, string> = {
   Barcelona: 'Cataluña',
 }
 
+/**
+ * Display names for places.
+ *
+ * The Spanish `name` on each country stays the canonical value — it is the key
+ * the validator whitelists, the rules whitelist, and every stored member record
+ * uses. Translating it in place would invalidate existing data and three layers
+ * of validation at once. So these are a presentation layer only, looked up by
+ * canonical name.
+ *
+ * Regions are mostly proper nouns that read identically across languages;
+ * entries exist only where a genuine translation differs, and `placeLabel`
+ * falls back to the canonical string otherwise.
+ */
+type LocalizedText = { es: string; en: string; pt: string }
+
+export const countryLabels: Record<string, LocalizedText> = {
+  Argentina: { es: 'Argentina', en: 'Argentina', pt: 'Argentina' },
+  Bolivia: { es: 'Bolivia', en: 'Bolivia', pt: 'Bolívia' },
+  Brasil: { es: 'Brasil', en: 'Brazil', pt: 'Brasil' },
+  Chile: { es: 'Chile', en: 'Chile', pt: 'Chile' },
+  Colombia: { es: 'Colombia', en: 'Colombia', pt: 'Colômbia' },
+  'Costa Rica': { es: 'Costa Rica', en: 'Costa Rica', pt: 'Costa Rica' },
+  Ecuador: { es: 'Ecuador', en: 'Ecuador', pt: 'Equador' },
+  'El Salvador': { es: 'El Salvador', en: 'El Salvador', pt: 'El Salvador' },
+  España: { es: 'España', en: 'Spain', pt: 'Espanha' },
+  'Estados Unidos': { es: 'Estados Unidos', en: 'United States', pt: 'Estados Unidos' },
+  Finlandia: { es: 'Finlandia', en: 'Finland', pt: 'Finlândia' },
+  Francia: { es: 'Francia', en: 'France', pt: 'França' },
+  Guatemala: { es: 'Guatemala', en: 'Guatemala', pt: 'Guatemala' },
+  México: { es: 'México', en: 'Mexico', pt: 'México' },
+  Nicaragua: { es: 'Nicaragua', en: 'Nicaragua', pt: 'Nicarágua' },
+  Panamá: { es: 'Panamá', en: 'Panama', pt: 'Panamá' },
+  Paraguay: { es: 'Paraguay', en: 'Paraguay', pt: 'Paraguai' },
+  Perú: { es: 'Perú', en: 'Peru', pt: 'Peru' },
+  Suiza: { es: 'Suiza', en: 'Switzerland', pt: 'Suíça' },
+  Uruguay: { es: 'Uruguay', en: 'Uruguay', pt: 'Uruguai' },
+  Venezuela: { es: 'Venezuela', en: 'Venezuela', pt: 'Venezuela' },
+}
+
+export const regionLabels: Record<string, LocalizedText> = {
+  'Ciudad de México': { es: 'Ciudad de México', en: 'Mexico City', pt: 'Cidade do México' },
+  'Región Metropolitana': {
+    es: 'Región Metropolitana',
+    en: 'Metropolitan Region',
+    pt: 'Região Metropolitana',
+  },
+  'Nueva York': { es: 'Nueva York', en: 'New York', pt: 'Nova York' },
+  'Distrito Capital': { es: 'Distrito Capital', en: 'Capital District', pt: 'Distrito Capital' },
+  Cataluña: { es: 'Cataluña', en: 'Catalonia', pt: 'Catalunha' },
+  Andalucía: { es: 'Andalucía', en: 'Andalusia', pt: 'Andaluzia' },
+  'País Vasco': { es: 'País Vasco', en: 'Basque Country', pt: 'País Basco' },
+  'Isla de Francia': { es: 'Isla de Francia', en: 'Île-de-France', pt: 'Ilha de França' },
+  Occitania: { es: 'Occitania', en: 'Occitania', pt: 'Occitânia' },
+  Ginebra: { es: 'Ginebra', en: 'Geneva', pt: 'Genebra' },
+  Zúrich: { es: 'Zúrich', en: 'Zurich', pt: 'Zurique' },
+}
+
+export type PlaceLang = 'es' | 'en' | 'pt'
+
+/**
+ * Localized display name for a stored country or region, falling back to the
+ * canonical value when no translation exists (proper nouns like "Jalisco",
+ * "São Paulo" or "Grand Est" are identical in all three languages).
+ */
+export function placeLabel(canonical: string, lang: PlaceLang): string {
+  return (countryLabels[canonical] ?? regionLabels[canonical])?.[lang] ?? canonical
+}
+
 export interface ResearchInterest {
   id: string
   es: string

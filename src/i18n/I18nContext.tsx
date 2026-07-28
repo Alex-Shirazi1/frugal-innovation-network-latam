@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useCapture } from '../lib/analytics'
 import { es, en, pt, type Dictionary } from './translations'
 
@@ -24,6 +24,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(getInitialLang)
   const capture = useCapture()
 
+  /**
+   * Keep <html lang> in sync with the rendered language.
+   *
+   * This previously only ran inside setLang, so a returning visitor whose
+   * stored preference was English got English content under `<html lang="es">`
+   * from index.html until they touched the switcher — which misleads screen
+   * reader pronunciation and search engines about the page's language.
+   */
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+
   const value = useMemo<I18nValue>(
     () => ({
       lang,
@@ -33,7 +45,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         }
         setLangState(next)
         window.localStorage.setItem(STORAGE_KEY, next)
-        document.documentElement.lang = next
       },
       t: dictionaries[lang],
     }),

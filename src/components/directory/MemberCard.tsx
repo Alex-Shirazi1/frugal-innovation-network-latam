@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
+import { placeLabel } from '../../data/onboardingOptions'
 import type { Member } from '../../api/types'
 
 interface MemberCardProps {
@@ -74,7 +75,7 @@ export const MemberCard = memo(function MemberCard({
         )}
         {affiliation ? (
           <span className="block mt-0.5 text-pizarra font-normal">
-            {member.region}, {member.country}
+            {placeLabel(member.region, lang)}, {placeLabel(member.country, lang)}
           </span>
         ) : null}
       </p>

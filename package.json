@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "rules": "tsx server/scripts/generate-firestore-rules.ts",
-    "test:rules": "firebase emulators:exec --only firestore,auth --project relif-rules-test \"vitest run server/firestore-rules.test.ts\""
+    "test:rules": "firebase emulators:exec --only firestore,auth --project relif-rules-test \"vitest run server/firestore-rules.test.ts server/firestore-adapter.test.ts\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",

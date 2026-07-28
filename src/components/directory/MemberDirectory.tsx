@@ -4,6 +4,7 @@ import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { MemberCard } from './MemberCard'
 import { MemberDetail } from './MemberDetail'
+import { placeLabel } from '../../data/onboardingOptions'
 import type { Member, PositionType } from '../../api/types'
 
 type PositionFilter = PositionType | 'all'
@@ -48,8 +49,13 @@ export function MemberDirectory() {
 
   // Only offer countries that actually have members, so no filter yields zero.
   const memberCountryOptions = useMemo(
-    () => [...new Set(members.map((m) => m.country))].sort((a, b) => a.localeCompare(b)),
-    [members],
+    () =>
+      [...new Set(members.map((m) => m.country))]
+        // Value stays the canonical stored name; only the label is localized,
+        // so sorting follows what the reader actually sees.
+        .map((canonical) => ({ canonical, label: placeLabel(canonical, lang) }))
+        .sort((a, b) => a.label.localeCompare(b.label, lang)),
+    [members, lang],
   )
 
   const filtered = useMemo(() => {
@@ -79,6 +85,10 @@ export function MemberDirectory() {
         institutionName(member.affiliationId) ?? '',
         member.country,
         member.region,
+        // Also match the localized place names, so searching "Mexico" in
+        // English finds members stored under the canonical "México".
+        placeLabel(member.country, lang),
+        placeLabel(member.region, lang),
         labelsFor(member.interestIds, options.researchInterests),
         labelsFor(member.generalAreaIds, options.generalAreas),
       ]
@@ -95,6 +105,7 @@ export function MemberDirectory() {
     options.researchInterests,
     options.generalAreas,
     institutionName,
+    lang,
   ])
 
   const hasActiveFilters = position !== ALL || area !== ALL || country !== ALL || query !== ''
@@ -179,8 +190,8 @@ export function MemberDirectory() {
               className="rounded-full border border-carbon/15 bg-white/70 px-3.5 py-2 text-xs font-semibold text-carbon outline-none transition-colors focus:border-teal"
             >
               <option value={ALL}>{t.directory.allCountries}</option>
-              {memberCountryOptions.map((name) => (
-                <option key={name} value={name}>{name}</option>
+              {memberCountryOptions.map((option) => (
+                <option key={option.canonical} value={option.canonical}>{option.label}</option>
               ))}
             </select>
           </label>

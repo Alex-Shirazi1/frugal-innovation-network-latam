@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { adminApi, type AdminSession } from '../../api/adminApi'
 import type { PendingMember } from '../../api/types'
-import { generalAreas, languageOptions, researchInterests } from '../../data/onboardingOptions'
+import {
+  generalAreas,
+  languageOptions,
+  placeLabel,
+  researchInterests,
+} from '../../data/onboardingOptions'
 import { institutions } from '../../data/institutions'
 
 const inputClass =
@@ -130,7 +135,8 @@ function PendingCard({
             <p className="text-xs font-medium text-carbon">{entry.jobPositionName}</p>
           ) : null}
           <p className="mt-1 text-xs text-pizarra">
-            {institutionLabel(entry.affiliationId)} · {entry.region}, {entry.country}
+            {institutionLabel(entry.affiliationId)} · {placeLabel(entry.region, 'es')},{' '}
+            {placeLabel(entry.country, 'es')}
           </p>
         </div>
         <time className="text-[11px] text-pizarra" dateTime={entry.createdAt}>

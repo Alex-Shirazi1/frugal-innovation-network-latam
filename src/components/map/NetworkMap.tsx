@@ -4,6 +4,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { SectionHeading } from '../ui/SectionHeading'
 import { useApiData } from '../../api/ApiDataContext'
 import type { Institution, InstitutionCategory } from '../../api/types'
+import { placeLabel } from '../../data/onboardingOptions'
 import { countryPaths, projectLatLon } from './geo'
 import {
   INITIAL_VIEW,
@@ -31,7 +32,7 @@ const PIN_PATH =
   'M0 0C-1.8-4.5-8-8.9-8-14.5A8 8 0 0 1 8-14.5C8-8.9 1.8-4.5 0 0Z'
 
 export function NetworkMap() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { mappedInstitutions } = useApiData()
   const reducedMotion = useReducedMotion()
   const [view, setView] = useState<ViewState>(INITIAL_VIEW)
@@ -263,7 +264,7 @@ export function NetworkMap() {
                   </span>
                   <h4 className="mt-2 text-sm font-bold leading-snug">{selected.name}</h4>
                   <p className="mt-1 text-xs text-pizarra">
-                    {selected.city}, {selected.country}
+                    {selected.city}, {placeLabel(selected.country, lang)}
                   </p>
                   <div className="mt-2.5 flex items-center justify-between">
                     <a
