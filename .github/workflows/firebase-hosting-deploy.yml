@@ -59,6 +59,15 @@ jobs:
       # only be trusted if it matches that data (checked by the drift test in
       # `npm test`) AND actually behaves (checked here against the emulator).
       # These 47 tests are the gate on auto-deploying security rules.
+      # The Firestore emulator runs on the JVM and firebase-tools requires JDK 21+,
+      # which is newer than the ubuntu runner's default.
+      - name: Set up Java for the Firestore emulator
+        if: env.FIRESTORE_CONFIGURED == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: Test Firestore rules against the emulator
         if: env.FIRESTORE_CONFIGURED == 'true'
         run: npm run test:rules
