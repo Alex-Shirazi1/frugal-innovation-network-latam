@@ -1,0 +1,127 @@
+rules_version = '2';
+
+// GENERATED FILE — do not edit by hand.
+// Produced by server/scripts/generate-firestore-rules.ts from the canonical
+// option data in src/data/onboardingOptions.ts and src/data/institutions.ts.
+// Regenerate with: npm run rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Identity ---------------------------------------------------------
+    // Moderation is gated on a custom claim, not on merely being signed in.
+    // Set it once per moderator with the Admin SDK (see docs/DEPLOYMENT.md).
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // ---- Generated whitelists --------------------------------------------
+    function positionTypes() { return ['staff', 'faculty', 'researcher', 'administrator', 'independent']; }
+    function interestIds() { return ['metodologias', 'educacion', 'economia-circular', 'emprendimiento', 'tecnologias', 'salud', 'energia', 'agua', 'agro', 'politicas', 'diseno', 'manufactura']; }
+    function areaIds() { return ['ingenieria', 'negocios', 'ciencias-sociales', 'salud-publica', 'diseno-arte', 'ciencias-naturales', 'educacion-area', 'computacion', 'derecho', 'agronomia']; }
+    function languageIds() { return ['es', 'pt', 'en', 'fr', 'it', 'de']; }
+    function affiliationIds() { return ['iteso', 'javeriana', 'javeriana-cali', 'ucc', 'uca-sv', 'uca-ni', 'scu', 'up-pe', 'esan', 'ibero-cdmx', 'ibero-leon', 'ibero-puebla', 'ibero-torreon', 'ibero-tijuana', 'uas', 'uic', 'ubiobio', 'usach', 'duoc', 'ufmg', 'uarm', 'uao', 'unad', 'usb-cali', 'comillas', 'utt', 'aalto', 'up-innovation', 'frugal-lab', 'innodeva', 'acpo', 'camara-verde', 'rebrif', 'world-entrepreneurs', 'ecoins', 'captanda', 'ctic-uni']; }
+    function regionsByCountry() {
+      return {
+      'Argentina': ['Buenos Aires', 'Córdoba', 'Mendoza', 'Santa Fe', 'Tucumán'],
+      'Bolivia': ['La Paz', 'Cochabamba', 'Santa Cruz', 'Tarija'],
+      'Brasil': ['São Paulo', 'Minas Gerais', 'Rio de Janeiro', 'Bahia', 'Paraná', 'Pernambuco'],
+      'Chile': ['Región Metropolitana', 'Valparaíso', 'Biobío', 'Antofagasta', 'Los Lagos'],
+      'Colombia': ['Bogotá D.C.', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Santander'],
+      'Costa Rica': ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste'],
+      'Ecuador': ['Pichincha', 'Guayas', 'Azuay', 'Manabí'],
+      'El Salvador': ['San Salvador', 'Santa Ana', 'San Miguel', 'La Libertad'],
+      'España': ['Madrid', 'Cataluña', 'Andalucía', 'País Vasco'],
+      'Estados Unidos': ['California', 'Texas', 'Nueva York', 'Florida'],
+      'Finlandia': ['Uusimaa', 'Pirkanmaa'],
+      'Francia': ['Grand Est', 'Isla de Francia', 'Occitania'],
+      'Guatemala': ['Guatemala', 'Quetzaltenango', 'Sacatepéquez'],
+      'México': ['Ciudad de México', 'Jalisco', 'Puebla', 'Guanajuato', 'Coahuila', 'Sinaloa', 'Baja California'],
+      'Nicaragua': ['Managua', 'León', 'Granada'],
+      'Panamá': ['Panamá', 'Colón', 'Chiriquí'],
+      'Paraguay': ['Asunción', 'Central', 'Alto Paraná'],
+      'Perú': ['Lima', 'Arequipa', 'Cusco', 'La Libertad', 'Piura'],
+      'Suiza': ['Ginebra', 'Zúrich', 'Vaud'],
+      'Uruguay': ['Montevideo', 'Canelones', 'Maldonado'],
+      'Venezuela': ['Distrito Capital', 'Zulia', 'Miranda', 'Carabobo']
+    };
+    }
+
+    // ---- Field-level validation ------------------------------------------
+    function textWithin(value, maxLen) {
+      return value is string && value.size() <= maxLen;
+    }
+
+    function requiredText(value, maxLen) {
+      return value is string && value.size() > 0 && value.size() <= maxLen;
+    }
+
+    // A list whose every entry is drawn from `allowed`, sized 1..maxLen.
+    function idsFrom(value, allowed, maxLen) {
+      return value is list
+        && value.size() > 0
+        && value.size() <= maxLen
+        && value.hasOnly(allowed);
+    }
+
+    function validLocation(data) {
+      return data.country is string
+        && data.region is string
+        && regionsByCountry().get(data.country, []).hasAny([data.region]);
+    }
+
+    function validAffiliation(data) {
+      return !('affiliationId' in data.keys())
+        || data.affiliationId == null
+        || affiliationIds().hasAny([data.affiliationId]);
+    }
+
+    function validSocialUrl(data) {
+      return !('socialUrl' in data.keys())
+        || data.socialUrl == null
+        || (textWithin(data.socialUrl, 300)
+            && (data.socialUrl.matches('https://.*') || data.socialUrl.matches('http://.*')));
+    }
+
+    function validSubmission(data) {
+      return data.keys().hasOnly(['firstName', 'lastName', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
+        && data.keys().hasAll(['firstName', 'lastName', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
+        && requiredText(data.firstName, 60)
+        && requiredText(data.lastName, 80)
+        && positionTypes().hasAny([data.position])
+        && textWithin(data.jobPositionName, 120)
+        && textWithin(data.biography, 800)
+        && validLocation(data)
+        && validAffiliation(data)
+        && idsFrom(data.interestIds, interestIds(), 6)
+        && idsFrom(data.generalAreaIds, areaIds(), 3)
+        && idsFrom(data.languages, languageIds(), 6)
+        && validSocialUrl(data)
+        // Consent is a stored gate, not just UI copy — this is real PII.
+        && data.consentToPublish == true
+        // A submitter cannot self-approve.
+        && data.status == 'pending';
+    }
+
+    // ---- Collections ------------------------------------------------------
+
+    // Intake queue. Deliberately NOT publicly readable: it holds personal data
+    // for people who have not been approved for publication yet.
+    match /submissions/{submissionId} {
+      allow create: if validSubmission(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // The published directory. World-readable by design; only a moderator
+    // writes here, and only by copying an approved submission across.
+    match /members/{memberId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

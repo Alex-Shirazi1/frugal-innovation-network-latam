@@ -33,3 +33,9 @@ firebase-debug.log
 server/*.db
 server/*.db-journal
 .env
+
+# Firebase emulator artifacts
+firestore-debug.log
+firebase-debug.log
+ui-debug.log
+.firebase/

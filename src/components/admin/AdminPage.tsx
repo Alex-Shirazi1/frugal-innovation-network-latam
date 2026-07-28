@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
-import { adminApi, type PendingMember } from '../../api/adminApi'
-import { researchInterests } from '../../data/onboardingOptions'
+import { adminApi, type AdminSession } from '../../api/adminApi'
+import type { PendingMember } from '../../api/types'
+import { generalAreas, languageOptions, researchInterests } from '../../data/onboardingOptions'
 import { institutions } from '../../data/institutions'
-
-const KEY_STORAGE = 'relif-admin-key'
 
 const inputClass =
   'w-full rounded-xl border border-carbon/15 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-teal'
 
-function interestLabel(id: string): string {
-  return researchInterests.find((i) => i.id === id)?.es ?? id
+function labelFrom(list: { id: string; es: string }[], id: string): string {
+  return list.find((entry) => entry.id === id)?.es ?? id
 }
 
 function institutionLabel(id: string | null): string {
@@ -17,55 +16,88 @@ function institutionLabel(id: string | null): string {
   return institutions.find((i) => i.id === id)?.name ?? id
 }
 
-function LoginGate({ onAuthenticated }: { onAuthenticated: (key: string) => void }) {
+/**
+ * Sign-in gate. On the hosted deployment this is Google sign-in gated by an
+ * `admin` custom claim; a static site cannot hold a shared secret, so the key
+ * form only appears when running against the local Express backend.
+ */
+function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void }) {
+  const backend = adminApi.backend()
   const [key, setKey] = useState('')
-  const [status, setStatus] = useState<'idle' | 'checking' | 'failed'>('idle')
+  const [status, setStatus] = useState<'idle' | 'checking' | 'failed' | 'denied'>('idle')
 
-  async function submit(event: React.FormEvent) {
-    event.preventDefault()
-    if (!key) return
+  async function attempt(secret?: string) {
     setStatus('checking')
     try {
-      await adminApi.login(key)
-      sessionStorage.setItem(KEY_STORAGE, key)
-      onAuthenticated(key)
-    } catch {
-      setStatus('failed')
+      onSignedIn(await adminApi.signIn(secret))
+    } catch (error: unknown) {
+      setStatus(error instanceof Error && error.message === 'unauthorized' ? 'denied' : 'failed')
     }
   }
 
   return (
     <div className="mx-auto max-w-sm pt-32 px-4">
       <h1 className="font-display text-2xl font-semibold text-carbon">Panel de administración</h1>
-      <p className="mt-2 text-sm text-pizarra">
-        Acceso restringido — ingresa la clave de administración.
-      </p>
-      <form onSubmit={submit} className="mt-6 space-y-4">
-        <input
-          type="password"
-          className={inputClass}
-          value={key}
-          onChange={(event) => {
-            setKey(event.target.value)
-            setStatus('idle')
-          }}
-          placeholder="Clave de administración"
-          autoComplete="current-password"
-          aria-label="Clave de administración"
-        />
-        {status === 'failed' ? (
-          <p role="alert" className="text-xs font-medium text-teal-deep">
-            Clave incorrecta o servidor no disponible.
+
+      {backend === 'firestore' ? (
+        <>
+          <p className="mt-2 text-sm text-pizarra">
+            Acceso restringido a moderadores autorizados de la red.
           </p>
-        ) : null}
-        <button
-          type="submit"
-          disabled={status === 'checking' || !key}
-          className="w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
-        >
-          {status === 'checking' ? 'Verificando…' : 'Entrar'}
-        </button>
-      </form>
+          <button
+            type="button"
+            onClick={() => void attempt()}
+            disabled={status === 'checking'}
+            className="mt-6 w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
+          >
+            {status === 'checking' ? 'Verificando…' : 'Entrar con Google'}
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-pizarra">
+            Backend local — ingresa la clave de administración.
+          </p>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (key) void attempt(key)
+            }}
+            className="mt-6 space-y-4"
+          >
+            <input
+              type="password"
+              className={inputClass}
+              value={key}
+              onChange={(event) => {
+                setKey(event.target.value)
+                setStatus('idle')
+              }}
+              placeholder="Clave de administración"
+              autoComplete="current-password"
+              aria-label="Clave de administración"
+            />
+            <button
+              type="submit"
+              disabled={status === 'checking' || !key}
+              className="w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
+            >
+              {status === 'checking' ? 'Verificando…' : 'Entrar'}
+            </button>
+          </form>
+        </>
+      )}
+
+      {status === 'denied' ? (
+        <p role="alert" className="mt-4 text-xs font-medium text-teal-deep">
+          Esta cuenta no tiene permisos de moderación.
+        </p>
+      ) : null}
+      {status === 'failed' ? (
+        <p role="alert" className="mt-4 text-xs font-medium text-teal-deep">
+          No se pudo iniciar sesión. Revisa la configuración o intenta de nuevo.
+        </p>
+      ) : null}
     </div>
   )
 }
@@ -94,6 +126,9 @@ function PendingCard({
         <div>
           <h3 className="font-semibold">{entry.fullName}</h3>
           <p className="text-xs text-pizarra">{entry.title.es}</p>
+          {entry.jobPositionName ? (
+            <p className="text-xs font-medium text-carbon">{entry.jobPositionName}</p>
+          ) : null}
           <p className="mt-1 text-xs text-pizarra">
             {institutionLabel(entry.affiliationId)} · {entry.region}, {entry.country}
           </p>
@@ -103,21 +138,45 @@ function PendingCard({
         </time>
       </div>
 
+      {entry.biography ? (
+        <p className="mt-3 text-xs leading-relaxed text-pizarra">{entry.biography}</p>
+      ) : null}
+
       <ul className="mt-3 flex flex-wrap gap-1.5">
         {entry.interestIds.map((id) => (
-          <li key={id} className="rounded-full bg-niebla px-2.5 py-1 text-[11px] font-medium text-pizarra">
-            {interestLabel(id)}
+          <li
+            key={id}
+            className="rounded-full bg-verde/12 px-2.5 py-1 text-[11px] font-medium text-[#5d8523]"
+          >
+            {labelFrom(researchInterests, id)}
+          </li>
+        ))}
+        {entry.generalAreaIds.map((id) => (
+          <li
+            key={id}
+            className="rounded-full bg-teal/10 px-2.5 py-1 text-[11px] font-medium text-teal-deep"
+          >
+            {labelFrom(generalAreas, id)}
           </li>
         ))}
       </ul>
 
       <div className="mt-3 flex flex-wrap items-center gap-4 text-xs">
+        {entry.languages.length > 0 ? (
+          <span className="text-pizarra">
+            Idiomas: {entry.languages.map((id) => labelFrom(languageOptions, id)).join(' · ')}
+          </span>
+        ) : null}
         {entry.socialUrl ? (
-          <a href={entry.socialUrl} target="_blank" rel="noreferrer" className="font-semibold text-teal hover:underline">
+          <a
+            href={entry.socialUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-teal hover:underline"
+          >
             ↗ {entry.socialUrl.replace(/^https?:\/\//, '')}
           </a>
         ) : null}
-        {entry.cvFileName ? <span className="text-pizarra">CV: {entry.cvFileName}</span> : null}
       </div>
 
       <div className="mt-4 flex gap-2">
@@ -143,45 +202,72 @@ function PendingCard({
 }
 
 export function AdminPage() {
-  const [adminKey, setAdminKey] = useState<string | null>(() => sessionStorage.getItem(KEY_STORAGE))
+  const [session, setSession] = useState<AdminSession | null>(null)
+  const [restoring, setRestoring] = useState(true)
   const [pending, setPending] = useState<PendingMember[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const refresh = useCallback(async (key: string) => {
+  const refresh = useCallback(async () => {
     try {
-      setPending(await adminApi.listPending(key))
+      setPending(await adminApi.listPending())
       setError(null)
     } catch (err: unknown) {
       if (err instanceof Error && err.message === 'unauthorized') {
-        sessionStorage.removeItem(KEY_STORAGE)
-        setAdminKey(null)
+        await adminApi.signOut()
+        setSession(null)
       } else {
-        setError('No se pudo contactar al servidor. ¿Está corriendo el backend?')
+        setError('No se pudo cargar la cola de solicitudes. Intenta de nuevo.')
       }
     }
   }, [])
 
+  // Restore an existing session (Firebase auth state, or the dev key) on load.
   useEffect(() => {
-    if (adminKey) void refresh(adminKey)
-  }, [adminKey, refresh])
+    let cancelled = false
+    void adminApi
+      .restore()
+      .then((restored) => {
+        if (!cancelled) setSession(restored)
+      })
+      .catch(() => {
+        if (!cancelled) setSession(null)
+      })
+      .finally(() => {
+        if (!cancelled) setRestoring(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
-  if (!adminKey) {
-    return (
-      <main className="min-h-screen bg-niebla/60">
-        <LoginGate onAuthenticated={setAdminKey} />
-      </main>
-    )
-  }
+  useEffect(() => {
+    if (session) void refresh()
+  }, [session, refresh])
 
   async function resolve(id: string, action: 'approve' | 'reject') {
-    if (!adminKey) return
     try {
-      if (action === 'approve') await adminApi.approve(adminKey, id)
-      else await adminApi.reject(adminKey, id)
+      if (action === 'approve') await adminApi.approve(id)
+      else await adminApi.reject(id)
       setPending((prev) => prev?.filter((entry) => entry.id !== id) ?? null)
     } catch {
       setError('La acción falló — recarga e intenta de nuevo.')
     }
+  }
+
+  if (restoring) {
+    return (
+      <main className="min-h-screen bg-niebla/60">
+        <p className="pt-32 text-center text-sm text-pizarra">Verificando sesión…</p>
+      </main>
+    )
+  }
+
+  if (!session) {
+    return (
+      <main className="min-h-screen bg-niebla/60">
+        <LoginGate onSignedIn={setSession} />
+      </main>
+    )
   }
 
   return (
@@ -189,15 +275,18 @@ export function AdminPage() {
       <div className="mx-auto max-w-3xl px-4 pt-16">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal">RELIF · Administración</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal">
+              RELIF · Administración
+            </p>
             <h1 className="mt-1 font-display text-3xl font-semibold text-carbon">
               Solicitudes de membresía
             </h1>
+            <p className="mt-1 text-xs text-pizarra">{session.label}</p>
           </div>
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => void refresh(adminKey)}
+              onClick={() => void refresh()}
               className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal hover:text-teal"
             >
               ⟳ Actualizar
@@ -205,8 +294,7 @@ export function AdminPage() {
             <button
               type="button"
               onClick={() => {
-                sessionStorage.removeItem(KEY_STORAGE)
-                setAdminKey(null)
+                void adminApi.signOut().then(() => setSession(null))
               }}
               className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal-deep hover:text-teal-deep"
             >
@@ -216,7 +304,10 @@ export function AdminPage() {
         </div>
 
         {error ? (
-          <p role="alert" className="mt-6 rounded-xl border border-naranja/40 bg-naranja/10 p-4 text-sm text-carbon">
+          <p
+            role="alert"
+            className="mt-6 rounded-xl border border-naranja/40 bg-naranja/10 p-4 text-sm text-carbon"
+          >
             {error}
           </p>
         ) : null}
@@ -227,7 +318,7 @@ export function AdminPage() {
 
         {pending !== null && pending.length === 0 ? (
           <p className="mt-10 rounded-2xl border border-dashed border-carbon/20 p-10 text-center text-sm text-pizarra">
-            No hay solicitudes pendientes. 🎉
+            No hay solicitudes pendientes.
           </p>
         ) : null}
 
