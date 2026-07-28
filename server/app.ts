@@ -1,7 +1,10 @@
 /**
- * RELIF prototype API. Serves all site content plus the member-intake
- * pipeline. This server NEVER talks to the live redinnovacionfrugal.lat
- * host — it is the future replacement for it.
+ * RELIF local development API. Serves all site content plus the member-intake
+ * pipeline. This server NEVER talks to the live redinnovacionfrugal.lat host.
+ *
+ * Production does not run this process — the hosted site uses the Firestore
+ * adapter instead (see docs/DEPLOYMENT.md). Keeping Express for local dev means
+ * development needs no cloud account, no network, and no billable resources.
  *
  * Every response uses the { success, data, error } envelope.
  */
@@ -9,26 +12,28 @@ import { readFileSync } from 'node:fs'
 import { timingSafeEqual } from 'node:crypto'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import express from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
 import rateLimit from 'express-rate-limit'
-import { validateIntake } from './validate.mjs'
+import { validateIntake } from '../src/domain/intake'
+import type { IntakeDb } from './db'
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), 'data')
-const readJson = (name) => JSON.parse(readFileSync(join(dataDir, `${name}.json`), 'utf8'))
+const readJson = (name: string): unknown =>
+  JSON.parse(readFileSync(join(dataDir, `${name}.json`), 'utf8'))
 
-const seedMembers = readJson('members')
+const seedMembers = readJson('members') as unknown[]
 const institutions = readJson('institutions')
 const resources = readJson('resources')
 const conference = readJson('conference')
 const onboardingOptions = readJson('onboarding-options')
 
-const ok = (data) => ({ success: true, data, error: null })
-const err = (error) => ({ success: false, data: null, error })
+const ok = <T,>(data: T) => ({ success: true, data, error: null })
+const err = (error: string) => ({ success: false, data: null, error })
 
 const DEV_ADMIN_KEY = 'relif-dev-admin'
 
-function getAdminKey() {
+function getAdminKey(): string {
   const key = process.env.ADMIN_KEY
   if (key) return key
   if (process.env.NODE_ENV === 'production') {
@@ -37,19 +42,21 @@ function getAdminKey() {
   return DEV_ADMIN_KEY
 }
 
-function safeEqual(a, b) {
+function safeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(String(a))
   const bufB = Buffer.from(String(b))
   return bufA.length === bufB.length && timingSafeEqual(bufA, bufB)
 }
 
-export function createApp(db) {
+export function createApp(db: IntakeDb) {
   const app = express()
   const adminKey = getAdminKey()
   if (adminKey === DEV_ADMIN_KEY) {
     console.warn('[relif-api] ADMIN_KEY not set — using the dev default. Never do this in production.')
   }
 
+  // Dev-only server, so a permissive origin is fine here. The hosted path does
+  // not use this process; Firestore rules are the boundary in production.
   app.use(cors())
   app.use(express.json({ limit: '50kb' }))
 
@@ -82,8 +89,8 @@ export function createApp(db) {
     }
 
     const result = validateIntake(req.body)
-    if (!result.ok) {
-      return res.status(400).json(err(result.error))
+    if (!result.ok || !result.member) {
+      return res.status(400).json(err(result.error ?? 'missing-required'))
     }
 
     const record = db.insertIntake(result.member)
@@ -99,7 +106,7 @@ export function createApp(db) {
     message: err('rate-limited'),
   })
 
-  function requireAdmin(req, res, next) {
+  function requireAdmin(req: Request, res: Response, next: NextFunction) {
     if (!safeEqual(req.get('x-admin-key') ?? '', adminKey)) {
       return res.status(401).json(err('unauthorized'))
     }

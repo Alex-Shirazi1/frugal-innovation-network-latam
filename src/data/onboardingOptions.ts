@@ -25,15 +25,68 @@ export const countries: CountryOption[] = [
   { name: 'El Salvador', regions: ['San Salvador', 'Santa Ana', 'San Miguel', 'La Libertad'] },
   { name: 'España', regions: ['Madrid', 'Cataluña', 'Andalucía', 'País Vasco'] },
   { name: 'Estados Unidos', regions: ['California', 'Texas', 'Nueva York', 'Florida'] },
+  // Non-LatAm entries exist because the network has partner institutions there
+  // (Aalto, UTT, World Entrepreneurs). Members can be affiliated with them, so
+  // the country/region whitelist has to cover them or intake would reject.
+  { name: 'Finlandia', regions: ['Uusimaa', 'Pirkanmaa'] },
+  { name: 'Francia', regions: ['Grand Est', 'Isla de Francia', 'Occitania'] },
   { name: 'Guatemala', regions: ['Guatemala', 'Quetzaltenango', 'Sacatepéquez'] },
   { name: 'México', regions: ['Ciudad de México', 'Jalisco', 'Puebla', 'Guanajuato', 'Coahuila', 'Sinaloa', 'Baja California'] },
   { name: 'Nicaragua', regions: ['Managua', 'León', 'Granada'] },
   { name: 'Panamá', regions: ['Panamá', 'Colón', 'Chiriquí'] },
   { name: 'Paraguay', regions: ['Asunción', 'Central', 'Alto Paraná'] },
   { name: 'Perú', regions: ['Lima', 'Arequipa', 'Cusco', 'La Libertad', 'Piura'] },
+  { name: 'Suiza', regions: ['Ginebra', 'Zúrich', 'Vaud'] },
   { name: 'Uruguay', regions: ['Montevideo', 'Canelones', 'Maldonado'] },
   { name: 'Venezuela', regions: ['Distrito Capital', 'Zulia', 'Miranda', 'Carabobo'] },
 ]
+
+/**
+ * Maps each country to the region that a city belongs to, so seed data derived
+ * from an institution's city still lands on a region the validator accepts.
+ * Only cities present in src/data/institutions.ts need an entry.
+ */
+export const cityToRegion: Record<string, string> = {
+  Guadalajara: 'Jalisco',
+  'Ciudad de México': 'Ciudad de México',
+  León: 'Guanajuato',
+  Puebla: 'Puebla',
+  Torreón: 'Coahuila',
+  Culiacán: 'Sinaloa',
+  Tijuana: 'Baja California',
+  Bogotá: 'Bogotá D.C.',
+  Cali: 'Valle del Cauca',
+  Medellín: 'Antioquia',
+  Córdoba: 'Córdoba',
+  'Buenos Aires': 'Buenos Aires',
+  'San Salvador': 'San Salvador',
+  Managua: 'Managua',
+  'Santa Clara': 'California',
+  Lima: 'Lima',
+  Arequipa: 'Arequipa',
+  Santiago: 'Región Metropolitana',
+  Valparaíso: 'Valparaíso',
+  Concepción: 'Biobío',
+  Troyes: 'Grand Est',
+  Espoo: 'Uusimaa',
+  Ginebra: 'Ginebra',
+  'São Paulo': 'São Paulo',
+  'Belo Horizonte': 'Minas Gerais',
+  'Rio de Janeiro': 'Rio de Janeiro',
+  Quito: 'Pichincha',
+  Guayaquil: 'Guayas',
+  'San José': 'San José',
+  'Ciudad de Guatemala': 'Guatemala',
+  Guatemala: 'Guatemala',
+  Montevideo: 'Montevideo',
+  Asunción: 'Asunción',
+  'La Paz': 'La Paz',
+  Cochabamba: 'Cochabamba',
+  Caracas: 'Distrito Capital',
+  Panamá: 'Panamá',
+  Madrid: 'Madrid',
+  Barcelona: 'Cataluña',
+}
 
 export interface ResearchInterest {
   id: string
@@ -56,3 +109,50 @@ export const researchInterests: ResearchInterest[] = [
   { id: 'diseno', es: 'Diseño centrado en comunidades', en: 'Community-centered design', pt: 'Design centrado em comunidades' },
   { id: 'manufactura', es: 'Manufactura local', en: 'Local manufacturing', pt: 'Manufatura local' },
 ]
+
+/**
+ * Broad disciplinary areas — Allan's "general area of interest", asked
+ * separately from the narrower technical research interests above.
+ */
+export const generalAreas: ResearchInterest[] = [
+  { id: 'ingenieria', es: 'Ingeniería', en: 'Engineering', pt: 'Engenharia' },
+  { id: 'negocios', es: 'Negocios y administración', en: 'Business & management', pt: 'Negócios e administração' },
+  { id: 'ciencias-sociales', es: 'Ciencias sociales', en: 'Social sciences', pt: 'Ciências sociais' },
+  { id: 'salud-publica', es: 'Salud pública', en: 'Public health', pt: 'Saúde pública' },
+  { id: 'diseno-arte', es: 'Diseño y artes', en: 'Design & arts', pt: 'Design e artes' },
+  { id: 'ciencias-naturales', es: 'Ciencias naturales', en: 'Natural sciences', pt: 'Ciências naturais' },
+  { id: 'educacion-area', es: 'Educación', en: 'Education', pt: 'Educação' },
+  { id: 'computacion', es: 'Computación y datos', en: 'Computing & data', pt: 'Computação e dados' },
+  { id: 'derecho', es: 'Derecho y políticas', en: 'Law & policy', pt: 'Direito e políticas' },
+  { id: 'agronomia', es: 'Agronomía', en: 'Agronomy', pt: 'Agronomia' },
+]
+
+export interface LanguageOption {
+  /** ISO 639-1 code — stored on the member record. */
+  id: string
+  es: string
+  en: string
+  pt: string
+}
+
+/** Languages a member can work in. Allan flagged this as a missing field. */
+export const languageOptions: LanguageOption[] = [
+  { id: 'es', es: 'Español', en: 'Spanish', pt: 'Espanhol' },
+  { id: 'pt', es: 'Portugués', en: 'Portuguese', pt: 'Português' },
+  { id: 'en', es: 'Inglés', en: 'English', pt: 'Inglês' },
+  { id: 'fr', es: 'Francés', en: 'French', pt: 'Francês' },
+  { id: 'it', es: 'Italiano', en: 'Italian', pt: 'Italiano' },
+  { id: 'de', es: 'Alemán', en: 'German', pt: 'Alemão' },
+]
+
+/** Upper bounds shared by the form, the validator, and the Firestore rules. */
+export const fieldLimits = {
+  firstName: 60,
+  lastName: 80,
+  jobPositionName: 120,
+  biography: 800,
+  socialUrl: 300,
+  maxTechnicalInterests: 6,
+  maxGeneralAreas: 3,
+  maxLanguages: 6,
+} as const

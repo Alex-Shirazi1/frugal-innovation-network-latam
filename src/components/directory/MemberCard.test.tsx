@@ -4,7 +4,8 @@ import type { ReactElement } from 'react'
 import { MemberCard } from './MemberCard'
 import { I18nProvider } from '../../i18n/I18nContext'
 import { ApiDataProvider } from '../../api/ApiDataContext'
-import { institutionName, type Member } from '../../data/members'
+import { institutionName } from '../../data/members'
+import { makeMember } from '../../test/fixtures'
 import { institutions } from '../../data/institutions'
 
 // MemberCard reads institution names and interest labels from the data layer,
@@ -21,20 +22,6 @@ beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
 })
 
-function makeMember(overrides: Partial<Member> = {}): Member {
-  return {
-    id: 'm-1',
-    fullName: 'Ada Lovelace',
-    title: { es: 'Investigadora', en: 'Researcher', pt: 'Pesquisadora' },
-    position: 'researcher',
-    affiliationId: null,
-    country: 'México',
-    region: 'Jalisco',
-    interestIds: ['salud', 'agua', 'energia'],
-    avatarHue: 3,
-    ...overrides,
-  }
-}
 
 describe('MemberCard', () => {
   it('renders the member name and the localized title (default Spanish)', () => {

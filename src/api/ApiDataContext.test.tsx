@@ -2,21 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { ApiDataProvider, useApiData } from './ApiDataContext'
 import { mockMembers } from '../data/members'
-import type { Member } from './types'
+import { makeMember as buildMember } from '../test/fixtures'
 
-function makeMember(id: string): Member {
-  return {
-    id,
-    fullName: 'Test Member',
-    title: { es: 'Prueba', en: 'Test', pt: 'Teste' },
-    position: 'independent',
-    affiliationId: null,
-    country: 'México',
-    region: 'Jalisco',
-    interestIds: ['salud'],
-    avatarHue: 42,
-  }
-}
+const makeMember = (id: string) => buildMember({ id, position: 'independent' })
 
 describe('ApiDataProvider / useApiData', () => {
   beforeEach(() => {

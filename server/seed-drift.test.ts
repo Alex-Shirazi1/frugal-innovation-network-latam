@@ -18,7 +18,13 @@ import {
   galleryTiles,
   speakers,
 } from '../src/data/conference'
-import { countries, positionTypes, researchInterests } from '../src/data/onboardingOptions'
+import {
+  countries,
+  generalAreas,
+  languageOptions,
+  positionTypes,
+  researchInterests,
+} from '../src/data/onboardingOptions'
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), 'data')
 const readJson = (name: string): unknown =>
@@ -33,7 +39,10 @@ describe('server/data JSON matches src/data (run `npm run seed` if not)', () => 
     ['members', mockMembers],
     ['resources', resources],
     ['conference', { agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles }],
-    ['onboarding-options', { countries, positionTypes, researchInterests }],
+    [
+      'onboarding-options',
+      { countries, positionTypes, researchInterests, generalAreas, languageOptions },
+    ],
   ])('%s.json is in sync', (name, canonical) => {
     expect(readJson(name)).toEqual(normalize(canonical))
   })

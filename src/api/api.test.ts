@@ -3,17 +3,9 @@ import { bundledDataSource } from './adapters/bundled'
 import { createHttpDataSource } from './adapters/http'
 import { createFallbackDataSource } from './fallback'
 import type { IntakeSubmission } from './types'
+import { makeSubmission } from '../test/fixtures'
 
-const validSubmission: IntakeSubmission = {
-  fullName: 'Ana Prueba García',
-  position: 'researcher',
-  affiliationId: 'iteso',
-  country: 'México',
-  region: 'Jalisco',
-  interestIds: ['salud', 'energia'],
-  socialUrl: 'https://linkedin.com/in/ana-prueba',
-  cvFileName: null,
-}
+const validSubmission: IntakeSubmission = makeSubmission()
 
 function jsonResponse(body: unknown): Response {
   return new Response(JSON.stringify(body), {
@@ -45,13 +37,17 @@ describe('bundledDataSource', () => {
   })
 
   it.each([
-    ['empty name', { ...validSubmission, fullName: ' ' }, 'missing-required'],
+    ['empty first name', { ...validSubmission, firstName: ' ' }, 'missing-required'],
+    ['empty last name', { ...validSubmission, lastName: ' ' }, 'missing-required'],
+    ['no general areas', { ...validSubmission, generalAreaIds: [] }, 'missing-areas'],
+    ['no languages', { ...validSubmission, languages: [] }, 'missing-languages'],
+    ['consent withheld', { ...validSubmission, consentToPublish: false }, 'consent-required'],
     ['region/country mismatch', { ...validSubmission, region: 'Lima' }, 'invalid-location'],
     ['unknown interests', { ...validSubmission, interestIds: ['x'] }, 'missing-interests'],
     ['bad url', { ...validSubmission, socialUrl: 'nope' }, 'invalid-url'],
   ])('rejects %s', async (_label, submission, code) => {
     const result = await bundledDataSource.submitIntake(submission as IntakeSubmission)
-    expect(result).toEqual({ success: false, error: code })
+    expect(result).toEqual({ success: false, error: code, persisted: false })
   })
 })
 
@@ -70,13 +66,32 @@ describe('createHttpDataSource', () => {
     await expect(createHttpDataSource('/api').getMembers()).rejects.toThrow('boom')
   })
 
+  it('reports persisted: true when a backend accepted the record', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(jsonResponse({ success: true, data: { id: 'intake-1' }, error: null })),
+    )
+    const result = await createHttpDataSource('/api').submitIntake(validSubmission)
+    expect(result.success).toBe(true)
+    expect(result.persisted).toBe(true)
+  })
+
+  it('reports persisted: false when the backend rejected the record', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(jsonResponse({ success: false, data: null, error: 'invalid-url' })),
+    )
+    const result = await createHttpDataSource('/api').submitIntake(validSubmission)
+    expect(result.persisted).toBe(false)
+  })
+
   it('maps intake validation errors without throwing', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(jsonResponse({ success: false, data: null, error: 'invalid-location' })),
     )
     const result = await createHttpDataSource('/api').submitIntake(validSubmission)
-    expect(result).toEqual({ success: false, error: 'invalid-location' })
+    expect(result).toEqual({ success: false, error: 'invalid-location', persisted: false })
   })
 
   it('POSTs intake submissions to the intake endpoint', async () => {
@@ -89,7 +104,8 @@ describe('createHttpDataSource', () => {
     const [url, init] = fetchMock.mock.calls[0]
     expect(url).toBe('/api/members/intake')
     expect(init.method).toBe('POST')
-    expect(JSON.parse(init.body).fullName).toBe('Ana Prueba García')
+    expect(JSON.parse(init.body).firstName).toBe('Ana')
+    expect(JSON.parse(init.body).lastName).toBe('Prueba García')
   })
 })
 
@@ -111,16 +127,29 @@ describe('createFallbackDataSource', () => {
     expect(fallbackSpy.getMembers).not.toHaveBeenCalled()
   })
 
+  it('marks a submission non-persisted when it falls back to bundled data', async () => {
+    const primary = {
+      ...bundledDataSource,
+      submitIntake: vi.fn().mockRejectedValue(new Error('network down')),
+    }
+    const source = createFallbackDataSource(primary, bundledDataSource)
+
+    const result = await source.submitIntake(validSubmission)
+    expect(result.success).toBe(true)
+    // Validated locally, stored nowhere — the UI must not claim success.
+    expect(result.persisted).toBe(false)
+  })
+
   it('does not retry intake validation failures against the fallback', async () => {
     const primary = {
       ...bundledDataSource,
-      submitIntake: vi.fn().mockResolvedValue({ success: false, error: 'invalid-url' }),
+      submitIntake: vi.fn().mockResolvedValue({ success: false, error: 'invalid-url', persisted: false }),
     }
     const fallback = { ...bundledDataSource, submitIntake: vi.fn() }
     const source = createFallbackDataSource(primary, fallback)
 
     const result = await source.submitIntake(validSubmission)
-    expect(result).toEqual({ success: false, error: 'invalid-url' })
+    expect(result).toEqual({ success: false, error: 'invalid-url', persisted: false })
     expect(fallback.submitIntake).not.toHaveBeenCalled()
   })
 })

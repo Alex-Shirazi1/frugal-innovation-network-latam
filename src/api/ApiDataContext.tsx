@@ -28,7 +28,13 @@ import {
   galleryTiles,
   speakers,
 } from '../data/conference'
-import { countries, positionTypes, researchInterests } from '../data/onboardingOptions'
+import {
+  countries,
+  generalAreas,
+  languageOptions,
+  positionTypes,
+  researchInterests,
+} from '../data/onboardingOptions'
 
 interface ApiDataValue {
   institutions: Institution[]
@@ -68,6 +74,8 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
     countries,
     positionTypes,
     researchInterests,
+    generalAreas,
+    languageOptions,
   })
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
 

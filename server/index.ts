@@ -1,5 +1,5 @@
-import { createApp } from './app.mjs'
-import { openDb } from './db.mjs'
+import { createApp } from './app'
+import { openDb } from './db'
 
 const PORT = Number(process.env.PORT ?? 3001)
 

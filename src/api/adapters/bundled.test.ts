@@ -1,23 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { processIntakeLocally as processIntake } from './bundled'
 import type { IntakeSubmission } from '../types'
+import { makeSubmission } from '../../test/fixtures'
 import { countries, researchInterests } from '../../data/onboardingOptions'
 
 // A submission that passes every validation gate. Individual tests clone and
 // mutate this to exercise one failure mode at a time.
 function validSubmission(overrides: Partial<IntakeSubmission> = {}): IntakeSubmission {
   const country = countries[0]
-  return {
-    fullName: 'Ada Lovelace',
-    position: 'researcher',
+  return makeSubmission({
+    firstName: 'Ada',
+    lastName: 'Lovelace',
     affiliationId: null,
     country: country.name,
     region: country.regions[0],
     interestIds: [researchInterests[0].id],
     socialUrl: '',
-    cvFileName: null,
     ...overrides,
-  }
+  })
 }
 
 describe('processIntake', () => {
@@ -46,17 +46,17 @@ describe('processIntake', () => {
     expect(result.data?.position).toBe('researcher')
     // researcher position maps to a localized title.
     expect(result.data?.title.en).toBe('Researcher')
-    expect(result.data?.id).toMatch(/^intake-/)
+    expect(result.data?.id).toMatch(/^local-/)
   })
 
   it('trims whitespace from the full name', async () => {
-    const result = await run(validSubmission({ fullName: '  Grace Hopper  ' }))
+    const result = await run(validSubmission({ firstName: '  Grace  ', lastName: '  Hopper  ' }))
     expect(result.success).toBe(true)
     expect(result.data?.fullName).toBe('Grace Hopper')
   })
 
-  it('rejects a blank name', async () => {
-    const result = await run(validSubmission({ fullName: '   ' }))
+  it('rejects a blank first name', async () => {
+    const result = await run(validSubmission({ firstName: '   ' }))
     expect(result.success).toBe(false)
     expect(result.error).toBe('missing-required')
   })
@@ -117,9 +117,55 @@ describe('processIntake', () => {
     expect(result.data?.socialUrl).toBeUndefined()
   })
 
+  it('rejects a blank last name', async () => {
+    const result = await run(validSubmission({ lastName: '  ' }))
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('missing-required')
+  })
+
+  it('requires at least one general area', async () => {
+    const result = await run(validSubmission({ generalAreaIds: [] }))
+    expect(result.error).toBe('missing-areas')
+  })
+
+  it('requires at least one language', async () => {
+    const result = await run(validSubmission({ languages: [] }))
+    expect(result.error).toBe('missing-languages')
+  })
+
+  it('requires explicit consent to publish', async () => {
+    const result = await run(validSubmission({ consentToPublish: false }))
+    expect(result.error).toBe('consent-required')
+  })
+
+  it('rejects an overlong biography', async () => {
+    const result = await run(validSubmission({ biography: 'x'.repeat(801) }))
+    expect(result.error).toBe('too-long')
+  })
+
+  it('splits and echoes the name parts it was given', async () => {
+    const result = await run(validSubmission({ firstName: 'Grace', lastName: 'Hopper' }))
+    expect(result.data?.firstName).toBe('Grace')
+    expect(result.data?.lastName).toBe('Hopper')
+    expect(result.data?.fullName).toBe('Grace Hopper')
+  })
+
+  /**
+   * The whole point of the flag: this adapter validates but stores nothing, so
+   * the UI must never report a saved submission on its word alone.
+   */
+  it('always reports persisted: false, even on success', async () => {
+    const ok = await run(validSubmission())
+    expect(ok.success).toBe(true)
+    expect(ok.persisted).toBe(false)
+
+    const bad = await run(validSubmission({ consentToPublish: false }))
+    expect(bad.persisted).toBe(false)
+  })
+
   it('derives a deterministic avatarHue in the 0-359 range from the name', async () => {
-    const a = await run(validSubmission({ fullName: 'Ada Lovelace' }))
-    const b = await run(validSubmission({ fullName: 'Ada Lovelace' }))
+    const a = await run(validSubmission({ firstName: 'Ada Lovelace' }))
+    const b = await run(validSubmission({ firstName: 'Ada Lovelace' }))
     expect(a.data?.avatarHue).toBe(b.data?.avatarHue)
     expect(a.data?.avatarHue).toBeGreaterThanOrEqual(0)
     expect(a.data?.avatarHue).toBeLessThan(360)

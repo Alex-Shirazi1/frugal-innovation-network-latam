@@ -1,7 +1,7 @@
 /**
  * Dumps the canonical in-repo datasets to server/data/*.json.
  * The JSON files are the single source of truth consumed by BOTH the
- * prototype backend (served over HTTP) and the frontend bundled adapter
+ * local dev backend (served over HTTP) and the frontend bundled adapter
  * (imported directly as an offline fallback).
  *
  * Run with: npm run seed
@@ -20,7 +20,13 @@ import {
   conferenceVideos,
   galleryTiles,
 } from '../../src/data/conference'
-import { countries, positionTypes, researchInterests } from '../../src/data/onboardingOptions'
+import {
+  countries,
+  generalAreas,
+  languageOptions,
+  positionTypes,
+  researchInterests,
+} from '../../src/data/onboardingOptions'
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'data')
 mkdirSync(outDir, { recursive: true })
@@ -35,4 +41,10 @@ dump('institutions', institutions)
 dump('members', mockMembers)
 dump('resources', resources)
 dump('conference', { agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles })
-dump('onboarding-options', { countries, positionTypes, researchInterests })
+dump('onboarding-options', {
+  countries,
+  positionTypes,
+  researchInterests,
+  generalAreas,
+  languageOptions,
+})

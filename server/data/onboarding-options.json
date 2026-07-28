@@ -97,6 +97,21 @@
       ]
     },
     {
+      "name": "Finlandia",
+      "regions": [
+        "Uusimaa",
+        "Pirkanmaa"
+      ]
+    },
+    {
+      "name": "Francia",
+      "regions": [
+        "Grand Est",
+        "Isla de Francia",
+        "Occitania"
+      ]
+    },
+    {
       "name": "Guatemala",
       "regions": [
         "Guatemala",
@@ -148,6 +163,14 @@
         "Cusco",
         "La Libertad",
         "Piura"
+      ]
+    },
+    {
+      "name": "Suiza",
+      "regions": [
+        "Ginebra",
+        "Zúrich",
+        "Vaud"
       ]
     },
     {
@@ -247,6 +270,106 @@
       "es": "Manufactura local",
       "en": "Local manufacturing",
       "pt": "Manufatura local"
+    }
+  ],
+  "generalAreas": [
+    {
+      "id": "ingenieria",
+      "es": "Ingeniería",
+      "en": "Engineering",
+      "pt": "Engenharia"
+    },
+    {
+      "id": "negocios",
+      "es": "Negocios y administración",
+      "en": "Business & management",
+      "pt": "Negócios e administração"
+    },
+    {
+      "id": "ciencias-sociales",
+      "es": "Ciencias sociales",
+      "en": "Social sciences",
+      "pt": "Ciências sociais"
+    },
+    {
+      "id": "salud-publica",
+      "es": "Salud pública",
+      "en": "Public health",
+      "pt": "Saúde pública"
+    },
+    {
+      "id": "diseno-arte",
+      "es": "Diseño y artes",
+      "en": "Design & arts",
+      "pt": "Design e artes"
+    },
+    {
+      "id": "ciencias-naturales",
+      "es": "Ciencias naturales",
+      "en": "Natural sciences",
+      "pt": "Ciências naturais"
+    },
+    {
+      "id": "educacion-area",
+      "es": "Educación",
+      "en": "Education",
+      "pt": "Educação"
+    },
+    {
+      "id": "computacion",
+      "es": "Computación y datos",
+      "en": "Computing & data",
+      "pt": "Computação e dados"
+    },
+    {
+      "id": "derecho",
+      "es": "Derecho y políticas",
+      "en": "Law & policy",
+      "pt": "Direito e políticas"
+    },
+    {
+      "id": "agronomia",
+      "es": "Agronomía",
+      "en": "Agronomy",
+      "pt": "Agronomia"
+    }
+  ],
+  "languageOptions": [
+    {
+      "id": "es",
+      "es": "Español",
+      "en": "Spanish",
+      "pt": "Espanhol"
+    },
+    {
+      "id": "pt",
+      "es": "Portugués",
+      "en": "Portuguese",
+      "pt": "Português"
+    },
+    {
+      "id": "en",
+      "es": "Inglés",
+      "en": "English",
+      "pt": "Inglês"
+    },
+    {
+      "id": "fr",
+      "es": "Francés",
+      "en": "French",
+      "pt": "Francês"
+    },
+    {
+      "id": "it",
+      "es": "Italiano",
+      "en": "Italian",
+      "pt": "Italiano"
+    },
+    {
+      "id": "de",
+      "es": "Alemán",
+      "en": "German",
+      "pt": "Alemão"
     }
   ]
 }

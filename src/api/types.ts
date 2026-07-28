@@ -13,11 +13,26 @@ export type {
   Localized,
   Speaker,
 } from '../data/conference'
-export type { CountryOption, PositionType, ResearchInterest } from '../data/onboardingOptions'
+export type {
+  CountryOption,
+  LanguageOption,
+  PositionType,
+  ResearchInterest,
+} from '../data/onboardingOptions'
+
+// Validation lives in src/domain/intake.ts — the single source of truth shared
+// by the browser, the local Express backend, and the generated Firestore rules.
+export type { IntakeSubmission, IntakeErrorCode, ValidatedIntake } from '../domain/intake'
 
 import type { Member } from '../data/members'
 import type { AgendaItem, ConferenceVideo, GalleryTile, Speaker } from '../data/conference'
-import type { CountryOption, PositionType, ResearchInterest } from '../data/onboardingOptions'
+import type {
+  CountryOption,
+  LanguageOption,
+  PositionType,
+  ResearchInterest,
+} from '../data/onboardingOptions'
+import type { IntakeErrorCode } from '../domain/intake'
 
 /** Envelope returned by every backend endpoint. */
 export interface ApiResponse<T> {
@@ -38,31 +53,27 @@ export interface OnboardingOptions {
   countries: CountryOption[]
   positionTypes: PositionType[]
   researchInterests: ResearchInterest[]
+  generalAreas: ResearchInterest[]
+  languageOptions: LanguageOption[]
 }
-
-export interface IntakeSubmission {
-  fullName: string
-  position: PositionType | ''
-  affiliationId: string | null
-  country: string
-  region: string
-  interestIds: string[]
-  socialUrl: string
-  cvFileName: string | null
-}
-
-/** Stable error codes shared by the server and the bundled fallback. */
-export type IntakeErrorCode =
-  | 'missing-required'
-  | 'invalid-location'
-  | 'invalid-affiliation'
-  | 'missing-interests'
-  | 'invalid-url'
-  | 'rate-limited'
-  | 'network'
 
 export interface IntakeResult {
   success: boolean
   data?: Member
   error?: IntakeErrorCode
+  /**
+   * True only when a backend durably stored the submission.
+   *
+   * The bundled fallback can validate a submission perfectly well while
+   * storing nothing, so the UI must not treat `success: true` alone as proof
+   * the data was saved — otherwise a real signup silently disappears behind a
+   * success screen.
+   */
+  persisted: boolean
+}
+
+/** A pending submission as seen by a moderator. */
+export interface PendingMember extends Member {
+  status: 'pending' | 'approved'
+  createdAt: string
 }

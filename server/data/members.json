@@ -1,6 +1,8 @@
 [
   {
     "id": "mock-0",
+    "firstName": "Valentina",
+    "lastName": "Miranda Navarro",
     "fullName": "Valentina Miranda Navarro",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -8,18 +10,29 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "faculty",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": "iteso",
     "country": "México",
-    "region": "Guadalajara",
+    "region": "Jalisco",
     "interestIds": [
       "metodologias",
       "salud"
+    ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/valentina-miranda",
     "avatarHue": 0
   },
   {
     "id": "mock-1",
+    "firstName": "Mateo",
+    "lastName": "Ríos Ibarra",
     "fullName": "Mateo Ríos Ibarra",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -27,6 +40,8 @@
       "pt": "Professor de Engenharia"
     },
     "position": "researcher",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": "uca-ni",
     "country": "Nicaragua",
     "region": "Managua",
@@ -35,11 +50,20 @@
       "agro",
       "educacion"
     ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/mateo-ríos",
     "avatarHue": 47
   },
   {
     "id": "mock-2",
+    "firstName": "Camila",
+    "lastName": "Vergara Cortés",
     "fullName": "Camila Vergara Cortés",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -47,19 +71,30 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "staff",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": "ibero-leon",
     "country": "México",
-    "region": "León",
+    "region": "Guanajuato",
     "interestIds": [
       "energia",
       "manufactura",
       "tecnologias",
       "politicas"
     ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 94
   },
   {
     "id": "mock-3",
+    "firstName": "Santiago",
+    "lastName": "Bustos Quintero",
     "fullName": "Santiago Bustos Quintero",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -67,6 +102,8 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "administrator",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": "uic",
     "country": "México",
     "region": "Ciudad de México",
@@ -74,11 +111,21 @@
       "politicas",
       "economia-circular"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/santiago-bustos",
     "avatarHue": 141
   },
   {
     "id": "mock-4",
+    "firstName": "Lucía",
+    "lastName": "Cortés Ferreira",
     "fullName": "Lucía Cortés Ferreira",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -86,6 +133,8 @@
       "pt": "Coordenadora de Articulação"
     },
     "position": "independent",
+    "jobPositionName": "Jefa de Vinculación Comunitaria",
+    "biography": "Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -94,11 +143,19 @@
       "salud",
       "diseno"
     ],
+    "generalAreaIds": [
+      "educacion-area"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/lucía-cortés",
     "avatarHue": 188
   },
   {
     "id": "mock-5",
+    "firstName": "Sebastián",
+    "lastName": "Campos Ríos",
     "fullName": "Sebastián Campos Ríos",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -106,19 +163,31 @@
       "pt": "Doutorando"
     },
     "position": "researcher",
+    "jobPositionName": "Candidato a Doctor en Ingeniería",
+    "biography": "Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.",
     "affiliationId": "utt",
     "country": "Francia",
-    "region": "Troyes",
+    "region": "Grand Est",
     "interestIds": [
       "emprendimiento",
       "agro",
       "educacion",
       "energia"
     ],
+    "generalAreaIds": [
+      "ingenieria",
+      "salud-publica"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 235
   },
   {
     "id": "mock-6",
+    "firstName": "Isabella",
+    "lastName": "Cabrera Zamora",
     "fullName": "Isabella Cabrera Zamora",
     "title": {
       "es": "Director de Emprendimiento",
@@ -126,18 +195,29 @@
       "pt": "Diretor de Empreendedorismo"
     },
     "position": "staff",
+    "jobPositionName": "Director del Centro de Emprendimiento",
+    "biography": "Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.",
     "affiliationId": "acpo",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "energia",
       "manufactura"
+    ],
+    "generalAreaIds": [
+      "diseno-arte"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/isabella-cabrera",
     "avatarHue": 282
   },
   {
     "id": "mock-7",
+    "firstName": "Diego",
+    "lastName": "Arriaga Aguilar",
     "fullName": "Diego Arriaga Aguilar",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -145,19 +225,30 @@
       "pt": "Mestra em Políticas Públicas"
     },
     "position": "administrator",
+    "jobPositionName": "Analista de Políticas Públicas",
+    "biography": "Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.",
     "affiliationId": "captanda",
     "country": "Chile",
-    "region": "Santiago",
+    "region": "Región Metropolitana",
     "interestIds": [
       "politicas",
       "economia-circular",
       "agua"
+    ],
+    "generalAreaIds": [
+      "derecho",
+      "negocios"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/diego-arriaga",
     "avatarHue": 329
   },
   {
     "id": "mock-8",
+    "firstName": "Mariana",
+    "lastName": "Aguilar Molina",
     "fullName": "Mariana Aguilar Molina",
     "title": {
       "es": "Ingeniero de Producto",
@@ -165,6 +256,8 @@
       "pt": "Engenheiro de Produto"
     },
     "position": "faculty",
+    "jobPositionName": "Ingeniero de Producto Senior",
+    "biography": "Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.",
     "affiliationId": "ucc",
     "country": "Argentina",
     "region": "Córdoba",
@@ -174,10 +267,19 @@
       "diseno",
       "emprendimiento"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 16
   },
   {
     "id": "mock-9",
+    "firstName": "Joaquín",
+    "lastName": "Delgado Restrepo",
     "fullName": "Joaquín Delgado Restrepo",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -185,6 +287,8 @@
       "pt": "Gestora de Projetos Sociais"
     },
     "position": "researcher",
+    "jobPositionName": "Gerente de Proyectos Sociales",
+    "biography": "Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.",
     "affiliationId": "esan",
     "country": "Perú",
     "region": "Lima",
@@ -192,11 +296,21 @@
       "emprendimiento",
       "agro"
     ],
+    "generalAreaIds": [
+      "educacion-area",
+      "agronomia"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/joaquín-delgado",
     "avatarHue": 63
   },
   {
     "id": "mock-10",
+    "firstName": "Fernanda",
+    "lastName": "Ochoa Campos",
     "fullName": "Fernanda Ochoa Campos",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -204,19 +318,29 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "staff",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": "ibero-tijuana",
     "country": "México",
-    "region": "Tijuana",
+    "region": "Baja California",
     "interestIds": [
       "energia",
       "manufactura",
       "tecnologias"
+    ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/fernanda-ochoa",
     "avatarHue": 110
   },
   {
     "id": "mock-11",
+    "firstName": "Emiliano",
+    "lastName": "Ferreira Escobar",
     "fullName": "Emiliano Ferreira Escobar",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -224,19 +348,31 @@
       "pt": "Professor de Engenharia"
     },
     "position": "administrator",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": "duoc",
     "country": "Chile",
-    "region": "Santiago",
+    "region": "Región Metropolitana",
     "interestIds": [
       "politicas",
       "economia-circular",
       "agua",
       "metodologias"
     ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 157
   },
   {
     "id": "mock-12",
+    "firstName": "Antonia",
+    "lastName": "Paredes Paredes",
     "fullName": "Antonia Paredes Paredes",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -244,18 +380,29 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "faculty",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": "usb-cali",
     "country": "Colombia",
-    "region": "Cali",
+    "region": "Valle del Cauca",
     "interestIds": [
       "metodologias",
       "salud"
+    ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/antonia-paredes",
     "avatarHue": 204
   },
   {
     "id": "mock-13",
+    "firstName": "Tomás",
+    "lastName": "Peña Vergara",
     "fullName": "Tomás Peña Vergara",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -263,6 +410,8 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "independent",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -271,11 +420,20 @@
       "agro",
       "educacion"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/tomás-peña",
     "avatarHue": 251
   },
   {
     "id": "mock-14",
+    "firstName": "Renata",
+    "lastName": "Ibarra Fuentes",
     "fullName": "Renata Ibarra Fuentes",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -283,6 +441,8 @@
       "pt": "Coordenadora de Articulação"
     },
     "position": "staff",
+    "jobPositionName": "Jefa de Vinculación Comunitaria",
+    "biography": "Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.",
     "affiliationId": "world-entrepreneurs",
     "country": "Suiza",
     "region": "Ginebra",
@@ -292,10 +452,19 @@
       "tecnologias",
       "politicas"
     ],
+    "generalAreaIds": [
+      "educacion-area"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 298
   },
   {
     "id": "mock-15",
+    "firstName": "Gabriel",
+    "lastName": "Restrepo Delgado",
     "fullName": "Gabriel Restrepo Delgado",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -303,18 +472,30 @@
       "pt": "Doutorando"
     },
     "position": "administrator",
+    "jobPositionName": "Candidato a Doctor en Ingeniería",
+    "biography": "Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.",
     "affiliationId": "javeriana",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "politicas",
       "economia-circular"
+    ],
+    "generalAreaIds": [
+      "ingenieria",
+      "salud-publica"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/gabriel-restrepo",
     "avatarHue": 345
   },
   {
     "id": "mock-16",
+    "firstName": "Ximena",
+    "lastName": "Villanueva Tapia",
     "fullName": "Ximena Villanueva Tapia",
     "title": {
       "es": "Director de Emprendimiento",
@@ -322,19 +503,29 @@
       "pt": "Diretor de Empreendedorismo"
     },
     "position": "faculty",
+    "jobPositionName": "Director del Centro de Emprendimiento",
+    "biography": "Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.",
     "affiliationId": "scu",
     "country": "Estados Unidos",
-    "region": "Santa Clara",
+    "region": "California",
     "interestIds": [
       "metodologias",
       "salud",
       "diseno"
+    ],
+    "generalAreaIds": [
+      "diseno-arte"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/ximena-villanueva",
     "avatarHue": 32
   },
   {
     "id": "mock-17",
+    "firstName": "Andrés",
+    "lastName": "Sandoval Villanueva",
     "fullName": "Andrés Sandoval Villanueva",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -342,6 +533,8 @@
       "pt": "Mestra em Políticas Públicas"
     },
     "position": "researcher",
+    "jobPositionName": "Analista de Políticas Públicas",
+    "biography": "Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.",
     "affiliationId": "ibero-puebla",
     "country": "México",
     "region": "Puebla",
@@ -351,10 +544,20 @@
       "educacion",
       "energia"
     ],
+    "generalAreaIds": [
+      "derecho",
+      "negocios"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 79
   },
   {
     "id": "mock-18",
+    "firstName": "Paula",
+    "lastName": "Zamora Cabrera",
     "fullName": "Paula Zamora Cabrera",
     "title": {
       "es": "Ingeniero de Producto",
@@ -362,18 +565,29 @@
       "pt": "Engenheiro de Produto"
     },
     "position": "staff",
+    "jobPositionName": "Ingeniero de Producto Senior",
+    "biography": "Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.",
     "affiliationId": "ubiobio",
     "country": "Chile",
-    "region": "Concepción",
+    "region": "Biobío",
     "interestIds": [
       "energia",
       "manufactura"
+    ],
+    "generalAreaIds": [
+      "ciencias-sociales"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/paula-zamora",
     "avatarHue": 126
   },
   {
     "id": "mock-19",
+    "firstName": "Rodrigo",
+    "lastName": "Fuentes Salazar",
     "fullName": "Rodrigo Fuentes Salazar",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -381,19 +595,30 @@
       "pt": "Gestora de Projetos Sociais"
     },
     "position": "administrator",
+    "jobPositionName": "Gerente de Proyectos Sociales",
+    "biography": "Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.",
     "affiliationId": "uao",
     "country": "Colombia",
-    "region": "Cali",
+    "region": "Valle del Cauca",
     "interestIds": [
       "politicas",
       "economia-circular",
       "agua"
+    ],
+    "generalAreaIds": [
+      "educacion-area",
+      "agronomia"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/rodrigo-fuentes",
     "avatarHue": 173
   },
   {
     "id": "mock-20",
+    "firstName": "Daniela",
+    "lastName": "Herrera Peña",
     "fullName": "Daniela Herrera Peña",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -401,19 +626,30 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "faculty",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": "aalto",
     "country": "Finlandia",
-    "region": "Espoo",
+    "region": "Uusimaa",
     "interestIds": [
       "metodologias",
       "salud",
       "diseno",
       "emprendimiento"
     ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 220
   },
   {
     "id": "mock-21",
+    "firstName": "Felipe",
+    "lastName": "Quintero Bustos",
     "fullName": "Felipe Quintero Bustos",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -421,18 +657,30 @@
       "pt": "Professor de Engenharia"
     },
     "position": "researcher",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": "camara-verde",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "emprendimiento",
       "agro"
+    ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/felipe-quintero",
     "avatarHue": 267
   },
   {
     "id": "mock-22",
+    "firstName": "Carolina",
+    "lastName": "Escobar Herrera",
     "fullName": "Carolina Escobar Herrera",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -440,6 +688,8 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "independent",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -448,11 +698,19 @@
       "manufactura",
       "tecnologias"
     ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/carolina-escobar",
     "avatarHue": 314
   },
   {
     "id": "mock-23",
+    "firstName": "Nicolás",
+    "lastName": "Salazar Ochoa",
     "fullName": "Nicolás Salazar Ochoa",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -460,6 +718,8 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "administrator",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": "uca-sv",
     "country": "El Salvador",
     "region": "San Salvador",
@@ -469,10 +729,20 @@
       "agua",
       "metodologias"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 1
   },
   {
     "id": "mock-24",
+    "firstName": "Alejandra",
+    "lastName": "Navarro Miranda",
     "fullName": "Alejandra Navarro Miranda",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -480,6 +750,8 @@
       "pt": "Coordenadora de Articulação"
     },
     "position": "faculty",
+    "jobPositionName": "Jefa de Vinculación Comunitaria",
+    "biography": "Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.",
     "affiliationId": "ibero-cdmx",
     "country": "México",
     "region": "Ciudad de México",
@@ -487,11 +759,20 @@
       "metodologias",
       "salud"
     ],
+    "generalAreaIds": [
+      "educacion-area"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/alejandra-navarro",
     "avatarHue": 48
   },
   {
     "id": "mock-25",
+    "firstName": "Bruno",
+    "lastName": "Molina Sandoval",
     "fullName": "Bruno Molina Sandoval",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -499,19 +780,30 @@
       "pt": "Doutorando"
     },
     "position": "researcher",
+    "jobPositionName": "Candidato a Doctor en Ingeniería",
+    "biography": "Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.",
     "affiliationId": "uas",
     "country": "México",
-    "region": "Culiacán",
+    "region": "Sinaloa",
     "interestIds": [
       "emprendimiento",
       "agro",
       "educacion"
+    ],
+    "generalAreaIds": [
+      "ingenieria",
+      "salud-publica"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/bruno-molina",
     "avatarHue": 95
   },
   {
     "id": "mock-26",
+    "firstName": "Julieta",
+    "lastName": "Tapia Arriaga",
     "fullName": "Julieta Tapia Arriaga",
     "title": {
       "es": "Director de Emprendimiento",
@@ -519,19 +811,30 @@
       "pt": "Diretor de Empreendedorismo"
     },
     "position": "staff",
+    "jobPositionName": "Director del Centro de Emprendimiento",
+    "biography": "Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.",
     "affiliationId": "ufmg",
     "country": "Brasil",
-    "region": "Belo Horizonte",
+    "region": "Minas Gerais",
     "interestIds": [
       "energia",
       "manufactura",
       "tecnologias",
       "politicas"
     ],
+    "generalAreaIds": [
+      "diseno-arte"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 142
   },
   {
     "id": "mock-27",
+    "firstName": "Valentina",
+    "lastName": "Miranda Navarro",
     "fullName": "Valentina Miranda Navarro",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -539,6 +842,8 @@
       "pt": "Mestra em Políticas Públicas"
     },
     "position": "administrator",
+    "jobPositionName": "Analista de Políticas Públicas",
+    "biography": "Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.",
     "affiliationId": "comillas",
     "country": "España",
     "region": "Madrid",
@@ -546,11 +851,21 @@
       "politicas",
       "economia-circular"
     ],
+    "generalAreaIds": [
+      "derecho",
+      "negocios"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/valentina-miranda",
     "avatarHue": 189
   },
   {
     "id": "mock-28",
+    "firstName": "Mateo",
+    "lastName": "Ríos Ibarra",
     "fullName": "Mateo Ríos Ibarra",
     "title": {
       "es": "Ingeniero de Producto",
@@ -558,6 +873,8 @@
       "pt": "Engenheiro de Produto"
     },
     "position": "faculty",
+    "jobPositionName": "Ingeniero de Producto Senior",
+    "biography": "Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.",
     "affiliationId": "innodeva",
     "country": "Brasil",
     "region": "São Paulo",
@@ -566,11 +883,19 @@
       "salud",
       "diseno"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/mateo-ríos",
     "avatarHue": 236
   },
   {
     "id": "mock-29",
+    "firstName": "Camila",
+    "lastName": "Vergara Cortés",
     "fullName": "Camila Vergara Cortés",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -578,6 +903,8 @@
       "pt": "Gestora de Projetos Sociais"
     },
     "position": "researcher",
+    "jobPositionName": "Gerente de Proyectos Sociales",
+    "biography": "Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.",
     "affiliationId": "ecoins",
     "country": "Costa Rica",
     "region": "San José",
@@ -587,10 +914,20 @@
       "educacion",
       "energia"
     ],
+    "generalAreaIds": [
+      "educacion-area",
+      "agronomia"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 283
   },
   {
     "id": "mock-30",
+    "firstName": "Santiago",
+    "lastName": "Bustos Quintero",
     "fullName": "Santiago Bustos Quintero",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -598,18 +935,29 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "staff",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": "javeriana-cali",
     "country": "Colombia",
-    "region": "Cali",
+    "region": "Valle del Cauca",
     "interestIds": [
       "energia",
       "manufactura"
+    ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/santiago-bustos",
     "avatarHue": 330
   },
   {
     "id": "mock-31",
+    "firstName": "Lucía",
+    "lastName": "Cortés Ferreira",
     "fullName": "Lucía Cortés Ferreira",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -617,6 +965,8 @@
       "pt": "Professor de Engenharia"
     },
     "position": "independent",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -625,11 +975,20 @@
       "economia-circular",
       "agua"
     ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/lucía-cortés",
     "avatarHue": 17
   },
   {
     "id": "mock-32",
+    "firstName": "Sebastián",
+    "lastName": "Campos Ríos",
     "fullName": "Sebastián Campos Ríos",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -637,19 +996,30 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "faculty",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": "ibero-torreon",
     "country": "México",
-    "region": "Torreón",
+    "region": "Coahuila",
     "interestIds": [
       "metodologias",
       "salud",
       "diseno",
       "emprendimiento"
     ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 64
   },
   {
     "id": "mock-33",
+    "firstName": "Isabella",
+    "lastName": "Cabrera Zamora",
     "fullName": "Isabella Cabrera Zamora",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -657,18 +1027,30 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "researcher",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": "usach",
     "country": "Chile",
-    "region": "Santiago",
+    "region": "Región Metropolitana",
     "interestIds": [
       "emprendimiento",
       "agro"
+    ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/isabella-cabrera",
     "avatarHue": 111
   },
   {
     "id": "mock-34",
+    "firstName": "Diego",
+    "lastName": "Arriaga Aguilar",
     "fullName": "Diego Arriaga Aguilar",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -676,19 +1058,29 @@
       "pt": "Coordenadora de Articulação"
     },
     "position": "staff",
+    "jobPositionName": "Jefa de Vinculación Comunitaria",
+    "biography": "Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.",
     "affiliationId": "unad",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "energia",
       "manufactura",
       "tecnologias"
+    ],
+    "generalAreaIds": [
+      "educacion-area"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/diego-arriaga",
     "avatarHue": 158
   },
   {
     "id": "mock-35",
+    "firstName": "Mariana",
+    "lastName": "Aguilar Molina",
     "fullName": "Mariana Aguilar Molina",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -696,6 +1088,8 @@
       "pt": "Doutorando"
     },
     "position": "administrator",
+    "jobPositionName": "Candidato a Doctor en Ingeniería",
+    "biography": "Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.",
     "affiliationId": "up-innovation",
     "country": "México",
     "region": "Ciudad de México",
@@ -705,10 +1099,20 @@
       "agua",
       "metodologias"
     ],
+    "generalAreaIds": [
+      "ingenieria",
+      "salud-publica"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 205
   },
   {
     "id": "mock-36",
+    "firstName": "Joaquín",
+    "lastName": "Delgado Restrepo",
     "fullName": "Joaquín Delgado Restrepo",
     "title": {
       "es": "Director de Emprendimiento",
@@ -716,18 +1120,29 @@
       "pt": "Diretor de Empreendedorismo"
     },
     "position": "faculty",
+    "jobPositionName": "Director del Centro de Emprendimiento",
+    "biography": "Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.",
     "affiliationId": "rebrif",
     "country": "Brasil",
-    "region": "Belo Horizonte",
+    "region": "Minas Gerais",
     "interestIds": [
       "metodologias",
       "salud"
+    ],
+    "generalAreaIds": [
+      "diseno-arte"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/joaquín-delgado",
     "avatarHue": 252
   },
   {
     "id": "mock-37",
+    "firstName": "Fernanda",
+    "lastName": "Ochoa Campos",
     "fullName": "Fernanda Ochoa Campos",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -735,19 +1150,30 @@
       "pt": "Mestra em Políticas Públicas"
     },
     "position": "researcher",
+    "jobPositionName": "Analista de Políticas Públicas",
+    "biography": "Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.",
     "affiliationId": "iteso",
     "country": "México",
-    "region": "Guadalajara",
+    "region": "Jalisco",
     "interestIds": [
       "emprendimiento",
       "agro",
       "educacion"
+    ],
+    "generalAreaIds": [
+      "derecho",
+      "negocios"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/fernanda-ochoa",
     "avatarHue": 299
   },
   {
     "id": "mock-38",
+    "firstName": "Emiliano",
+    "lastName": "Ferreira Escobar",
     "fullName": "Emiliano Ferreira Escobar",
     "title": {
       "es": "Ingeniero de Producto",
@@ -755,6 +1181,8 @@
       "pt": "Engenheiro de Produto"
     },
     "position": "staff",
+    "jobPositionName": "Ingeniero de Producto Senior",
+    "biography": "Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.",
     "affiliationId": "uca-ni",
     "country": "Nicaragua",
     "region": "Managua",
@@ -764,10 +1192,19 @@
       "tecnologias",
       "politicas"
     ],
+    "generalAreaIds": [
+      "ciencias-sociales"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 346
   },
   {
     "id": "mock-39",
+    "firstName": "Antonia",
+    "lastName": "Paredes Paredes",
     "fullName": "Antonia Paredes Paredes",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -775,18 +1212,30 @@
       "pt": "Gestora de Projetos Sociais"
     },
     "position": "administrator",
+    "jobPositionName": "Gerente de Proyectos Sociales",
+    "biography": "Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.",
     "affiliationId": "ibero-leon",
     "country": "México",
-    "region": "León",
+    "region": "Guanajuato",
     "interestIds": [
       "politicas",
       "economia-circular"
+    ],
+    "generalAreaIds": [
+      "educacion-area",
+      "agronomia"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/antonia-paredes",
     "avatarHue": 33
   },
   {
     "id": "mock-40",
+    "firstName": "Tomás",
+    "lastName": "Peña Vergara",
     "fullName": "Tomás Peña Vergara",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -794,6 +1243,8 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "independent",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -802,11 +1253,19 @@
       "salud",
       "diseno"
     ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/tomás-peña",
     "avatarHue": 80
   },
   {
     "id": "mock-41",
+    "firstName": "Renata",
+    "lastName": "Ibarra Fuentes",
     "fullName": "Renata Ibarra Fuentes",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -814,6 +1273,8 @@
       "pt": "Professor de Engenharia"
     },
     "position": "researcher",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": "uarm",
     "country": "Perú",
     "region": "Lima",
@@ -823,10 +1284,20 @@
       "educacion",
       "energia"
     ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 127
   },
   {
     "id": "mock-42",
+    "firstName": "Gabriel",
+    "lastName": "Restrepo Delgado",
     "fullName": "Gabriel Restrepo Delgado",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -834,18 +1305,29 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "staff",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": "utt",
     "country": "Francia",
-    "region": "Troyes",
+    "region": "Grand Est",
     "interestIds": [
       "energia",
       "manufactura"
+    ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/gabriel-restrepo",
     "avatarHue": 174
   },
   {
     "id": "mock-43",
+    "firstName": "Ximena",
+    "lastName": "Villanueva Tapia",
     "fullName": "Ximena Villanueva Tapia",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -853,19 +1335,30 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "administrator",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": "acpo",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "politicas",
       "economia-circular",
       "agua"
+    ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/ximena-villanueva",
     "avatarHue": 221
   },
   {
     "id": "mock-44",
+    "firstName": "Andrés",
+    "lastName": "Sandoval Villanueva",
     "fullName": "Andrés Sandoval Villanueva",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -873,19 +1366,30 @@
       "pt": "Coordenadora de Articulação"
     },
     "position": "faculty",
+    "jobPositionName": "Jefa de Vinculación Comunitaria",
+    "biography": "Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.",
     "affiliationId": "captanda",
     "country": "Chile",
-    "region": "Santiago",
+    "region": "Región Metropolitana",
     "interestIds": [
       "metodologias",
       "salud",
       "diseno",
       "emprendimiento"
     ],
+    "generalAreaIds": [
+      "educacion-area"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 268
   },
   {
     "id": "mock-45",
+    "firstName": "Paula",
+    "lastName": "Zamora Cabrera",
     "fullName": "Paula Zamora Cabrera",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -893,6 +1397,8 @@
       "pt": "Doutorando"
     },
     "position": "researcher",
+    "jobPositionName": "Candidato a Doctor en Ingeniería",
+    "biography": "Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.",
     "affiliationId": "ucc",
     "country": "Argentina",
     "region": "Córdoba",
@@ -900,11 +1406,21 @@
       "emprendimiento",
       "agro"
     ],
+    "generalAreaIds": [
+      "ingenieria",
+      "salud-publica"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/paula-zamora",
     "avatarHue": 315
   },
   {
     "id": "mock-46",
+    "firstName": "Rodrigo",
+    "lastName": "Fuentes Salazar",
     "fullName": "Rodrigo Fuentes Salazar",
     "title": {
       "es": "Director de Emprendimiento",
@@ -912,6 +1428,8 @@
       "pt": "Diretor de Empreendedorismo"
     },
     "position": "staff",
+    "jobPositionName": "Director del Centro de Emprendimiento",
+    "biography": "Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.",
     "affiliationId": "esan",
     "country": "Perú",
     "region": "Lima",
@@ -920,11 +1438,19 @@
       "manufactura",
       "tecnologias"
     ],
+    "generalAreaIds": [
+      "diseno-arte"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/rodrigo-fuentes",
     "avatarHue": 2
   },
   {
     "id": "mock-47",
+    "firstName": "Daniela",
+    "lastName": "Herrera Peña",
     "fullName": "Daniela Herrera Peña",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -932,19 +1458,31 @@
       "pt": "Mestra em Políticas Públicas"
     },
     "position": "administrator",
+    "jobPositionName": "Analista de Políticas Públicas",
+    "biography": "Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.",
     "affiliationId": "ibero-tijuana",
     "country": "México",
-    "region": "Tijuana",
+    "region": "Baja California",
     "interestIds": [
       "politicas",
       "economia-circular",
       "agua",
       "metodologias"
     ],
+    "generalAreaIds": [
+      "derecho",
+      "negocios"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 49
   },
   {
     "id": "mock-48",
+    "firstName": "Felipe",
+    "lastName": "Quintero Bustos",
     "fullName": "Felipe Quintero Bustos",
     "title": {
       "es": "Ingeniero de Producto",
@@ -952,18 +1490,29 @@
       "pt": "Engenheiro de Produto"
     },
     "position": "faculty",
+    "jobPositionName": "Ingeniero de Producto Senior",
+    "biography": "Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.",
     "affiliationId": "duoc",
     "country": "Chile",
-    "region": "Santiago",
+    "region": "Región Metropolitana",
     "interestIds": [
       "metodologias",
       "salud"
+    ],
+    "generalAreaIds": [
+      "ciencias-sociales"
+    ],
+    "languages": [
+      "es",
+      "en"
     ],
     "socialUrl": "https://linkedin.com/in/felipe-quintero",
     "avatarHue": 96
   },
   {
     "id": "mock-49",
+    "firstName": "Carolina",
+    "lastName": "Escobar Herrera",
     "fullName": "Carolina Escobar Herrera",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -971,6 +1520,8 @@
       "pt": "Gestora de Projetos Sociais"
     },
     "position": "independent",
+    "jobPositionName": "Gerente de Proyectos Sociales",
+    "biography": "Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.",
     "affiliationId": null,
     "country": "México",
     "region": "Ciudad de México",
@@ -979,11 +1530,20 @@
       "agro",
       "educacion"
     ],
+    "generalAreaIds": [
+      "educacion-area",
+      "agronomia"
+    ],
+    "languages": [
+      "es"
+    ],
     "socialUrl": "https://scholar.example.org/carolina-escobar",
     "avatarHue": 143
   },
   {
     "id": "mock-50",
+    "firstName": "Nicolás",
+    "lastName": "Salazar Ochoa",
     "fullName": "Nicolás Salazar Ochoa",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -991,6 +1551,8 @@
       "pt": "Dra. em Design e Inovação"
     },
     "position": "staff",
+    "jobPositionName": "Profesora Titular, Departamento de Diseño",
+    "biography": "Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.",
     "affiliationId": "frugal-lab",
     "country": "Perú",
     "region": "Lima",
@@ -1000,10 +1562,19 @@
       "tecnologias",
       "politicas"
     ],
+    "generalAreaIds": [
+      "ingenieria"
+    ],
+    "languages": [
+      "pt",
+      "es"
+    ],
     "avatarHue": 190
   },
   {
     "id": "mock-51",
+    "firstName": "Alejandra",
+    "lastName": "Navarro Miranda",
     "fullName": "Alejandra Navarro Miranda",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -1011,6 +1582,8 @@
       "pt": "Professor de Engenharia"
     },
     "position": "administrator",
+    "jobPositionName": "Coordinador de Laboratorio de Innovación",
+    "biography": "Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.",
     "affiliationId": "world-entrepreneurs",
     "country": "Suiza",
     "region": "Ginebra",
@@ -1018,11 +1591,21 @@
       "politicas",
       "economia-circular"
     ],
+    "generalAreaIds": [
+      "diseno-arte",
+      "computacion"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
     "socialUrl": "https://linkedin.com/in/alejandra-navarro",
     "avatarHue": 237
   },
   {
     "id": "mock-52",
+    "firstName": "Bruno",
+    "lastName": "Molina Sandoval",
     "fullName": "Bruno Molina Sandoval",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -1030,19 +1613,29 @@
       "pt": "Pesquisadora em Sustentabilidade"
     },
     "position": "faculty",
+    "jobPositionName": "Investigadora Asociada",
+    "biography": "Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.",
     "affiliationId": "javeriana",
     "country": "Colombia",
-    "region": "Bogotá",
+    "region": "Bogotá D.C.",
     "interestIds": [
       "metodologias",
       "salud",
       "diseno"
+    ],
+    "generalAreaIds": [
+      "derecho"
+    ],
+    "languages": [
+      "es"
     ],
     "socialUrl": "https://scholar.example.org/bruno-molina",
     "avatarHue": 284
   },
   {
     "id": "mock-53",
+    "firstName": "Julieta",
+    "lastName": "Tapia Arriaga",
     "fullName": "Julieta Tapia Arriaga",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -1050,14 +1643,24 @@
       "pt": "Consultor em Inovação Social"
     },
     "position": "researcher",
+    "jobPositionName": "Consultor Independiente",
+    "biography": "Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.",
     "affiliationId": "scu",
     "country": "Estados Unidos",
-    "region": "Santa Clara",
+    "region": "California",
     "interestIds": [
       "emprendimiento",
       "agro",
       "educacion",
       "energia"
+    ],
+    "generalAreaIds": [
+      "ciencias-sociales",
+      "ciencias-naturales"
+    ],
+    "languages": [
+      "pt",
+      "es"
     ],
     "avatarHue": 331
   }

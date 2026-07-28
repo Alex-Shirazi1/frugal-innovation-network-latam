@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:server": "node server/index.mjs",
+    "dev:server": "tsx server/index.ts",
     "dev:all": "concurrently -n web,api -c cyan,green \"npm:dev\" \"npm:dev:server\"",
     "seed": "tsx server/scripts/seed.ts",
     "build": "tsc -b && vite build",

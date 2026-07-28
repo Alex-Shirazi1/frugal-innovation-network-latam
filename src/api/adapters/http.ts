@@ -5,7 +5,7 @@
  * environment change, not a code change.
  */
 import type { RelifDataSource } from '../dataSource'
-import type { ApiResponse, IntakeErrorCode, IntakeResult, IntakeSubmission } from '../types'
+import type { ApiResponse, IntakeErrorCode, IntakeResult, IntakeSubmission, Member } from '../types'
 
 const REQUEST_TIMEOUT_MS = 8000
 
@@ -37,7 +37,7 @@ export function createHttpDataSource(
     getOnboardingOptions: () => get('/onboarding-options'),
 
     async submitIntake(submission: IntakeSubmission): Promise<IntakeResult> {
-      let body: ApiResponse<IntakeResult['data']>
+      let body: ApiResponse<Member>
       try {
         body = await requestJson(`${baseUrl}/members/intake`, {
           method: 'POST',
@@ -48,9 +48,14 @@ export function createHttpDataSource(
         throw error instanceof Error ? error : new Error('network')
       }
       if (!body.success || !body.data) {
-        return { success: false, error: (body.error ?? 'network') as IntakeErrorCode }
+        return {
+          success: false,
+          error: (body.error ?? 'network') as IntakeErrorCode,
+          persisted: false,
+        }
       }
-      return { success: true, data: body.data }
+      // Reached a real backend that accepted and durably stored the record.
+      return { success: true, data: body.data, persisted: true }
     },
   }
 }

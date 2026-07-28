@@ -1,17 +1,41 @@
 import { institutions } from './institutions'
-import { researchInterests, type PositionType } from './onboardingOptions'
+import {
+  cityToRegion,
+  generalAreas,
+  languageOptions,
+  researchInterests,
+  type PositionType,
+} from './onboardingOptions'
 import type { Localized } from './conference'
 
 export interface Member {
   id: string
+  /** Allan asked for first and last name separately. */
+  firstName: string
+  lastName: string
+  /** Derived from firstName + lastName. Kept on the record so search, sort,
+   *  and display never have to re-join the parts inconsistently. */
   fullName: string
+  /**
+   * Curated, translated descriptor used for the card subtitle. Derived from
+   * `position` — NOT user-authored, which is why it can be localized.
+   */
   title: Localized
   position: PositionType
+  /** Free-text job title the member types themselves, in their own language. */
+  jobPositionName: string
+  /** Short self-authored bio. Single language; rendered as plain text. */
+  biography: string
   /** Institution id, or null for independent members */
   affiliationId: string | null
   country: string
   region: string
+  /** Narrow technical research interests (ids from researchInterests). */
   interestIds: string[]
+  /** Broad disciplinary areas (ids from generalAreas). */
+  generalAreaIds: string[]
+  /** ISO 639-1 codes from languageOptions. */
+  languages: string[]
   socialUrl?: string
   /** Deterministic hue used for the avatar placeholder */
   avatarHue: number
@@ -49,11 +73,47 @@ const titles: Localized[] = [
   { es: 'Gestora de Proyectos Sociales', en: 'Social Projects Manager', pt: 'Gestora de Projetos Sociais' },
 ]
 
+/** Free-text job titles, as a real member would type them. */
+const jobPositionNames = [
+  'Profesora Titular, Departamento de Diseño',
+  'Coordinador de Laboratorio de Innovación',
+  'Investigadora Asociada',
+  'Consultor Independiente',
+  'Jefa de Vinculación Comunitaria',
+  'Candidato a Doctor en Ingeniería',
+  'Director del Centro de Emprendimiento',
+  'Analista de Políticas Públicas',
+  'Ingeniero de Producto Senior',
+  'Gerente de Proyectos Sociales',
+]
+
+const biographyTemplates = [
+  'Trabaja en el diseño de soluciones de bajo costo con comunidades rurales, con énfasis en procesos participativos y transferencia de tecnología.',
+  'Coordina proyectos de innovación frugal aplicada a salud comunitaria y ha acompañado más de veinte iniciativas locales en la región.',
+  'Su investigación conecta economía circular y manufactura local, buscando cadenas de valor cortas y reparables.',
+  'Acompaña a emprendimientos sociales en etapas tempranas, con foco en modelos de negocio viables en contextos de recursos limitados.',
+  'Enlaza universidad y territorio a través de programas de aprendizaje-servicio y vinculación con organizaciones de base.',
+  'Estudia cómo las restricciones materiales moldean la creatividad técnica en contextos latinoamericanos.',
+  'Dirige iniciativas de formación en innovación frugal para docentes y estudiantes de ingeniería.',
+  'Analiza marcos regulatorios que habilitan o frenan la adopción de tecnologías apropiadas.',
+  'Desarrolla prototipos de dispositivos asequibles para agua y energía en zonas periurbanas.',
+  'Gestiona portafolios de proyectos sociales con métricas de impacto adaptadas a escalas pequeñas.',
+]
+
 const anchoredInstitutions = institutions.filter((i) => i.coords !== undefined)
 
 const socialHosts = ['https://linkedin.com/in/', 'https://scholar.example.org/', '']
 
 const TOTAL_MEMBERS = 54
+
+/**
+ * Resolves an institution's city to a region the validator accepts. Falls back
+ * to the city itself only if it is unmapped, which the seed-drift and
+ * validation tests will surface rather than hide.
+ */
+function regionForCity(city: string): string {
+  return cityToRegion[city] ?? city
+}
 
 function buildMember(index: number): Member {
   const first = firstNames[index % firstNames.length]
@@ -70,21 +130,37 @@ function buildMember(index: number): Member {
     (_, i) => researchInterests[(index * 3 + i * 5) % researchInterests.length].id,
   )
 
+  const areaCount = 1 + (index % 2)
+  const generalAreaIds = Array.from(
+    { length: areaCount },
+    (_, i) => generalAreas[(index * 4 + i * 3) % generalAreas.length].id,
+  )
+
+  // Everyone reads at least one regional language; some also work in English.
+  const languages = index % 3 === 0 ? ['es', 'en'] : index % 3 === 1 ? ['es'] : ['pt', 'es']
+
   const positions: PositionType[] = ['faculty', 'researcher', 'staff', 'administrator']
   const position: PositionType = isIndependent ? 'independent' : positions[index % positions.length]
 
   const socialHost = socialHosts[index % socialHosts.length]
   const slug = `${first}-${last}`.toLowerCase()
+  const lastNameFull = `${last} ${secondLast}`
 
   return {
     id: `mock-${index}`,
-    fullName: `${first} ${last} ${secondLast}`,
+    firstName: first,
+    lastName: lastNameFull,
+    fullName: `${first} ${lastNameFull}`,
     title: titles[index % titles.length],
     position,
+    jobPositionName: jobPositionNames[index % jobPositionNames.length],
+    biography: biographyTemplates[index % biographyTemplates.length],
     affiliationId: institution?.id ?? null,
     country: institution?.country ?? 'México',
-    region: institution?.city ?? 'Ciudad de México',
+    region: institution ? regionForCity(institution.city) : 'Ciudad de México',
     interestIds: [...new Set(interestIds)],
+    generalAreaIds: [...new Set(generalAreaIds)],
+    languages: languages.filter((id) => languageOptions.some((l) => l.id === id)),
     socialUrl: socialHost ? `${socialHost}${slug}` : undefined,
     avatarHue: (index * 47) % 360,
   }
