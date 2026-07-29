@@ -22,9 +22,18 @@ export interface Resource {
 }
 
 /**
- * Catalog of the documents that today live in a raw Google Drive folder.
- * Files are referenced by local paths so the library works fully offline;
- * the real PDFs get dropped into /public/docs during content migration.
+ * The network's own documents, as actually published.
+ *
+ * This deliberately holds only documents that exist. An earlier version listed
+ * nine entries including a MOOC guide, a 2024 meeting agenda, an English
+ * edition of the framework and a standalone references PDF — none of which the
+ * network publishes anywhere, on the site or in its Drive folder. They were
+ * design fixtures, and showing them to Allan would have implied documents that
+ * do not exist.
+ *
+ * The academic references that "REFERENCIAS" used to point at are the 43-paper
+ * bibliography (src/data/bibliography.ts), so they are no longer represented
+ * here as a single file.
  */
 export const resources: Resource[] = [
   {
@@ -43,60 +52,6 @@ export const resources: Resource[] = [
       es: 'El marco de trabajo de la red: principios, dimensiones y criterios de la innovación frugal en América Latina.',
       en: 'The network’s framework: principles, dimensions, and criteria for frugal innovation in Latin America.',
       pt: 'O marco de trabalho da rede: princípios, dimensões e critérios da inovação frugal na América Latina.',
-    },
-  },
-  {
-    id: 'relif-framework-en',
-    title: {
-      es: 'RELIF Framework (edición en inglés)',
-      en: 'RELIF Framework (English edition)',
-      pt: 'RELIF Framework (edição em inglês)',
-    },
-    language: 'EN',
-    author: 'RELIF',
-    year: 2021,
-    type: 'PDF',
-    file: '/docs/relif-framework-en.pdf',
-    summary: {
-      es: 'Versión en inglés del marco RELIF para audiencias internacionales.',
-      en: 'English edition of the RELIF framework for international audiences.',
-      pt: 'Versão em inglês do marco RELIF para públicos internacionais.',
-    },
-  },
-  {
-    id: 'referencias',
-    title: {
-      es: 'Referencias académicas RELIF',
-      en: 'RELIF Academic References',
-      pt: 'Referências acadêmicas RELIF',
-    },
-    language: 'ES',
-    author: 'Comisión de Investigación',
-    year: 2019,
-    type: 'Bibliografía',
-    file: '/docs/referencias-relif.pdf',
-    summary: {
-      es: 'Bibliografía comentada sobre innovación frugal: artículos, libros y casos fundacionales.',
-      en: 'Annotated bibliography on frugal innovation: foundational articles, books, and cases.',
-      pt: 'Bibliografia comentada sobre inovação frugal: artigos, livros e casos fundacionais.',
-    },
-  },
-  {
-    id: 'covid-frugal',
-    title: {
-      es: 'Innovación frugal en tiempos de COVID',
-      en: 'Frugal Innovation in COVID Times',
-      pt: 'Inovação frugal em tempos de COVID',
-    },
-    language: 'ES',
-    author: 'Red RELIF',
-    year: 2020,
-    type: 'Artículo',
-    file: '/docs/innovacion-frugal-covid.pdf',
-    summary: {
-      es: 'Cómo la pandemia aceleró soluciones frugales en salud, educación y economía local.',
-      en: 'How the pandemic accelerated frugal solutions in health, education, and local economies.',
-      pt: 'Como a pandemia acelerou soluções frugais em saúde, educação e economia local.',
     },
   },
   {
@@ -151,42 +106,6 @@ export const resources: Resource[] = [
       es: 'Versión en portugués de la convocatoria, en colaboración con REBRIF.',
       en: 'Portuguese edition of the announcement, in collaboration with REBRIF.',
       pt: 'Versão em português da chamada, em colaboração com a REBRIF.',
-    },
-  },
-  {
-    id: 'guia-mooc',
-    title: {
-      es: 'Guía del MOOC: innovar con escasos recursos',
-      en: 'MOOC Guide: Innovating with Scarce Resources',
-      pt: 'Guia do MOOC: inovar com poucos recursos',
-    },
-    language: 'ES',
-    author: 'Pontificia Universidad Javeriana',
-    year: 2022,
-    type: 'Guía',
-    file: '/docs/guia-mooc.pdf',
-    summary: {
-      es: 'Guía de acompañamiento del curso en línea de innovación frugal disponible en edX.',
-      en: 'Companion guide for the frugal innovation online course available on edX.',
-      pt: 'Guia de acompanhamento do curso on-line de inovação frugal disponível no edX.',
-    },
-  },
-  {
-    id: 'agenda-encuentro-2024',
-    title: {
-      es: 'Agenda — Encuentro Anual RELIF 2024',
-      en: 'Agenda — RELIF 2024 Annual Meeting',
-      pt: 'Agenda — Encontro Anual RELIF 2024',
-    },
-    language: 'ES',
-    author: 'Comisión de Eventos',
-    year: 2024,
-    type: 'PDF',
-    file: '/docs/agenda-encuentro-2024.pdf',
-    summary: {
-      es: 'Programa completo del encuentro anual 2024 de la red.',
-      en: 'Full program of the network’s 2024 annual meeting.',
-      pt: 'Programa completo do encontro anual 2024 da rede.',
     },
   },
 ]

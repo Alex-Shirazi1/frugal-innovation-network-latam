@@ -15,14 +15,9 @@ mkdirSync(outDir, { recursive: true })
 // Mirrors src/data/resources.ts file paths and titles.
 const documents = [
   { file: 'marco-relif.pdf', title: 'Marco RELIF de Innovación Frugal', author: 'RELIF · 2020' },
-  { file: 'relif-framework-en.pdf', title: 'RELIF Framework (English edition)', author: 'RELIF · 2021' },
-  { file: 'referencias-relif.pdf', title: 'Referencias académicas RELIF', author: 'Comisión de Investigación · 2019' },
-  { file: 'innovacion-frugal-covid.pdf', title: 'Innovación frugal en tiempos de COVID', author: 'Red RELIF · 2020' },
   { file: 'mundos-convocatoria-es.pdf', title: 'Mundos de Transformación - Convocatoria (ES)', author: 'Comité organizador · 2025' },
   { file: 'mundos-announcement-en.pdf', title: 'Worlds of Transformation - Announcement (EN)', author: 'Organizing committee · 2025' },
   { file: 'mundos-convocatoria-pt.pdf', title: 'Mundos de Transformação - Chamada (PT)', author: 'Comité organizador / REBRIF · 2025' },
-  { file: 'guia-mooc.pdf', title: 'Guía del MOOC: innovar con escasos recursos', author: 'Pontificia Universidad Javeriana · 2022' },
-  { file: 'agenda-encuentro-2024.pdf', title: 'Agenda - Encuentro Anual RELIF 2024', author: 'Comisión de Eventos · 2024' },
 ]
 
 const PAGE_COUNT = 4
