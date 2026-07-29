@@ -107,10 +107,24 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
       </div>
 
       <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] md:p-10">
-        {/* Document pane: embedded scrollable PDF when the file exists, styled cover otherwise */}
-        {fileState === 'ready' ? (
+        {/*
+          Document pane. While the HEAD check is in flight we show a neutral
+          skeleton of the same height, NOT the branded cover: rendering the cover
+          first made it look like the real first page, so the swap to the actual
+          PDF read as the viewer flipping to a different document. The cover is
+          now only used when there genuinely is no file to embed.
+        */}
+        {fileState === 'checking' ? (
+          <div
+            className="h-[420px] w-full animate-pulse rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[560px]"
+            aria-hidden="true"
+          />
+        ) : fileState === 'ready' ? (
           <div className="flex flex-col gap-2.5">
             <object
+              /* Force a fresh element per document so a previously instantiated
+                 PDF plugin can never be reused for a different file. */
+              key={resource.file}
               data={resource.file}
               type="application/pdf"
               aria-label={resource.title[lang]}

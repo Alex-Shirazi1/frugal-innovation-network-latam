@@ -70,23 +70,41 @@ const bodyEs = [
   'sitio lo servirá automáticamente, sin cambios de código.',
 ]
 
-function pageStream(doc, pageNumber) {
-  const title = wrap(doc.title, 38)
+/**
+ * Brand palette, one entry per document. All nine placeholders previously used
+ * the same teal header and the same body copy, so every preview looked like the
+ * same file and the library appeared broken. Varying the band colour and
+ * stamping the title large makes them tell themselves apart.
+ */
+const accents = [
+  [0.086, 0.522, 0.6],   // teal
+  [0.557, 0.737, 0.255], // verde
+  [0.965, 0.651, 0.125], // naranja
+  [0.914, 0.282, 0.141], // rojo
+  [0.302, 0.416, 0.475], // pizarra
+]
+
+function pageStream(doc, pageNumber, docIndex) {
+  const title = wrap(doc.title, 30)
+  const [r, g, b] = accents[docIndex % accents.length]
   const ops = []
-  // Teal header band + brand line
-  ops.push(`q 0.086 0.522 0.6 rg 0 ${PAGE_H - 64} ${PAGE_W} 64 re f Q`)
+  // Per-document header band + brand line
+  ops.push(`q ${r} ${g} ${b} rg 0 ${PAGE_H - 64} ${PAGE_W} 64 re f Q`)
   ops.push(`BT /F2 10 Tf 1 1 1 rg 48 ${PAGE_H - 40} Td (${pdfText('RED LATINOAMERICANA DE INNOVACION FRUGAL')}) Tj ET`)
+  ops.push(
+    `BT /F1 9 Tf 1 1 1 rg ${PAGE_W - 190} ${PAGE_H - 40} Td (${pdfText('DOCUMENTO DE MUESTRA')}) Tj ET`,
+  )
   // Watermark page number
   ops.push(`BT /F2 160 Tf 0.93 0.95 0.96 rg 240 320 Td (${pageNumber}) Tj ET`)
-  // Title block
-  let y = PAGE_H - 130
+  // Title block — larger than before so it reads as the document's identity
+  let y = PAGE_H - 140
   for (const line of title) {
-    ops.push(`BT /F2 20 Tf 0.125 0.196 0.212 rg 48 ${y} Td (${pdfText(line)}) Tj ET`)
-    y -= 26
+    ops.push(`BT /F2 26 Tf 0.125 0.196 0.212 rg 48 ${y} Td (${pdfText(line)}) Tj ET`)
+    y -= 32
   }
   ops.push(`BT /F1 11 Tf 0.3 0.42 0.47 rg 48 ${y - 4} Td (${pdfText(doc.author)}) Tj ET`)
   // Accent rule
-  ops.push(`q 0.965 0.65 0.125 rg 48 ${y - 18} 56 4 re f Q`)
+  ops.push(`q ${r} ${g} ${b} rg 48 ${y - 18} 56 4 re f Q`)
   // Body
   y -= 52
   for (const line of bodyEs) {
@@ -94,12 +112,12 @@ function pageStream(doc, pageNumber) {
     y -= 20
   }
   // Footer
-  ops.push(`q 0.086 0.522 0.6 rg 48 56 ${PAGE_W - 96} 1 re f Q`)
+  ops.push(`q ${r} ${g} ${b} rg 48 56 ${PAGE_W - 96} 1 re f Q`)
   ops.push(`BT /F1 10 Tf 0.3 0.42 0.47 rg 48 38 Td (${pdfText(`Página ${pageNumber} de ${PAGE_COUNT} - documento provisional`)}) Tj ET`)
   return ops.join('\n')
 }
 
-function buildPdf(doc) {
+function buildPdf(doc, docIndex) {
   // Object layout: 1 catalog, 2 pages, 3-4 fonts, then per page: page obj + content obj
   const objects = []
   const pageObjIds = []
@@ -115,7 +133,7 @@ function buildPdf(doc) {
   objects[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
 
   for (let i = 0; i < PAGE_COUNT; i += 1) {
-    const stream = pageStream(doc, i + 1)
+    const stream = pageStream(doc, i + 1, docIndex)
     objects[pageObjIds[i]] =
       `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] ` +
       `/Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjIds[i]} 0 R >>`
@@ -141,8 +159,8 @@ function buildPdf(doc) {
   return Buffer.from(body + xref + trailer, 'latin1')
 }
 
-for (const doc of documents) {
+documents.forEach((doc, docIndex) => {
   const path = join(outDir, doc.file)
-  writeFileSync(path, buildPdf(doc))
+  writeFileSync(path, buildPdf(doc, docIndex))
   console.log(`wrote ${path}`)
-}
+})

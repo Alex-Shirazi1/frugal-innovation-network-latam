@@ -7,6 +7,7 @@ import {
   regionalContacts,
   socialLinks,
 } from './network'
+import { socialIconPaths } from './socialIcons'
 import { es, en, pt } from '../i18n/translations'
 import { initiativeOrder } from '../components/sections/InitiativesSection'
 
@@ -33,6 +34,34 @@ describe('social links', () => {
   it('has no duplicate ids or urls', () => {
     expect(new Set(socialLinks.map((s) => s.id)).size).toBe(socialLinks.length)
     expect(new Set(socialLinks.map((s) => s.url)).size).toBe(socialLinks.length)
+  })
+})
+
+describe('social glyphs', () => {
+  /**
+   * These paths were originally hand-approximated and rendered visibly
+   * malformed (Instagram and Linktree especially). They now come from the
+   * simple-icons dataset, extracted at authoring time.
+   */
+  it('has a glyph for every social link', () => {
+    const missing = socialLinks.filter((s) => !socialIconPaths[s.id]).map((s) => s.id)
+    expect(missing).toEqual([])
+  })
+
+  it('has plausible SVG path data on a 24x24 viewBox', () => {
+    for (const social of socialLinks) {
+      const path = socialIconPaths[social.id]
+      // Starts with a moveto — absolute (M) or relative (m) are both valid.
+      expect(/^[Mm]/.test(path)).toBe(true)
+      expect(path.length).toBeGreaterThan(100)
+      // Only valid SVG path characters — catches truncation and stray text.
+      expect(path).toMatch(/^[MmLlHhVvCcSsQqTtAaZz0-9,.\s-]+$/)
+    }
+  })
+
+  it('gives every glyph a distinct shape', () => {
+    const paths = socialLinks.map((s) => socialIconPaths[s.id])
+    expect(new Set(paths).size).toBe(paths.length)
   })
 })
 
