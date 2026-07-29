@@ -1,4 +1,5 @@
 import { useI18n } from '../../i18n/I18nContext'
+import { networkEmails, socialLinks } from '../../data/network'
 
 export function Footer() {
   const { t } = useI18n()
@@ -39,20 +40,33 @@ export function Footer() {
             </h3>
             <ul className="mt-4 space-y-2 text-sm text-blanco/80">
               <li>
-                <a className="hover:text-naranja" href="mailto:contacto@redinnovacionfrugal.lat">
-                  contacto@redinnovacionfrugal.lat
+                <a className="hover:text-naranja" href={`mailto:${networkEmails.general}`}>
+                  {networkEmails.general}
                 </a>
               </li>
               <li>
-                <a
-                  className="hover:text-naranja"
-                  href="https://linktr.ee/redinnovacionfrugal"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t.footer.social}
+                <a className="hover:text-naranja" href="#contacto">
+                  {t.nav.contact}
                 </a>
               </li>
+            </ul>
+            {/* Every channel the network publishes, not just the Linktree. */}
+            <h3 className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-naranja">
+              {t.footer.social}
+            </h3>
+            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-blanco/80">
+              {socialLinks.map((social) => (
+                <li key={social.id}>
+                  <a
+                    className="hover:text-naranja"
+                    href={social.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {social.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

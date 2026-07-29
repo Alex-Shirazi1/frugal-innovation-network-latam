@@ -5,9 +5,11 @@ const sections = [
   { href: '#origen', key: 'origin' },
   { href: '#congreso', key: 'conference' },
   { href: '#innovacion-frugal', key: 'frugal' },
+  { href: '#acerca', key: 'about' },
   { href: '#mapa', key: 'map' },
   { href: '#miembros', key: 'members' },
   { href: '#recursos', key: 'library' },
+  { href: '#contacto', key: 'contact' },
 ] as const
 
 function LanguageToggle() {

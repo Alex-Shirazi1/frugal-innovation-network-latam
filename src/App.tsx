@@ -7,6 +7,8 @@ import { OriginSection } from './components/sections/OriginSection'
 import { ConferenceArchive } from './components/conference/ConferenceArchive'
 import { FrugalSection } from './components/sections/FrugalSection'
 import { InitiativesSection } from './components/sections/InitiativesSection'
+import { AboutSection } from './components/sections/AboutSection'
+import { ContactSection } from './components/sections/ContactSection'
 import { MemberDirectory } from './components/directory/MemberDirectory'
 import { ResourceLibrary } from './components/library/ResourceLibrary'
 import { OnboardingForm } from './components/onboarding/OnboardingForm'
@@ -37,6 +39,7 @@ export default function App() {
             {/* Conference archive sits between Origin and Frugal Innovation per spec */}
             <ConferenceArchive />
             <FrugalSection />
+            <AboutSection />
             <InitiativesSection />
             <DeferredSection minHeight={MAP_PLACEHOLDER_HEIGHT}>
               <Suspense fallback={<div style={{ minHeight: MAP_PLACEHOLDER_HEIGHT }} />}>
@@ -46,6 +49,7 @@ export default function App() {
             <MemberDirectory />
             <ResourceLibrary />
             <OnboardingForm />
+            <ContactSection />
           </main>
           <Footer />
         </div>
