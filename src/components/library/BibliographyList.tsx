@@ -134,59 +134,60 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
       ) : (
         <>
           {/* Desktop: dense table. Mobile: stacked rows. */}
-          <div className="mt-4 hidden overflow-x-auto rounded-xl border border-carbon/10 bg-white shadow-sm md:block">
+          <div className="mt-4 hidden overflow-hidden rounded-xl border border-carbon/10 bg-white shadow-sm md:block">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-teal/25 bg-niebla/60 text-xs uppercase tracking-wider text-pizarra">
-                  <th scope="col" className="px-4 py-3 font-bold">{t.biblio.colNumber}</th>
-                  <th scope="col" className="px-4 py-3 font-bold">{t.biblio.colTitle}</th>
-                  <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colAuthors}</th>
-                  <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colYear}</th>
-                  <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colLang}</th>
-                  <th scope="col" className="w-44 px-4 py-3 text-right font-bold">
+                  <th scope="col" className="px-5 py-3.5 font-bold">{t.biblio.colNumber}</th>
+                  <th scope="col" className="px-3 py-3.5 font-bold">{t.biblio.colTitle}</th>
+                  <th scope="col" className="px-3 py-3.5 font-bold">{t.biblio.colAuthors}</th>
+                  <th scope="col" className="px-3 py-3.5 font-bold">{t.biblio.colYear}</th>
+                  <th scope="col" className="px-3 py-3.5 font-bold">{t.biblio.colLang}</th>
+                  <th scope="col" className="w-44 px-5 py-3.5 text-right font-bold">
                     {t.library.colActions}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-carbon/8">
+              <tbody>
                 {visible.map((entry) => (
-                  <tr key={entry.id} className="transition-colors hover:bg-niebla/50">
-                    <td className="px-4 py-3 font-mono text-xs text-pizarra">{entry.paperNumber}</td>
-                    <td className="px-4 py-3">
+                  <tr
+                    key={entry.id}
+                    className="border-b border-carbon/5 last:border-0 transition-colors hover:bg-teal-tint/50"
+                  >
+                    <td className="px-5 py-4 font-mono text-xs text-pizarra">{entry.paperNumber}</td>
+                    <td className="px-3 py-4">
                       <button
                         type="button"
                         onClick={() => open(entry)}
-                        className="text-left font-medium text-carbon hover:text-teal hover:underline"
+                        className="text-left font-semibold text-carbon transition-colors hover:text-teal"
                       >
                         {entry.title}
                       </button>
                     </td>
-                    <td className="px-3 py-3 text-xs text-pizarra">{entry.authors}</td>
-                    <td className="px-3 py-3 whitespace-nowrap text-xs text-pizarra">
+                    <td className="px-3 py-4 text-pizarra">{entry.authors}</td>
+                    <td className="px-3 py-4 whitespace-nowrap text-pizarra">
                       {entry.year ?? t.biblio.noYear}
                     </td>
-                    <td className="px-3 py-3">
-                      <span className="rounded px-1.5 py-0.5 text-[10px] font-bold text-pizarra ring-1 ring-carbon/15">
+                    <td className="px-3 py-4">
+                      <span className="rounded-full bg-carbon/8 px-2.5 py-1 text-xs font-bold text-pizarra">
                         {entry.language}
                       </span>
                     </td>
-                    <td className="w-44 px-4 py-3">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => open(entry)}
-                          className="rounded-full border border-teal/30 px-3 py-1 text-[11px] font-bold whitespace-nowrap text-teal transition-colors hover:bg-teal hover:text-blanco"
-                        >
-                          {t.biblio.preview}
-                        </button>
-                        <a
-                          href={entry.file}
-                          download
-                          className="rounded-full border border-carbon/15 px-3 py-1 text-[11px] font-bold whitespace-nowrap text-pizarra transition-colors hover:border-carbon/40 hover:text-carbon"
-                        >
-                          ↓ {t.biblio.download}
-                        </a>
-                      </div>
+                    <td className="w-44 px-5 py-4 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => open(entry)}
+                        className="mr-2 rounded-full border border-carbon/15 px-3.5 py-1.5 text-xs font-bold transition-colors hover:border-teal hover:text-teal"
+                      >
+                        {t.library.preview}
+                      </button>
+                      <a
+                        href={entry.file}
+                        download
+                        className="rounded-full bg-teal px-3.5 py-1.5 text-xs font-bold text-blanco transition-colors hover:bg-teal-deep"
+                      >
+                        ↓ PDF
+                      </a>
                     </td>
                   </tr>
                 ))}
@@ -218,16 +219,16 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
                   <button
                     type="button"
                     onClick={() => open(entry)}
-                    className="rounded-full border border-teal/30 px-3 py-1 text-[11px] font-bold text-teal"
+                    className="rounded-full border border-carbon/15 px-3.5 py-1.5 text-xs font-bold transition-colors hover:border-teal hover:text-teal"
                   >
-                    {t.biblio.preview}
+                    {t.library.preview}
                   </button>
                   <a
                     href={entry.file}
                     download
-                    className="rounded-full border border-carbon/15 px-3 py-1 text-[11px] font-bold text-pizarra"
+                    className="rounded-full bg-teal px-3.5 py-1.5 text-xs font-bold text-blanco"
                   >
-                    ↓ {t.biblio.download}
+                    ↓ PDF
                   </a>
                 </div>
               </li>
