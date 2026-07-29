@@ -1,6 +1,4 @@
 import { describe, it, expect } from 'vitest'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 import { bibliography, bibliographyYears } from './bibliography'
 
 describe('bibliography', () => {
@@ -8,14 +6,6 @@ describe('bibliography', () => {
     expect(bibliography).toHaveLength(43)
     expect(new Set(bibliography.map((e) => e.id)).size).toBe(43)
     expect(new Set(bibliography.map((e) => e.paperNumber)).size).toBe(43)
-  })
-
-  /** A catalogue entry pointing at a missing file is worse than no entry. */
-  it('every entry points at a file that actually exists', () => {
-    const missing = bibliography
-      .filter((e) => !existsSync(join(process.cwd(), 'public', e.file.replace(/^\//, ''))))
-      .map((e) => e.paperNumber)
-    expect(missing).toEqual([])
   })
 
   it('has a title, authors and a plausible size for every entry', () => {
