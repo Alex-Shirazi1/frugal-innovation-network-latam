@@ -24,6 +24,7 @@ npm run dev:server # prototype API only
 npm run test       # unit, integration, adapter and drift suites
 npm run test:rules # firestore.rules against the emulator (needs Java)
 npm run rules      # regenerate firestore.rules from canonical data
+npm run relock     # REQUIRED after adding/removing any dependency
 npm run build      # type-check + production build
 npm run seed       # regenerate server/data/*.json from src/data (source of truth)
 ```
