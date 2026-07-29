@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCapture } from '../../lib/analytics'
 import { useI18n } from '../../i18n/I18nContext'
 import { SectionHeading } from '../ui/SectionHeading'
@@ -278,7 +278,6 @@ export function ResourceLibrary() {
   const { lang, t } = useI18n()
   const { resources } = useApiData()
   const capture = useCapture()
-  const [query, setQuery] = useState('')
   const [previewing, setPreviewing] = useState<Resource | null>(null)
   const [previewingPaper, setPreviewingPaper] = useState<BibliographyEntry | null>(null)
 
@@ -293,17 +292,6 @@ export function ResourceLibrary() {
     setPreviewing(resource)
   }
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return resources
-    return resources.filter((resource) =>
-      [resource.title.es, resource.title.en, resource.title.pt, resource.author, String(resource.year), resource.type]
-        .join(' ')
-        .toLowerCase()
-        .includes(q),
-    )
-  }, [resources, query])
-
   return (
     <section id="recursos" aria-labelledby="recursos-heading" className="py-(--spacing-section)">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
@@ -314,18 +302,8 @@ export function ResourceLibrary() {
           subtitle={t.library.subtitle}
         />
 
-        <input
-          type="search"
-          name="resource-search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder={t.library.searchPlaceholder}
-          aria-label={t.library.searchPlaceholder}
-          className="mb-6 w-full max-w-md rounded-full border border-carbon/15 bg-white px-5 py-3 text-sm outline-none transition-colors focus:border-teal"
-        />
-
         {/* Desktop: data table. Mobile: stacked cards. */}
-        <div className="hidden md:block overflow-hidden rounded-xl border border-carbon/10 bg-white shadow-sm">
+        <div className="mt-8 hidden md:block overflow-hidden rounded-xl border border-carbon/10 bg-white shadow-sm">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b-2 border-teal/25 bg-niebla/60 text-xs uppercase tracking-wider text-pizarra">
@@ -338,7 +316,7 @@ export function ResourceLibrary() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((resource) => (
+              {resources.map((resource) => (
                 <tr key={resource.id} className="border-b border-carbon/5 last:border-0 transition-colors hover:bg-teal-tint/50">
                   <th scope="row" className="px-5 py-4 font-semibold text-carbon">{resource.title[lang]}</th>
                   <td className="px-3 py-4 text-pizarra">{resource.language}</td>
@@ -372,7 +350,7 @@ export function ResourceLibrary() {
         </div>
 
         <ul className="md:hidden space-y-3">
-          {filtered.map((resource) => (
+          {resources.map((resource) => (
             <li key={resource.id} className="rounded-xl border border-carbon/10 bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <h3 className="font-semibold leading-snug">{resource.title[lang]}</h3>
