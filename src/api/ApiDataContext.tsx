@@ -58,8 +58,28 @@ const ApiDataContext = createContext<ApiDataValue | null>(null)
  * from the bundled snapshot, then hydrates from the backend when reachable —
  * so the UI never blocks on the network and still works fully offline.
  */
+/**
+ * Runs `task` once the browser is done with the work that matters for first
+ * paint. `requestIdleCallback` is unavailable in Safari <16.4 and in jsdom, so
+ * a timeout stands in; either way the deadline keeps hydration from being
+ * postponed indefinitely on a busy main thread.
+ */
+function whenIdle(task: () => void, timeout = 2000): () => void {
+  if (typeof requestIdleCallback === 'function') {
+    const handle = requestIdleCallback(task, { timeout })
+    return () => cancelIdleCallback(handle)
+  }
+  const handle = setTimeout(task, 200)
+  return () => clearTimeout(handle)
+}
+
 export function ApiDataProvider({ children }: { children: ReactNode }) {
-  const dataSourceRef = useRef(createDataSource())
+  // Lazy init: `useRef(createDataSource())` would re-run the factory on every
+  // render and throw the result away.
+  const dataSourceRef = useRef<ReturnType<typeof createDataSource> | null>(null)
+  if (dataSourceRef.current === null) dataSourceRef.current = createDataSource()
+  // Stable for the life of the provider, so closing over it is safe.
+  const dataSource = dataSourceRef.current
   const [institutions, setInstitutions] = useState<Institution[]>(bundledInstitutions)
   const [members, setMembers] = useState<Member[]>(mockMembers)
   const [resources, setResources] = useState<Resource[]>(bundledResources)
@@ -79,23 +99,34 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
   })
   const [lastAddedId, setLastAddedId] = useState<string | null>(null)
 
+  /**
+   * Every dataset above already renders from the bundled snapshot, so this
+   * hydration only ever *replaces* correct content with fresher content. That
+   * makes it safe — and necessary — to hold until the browser is idle: reaching
+   * Firestore drags in ~100kb of SDK, which competes with first paint for a
+   * result no reader is waiting on.
+   */
   useEffect(() => {
-    const source = dataSourceRef.current
     let cancelled = false
-    const hydrate = <T,>(load: Promise<T>, apply: (value: T) => void) =>
-      load.then((value) => {
-        if (!cancelled) apply(value)
-      })
+    const cancelIdle = whenIdle(() => {
+      const source = dataSourceRef.current
+      if (cancelled || source === null) return
+      const hydrate = <T,>(load: Promise<T>, apply: (value: T) => void) =>
+        load.then((value) => {
+          if (!cancelled) apply(value)
+        })
 
-    void Promise.allSettled([
-      hydrate(source.getInstitutions(), setInstitutions),
-      hydrate(source.getMembers(), setMembers),
-      hydrate(source.getResources(), setResources),
-      hydrate(source.getConference(), setConference),
-      hydrate(source.getOnboardingOptions(), setOptions),
-    ])
+      void Promise.allSettled([
+        hydrate(source.getInstitutions(), setInstitutions),
+        hydrate(source.getMembers(), setMembers),
+        hydrate(source.getResources(), setResources),
+        hydrate(source.getConference(), setConference),
+        hydrate(source.getOnboardingOptions(), setOptions),
+      ])
+    })
     return () => {
       cancelled = true
+      cancelIdle()
     }
   }, [])
 
@@ -117,7 +148,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
         setLastAddedId(member.id)
       },
       submitIntake: (submission: IntakeSubmission) =>
-        dataSourceRef.current.submitIntake(submission).catch(
+        dataSource.submitIntake(submission).catch(
           // Both adapters failed (or bundled threw): degrade to local processing.
           () => bundledDataSource.submitIntake(submission),
         ),

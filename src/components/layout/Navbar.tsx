@@ -27,7 +27,7 @@ function LanguageToggle() {
           type="button"
           onClick={() => setLang(option)}
           aria-pressed={lang === option}
-          className={`rounded-full px-2.5 py-1 uppercase tracking-wide transition-colors ${
+          className={`rounded-full px-2 py-1 uppercase tracking-wide transition-colors sm:px-2.5 ${
             lang === option
               ? 'bg-carbon text-blanco'
               : 'text-pizarra hover:text-carbon'
@@ -61,7 +61,7 @@ export function Navbar() {
       {/* Fixed height so switching languages never changes the bar's size */}
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-18 md:px-8"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-4 md:h-18 md:px-8"
       >
         <a href="#top" className="shrink-0">
           <img
@@ -69,7 +69,9 @@ export function Navbar() {
             alt="Red Latinoamericana de Innovación Frugal"
             width="1997"
             height="503"
-            className="h-10 w-auto md:h-12"
+            /* The lockup is ~4:1, so h-10 alone is 159px — wider than a 320px
+               bar can spare once the language toggle and menu button are in. */
+            className="h-8 w-auto sm:h-10 md:h-12"
           />
         </a>
 
@@ -86,7 +88,7 @@ export function Navbar() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <LanguageToggle />
           <a
             href="#unete"

@@ -41,7 +41,7 @@ export default function App() {
             <FrugalSection />
             <AboutSection />
             <InitiativesSection />
-            <DeferredSection minHeight={MAP_PLACEHOLDER_HEIGHT}>
+            <DeferredSection anchorId="mapa" minHeight={MAP_PLACEHOLDER_HEIGHT}>
               <Suspense fallback={<div style={{ minHeight: MAP_PLACEHOLDER_HEIGHT }} />}>
                 <NetworkMap />
               </Suspense>

@@ -59,7 +59,7 @@ export function ContactSection() {
 
         <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           {/* General inbox */}
-          <div className="rounded-3xl bg-carbon p-8 text-blanco">
+          <div className="min-w-0 rounded-3xl bg-carbon p-6 text-blanco sm:p-8">
             <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-naranja">
               {t.contact.generalTitle}
             </h3>
@@ -75,14 +75,17 @@ export function ContactSection() {
           </div>
 
           {/* Social channels */}
-          <div className="rounded-3xl border border-carbon/12 bg-blanco p-8">
+          <div className="min-w-0 rounded-3xl border border-carbon/12 bg-blanco p-6 sm:p-8">
             <h3 className="font-display text-xl font-medium uppercase tracking-wide text-carbon">
               {t.contact.socialTitle}
             </h3>
             <p className="mt-2 text-sm text-pizarra">{t.contact.socialSubtitle}</p>
             <ul className="mt-5 grid gap-2 sm:grid-cols-2">
               {socialLinks.map((social) => (
-                <li key={social.id}>
+                /* `min-w-0`: without it these grid items cannot shrink below
+                   their longest handle (`Red.Latinoamericana.Innovacion.Frugal`),
+                   which widened the whole contact grid past a 320px screen. */
+                <li key={social.id} className="min-w-0">
                   <a
                     href={social.url}
                     target="_blank"

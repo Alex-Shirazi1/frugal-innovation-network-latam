@@ -62,15 +62,22 @@ function DocumentCover({ resource }: { resource: Resource }) {
   )
 }
 
-function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
-  const { lang, t } = useI18n()
-  // Only embed the live PDF viewer when the file actually exists and is a PDF —
-  // the dev server answers missing paths with the SPA's HTML, so check the type.
-  const [fileState, setFileState] = useState<'checking' | 'ready' | 'missing'>('checking')
+type FileState = 'checking' | 'ready' | 'missing'
+
+/**
+ * Reports whether `file` is a real, servable PDF.
+ *
+ * Only embed the live viewer when the file actually exists and is a PDF — the
+ * dev server answers missing paths with the SPA's HTML, which an `<object>`
+ * would happily render as a blank page instead of falling back.
+ */
+function usePdfAvailability(file: string): FileState {
+  const [fileState, setFileState] = useState<FileState>('checking')
 
   useEffect(() => {
     let cancelled = false
-    fetch(resource.file, { method: 'HEAD' })
+    setFileState('checking')
+    fetch(file, { method: 'HEAD' })
       .then((response) => {
         const isPdf =
           response.ok && (response.headers.get('content-type') ?? '').includes('pdf')
@@ -82,7 +89,35 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
     return () => {
       cancelled = true
     }
-  }, [resource.file])
+  }, [file])
+
+  return fileState
+}
+
+/** Dark strip naming the file being viewed. Shared by both preview dialogs. */
+function ViewerToolbar({ file, onClose }: { file: string; onClose: () => void }) {
+  const { t } = useI18n()
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-carbon/10 bg-carbon px-5 py-3 sm:rounded-t-3xl">
+      <p className="truncate text-xs font-semibold text-blanco/80">
+        <span className="mr-2 text-naranja" aria-hidden="true">▤</span>
+        {file.split('/').pop()}
+      </p>
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={t.library.close}
+        className="shrink-0 rounded-full px-2.5 py-1 text-sm text-blanco/70 transition-colors hover:bg-white/10 hover:text-blanco"
+      >
+        ✕
+      </button>
+    </div>
+  )
+}
+
+function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () => void }) {
+  const { lang, t } = useI18n()
+  const fileState = usePdfAvailability(resource.file)
 
   const metadata = [
     { label: t.library.colAuthor, value: resource.author },
@@ -92,21 +127,7 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
   ]
   return (
     <Modal open onClose={onClose} labelledBy="resource-preview-title" wide>
-      {/* Viewer toolbar */}
-      <div className="flex items-center justify-between gap-4 border-b border-carbon/10 bg-carbon px-5 py-3 sm:rounded-t-3xl">
-        <p className="truncate text-xs font-semibold text-blanco/80">
-          <span className="mr-2 text-naranja" aria-hidden="true">▤</span>
-          {resource.file.split('/').pop()}
-        </p>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t.library.close}
-          className="shrink-0 rounded-full px-2.5 py-1 text-sm text-blanco/70 transition-colors hover:bg-white/10 hover:text-blanco"
-        >
-          ✕
-        </button>
-      </div>
+      <ViewerToolbar file={resource.file} onClose={onClose} />
 
       <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] md:p-10">
         {/*
@@ -201,9 +222,13 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
 }
 
 /**
- * Preview for a bibliography paper. Simpler than the resource modal: these are
- * third-party academic PDFs with no localized copy, so there is nothing to show
- * but the citation and the document itself.
+ * Preview for a bibliography paper.
+ *
+ * Deliberately the same dialog as {@link PreviewModal} — document pane left,
+ * citation and actions right — because a reader moving between the network's
+ * own documents and the academic compilation should not meet two different
+ * viewers. These are third-party PDFs with no localized copy, so the summary
+ * paragraph is the one thing that has no counterpart here.
  */
 function PaperPreviewModal({
   entry,
@@ -213,63 +238,98 @@ function PaperPreviewModal({
   onClose: () => void
 }) {
   const { t } = useI18n()
-  return (
-    <Modal open onClose={onClose} labelledBy="paper-preview-title" wide fill>
-      {/* Fixed header: citation and actions stay put while the PDF scrolls. */}
-      <div className="shrink-0 border-b border-carbon/10 px-6 pb-4 pt-5 md:px-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="font-mono text-[11px] text-pizarra">{entry.paperNumber}</p>
-            <h3
-              id="paper-preview-title"
-              className="mt-1 font-display text-lg font-medium leading-tight text-carbon md:text-xl"
-            >
-              {entry.title}
-            </h3>
-            <p className="mt-1 truncate text-sm text-pizarra">{entry.authors}</p>
-            <p className="mt-0.5 text-xs text-pizarra/80">
-              {entry.year ?? t.biblio.noYear} · {entry.language} · {entry.sizeKb} KB
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t.library.close}
-            className="shrink-0 rounded-full px-2.5 py-1 text-lg text-pizarra transition-colors hover:bg-carbon/8 hover:text-carbon"
-          >
-            ✕
-          </button>
-        </div>
+  const fileState = usePdfAvailability(entry.file)
 
-        <div className="mt-3.5 flex flex-wrap gap-2">
-          <a
-            href={entry.file}
-            download
-            className="rounded-full bg-teal px-5 py-2 text-xs font-bold text-blanco transition-colors hover:bg-teal-deep"
+  const metadata = [
+    { label: t.biblio.colAuthors, value: entry.authors },
+    { label: t.biblio.colYear, value: entry.year ? String(entry.year) : t.biblio.noYear },
+    { label: t.biblio.colLang, value: entry.language },
+    { label: t.biblio.colSize, value: `${entry.sizeKb} KB` },
+  ]
+
+  return (
+    <Modal open onClose={onClose} labelledBy="paper-preview-title" wide>
+      <ViewerToolbar file={entry.file} onClose={onClose} />
+
+      <div className="grid gap-8 p-6 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] md:p-10">
+        {/* Document pane — neutral skeleton while the HEAD check is in flight. */}
+        {fileState === 'checking' ? (
+          <div
+            className="h-[420px] w-full animate-pulse rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[560px]"
+            aria-hidden="true"
+          />
+        ) : fileState === 'ready' ? (
+          <div className="flex flex-col gap-2.5">
+            <object
+              /* Force a fresh element per document so a previously instantiated
+                 PDF plugin can never be reused for a different file. */
+              key={entry.file}
+              data={entry.file}
+              type="application/pdf"
+              aria-label={entry.title}
+              className="h-[420px] w-full overflow-hidden rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[560px]"
+            />
+            <a
+              href={entry.file}
+              target="_blank"
+              rel="noreferrer"
+              className="text-center text-xs font-semibold text-teal hover:underline"
+            >
+              ↗ {t.library.openInNewTab}
+            </a>
+          </div>
+        ) : (
+          <div className="flex h-[420px] items-center justify-center rounded-xl bg-niebla p-6 ring-1 ring-carbon/10 md:h-[560px]">
+            <p className="text-center text-sm text-pizarra">{t.library.previewMissing}</p>
+          </div>
+        )}
+
+        {/* Citation panel */}
+        <div className="flex flex-col">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-rojo">
+            {t.library.previewNote}
+          </p>
+          <h3
+            id="paper-preview-title"
+            className="mt-2 font-display text-2xl font-medium uppercase leading-tight text-carbon"
           >
-            ↓ {t.biblio.download}
-          </a>
-          <a
-            href={entry.file}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-full border border-carbon/15 px-5 py-2 text-xs font-bold text-carbon transition-colors hover:border-carbon/40"
-          >
-            ↗ {t.library.openInNewTab}
-          </a>
+            {entry.title}
+          </h3>
+          <span className="mt-3 block h-1 w-12 rounded-full bg-teal" aria-hidden="true" />
+
+          <p className="mt-4 font-mono text-xs text-pizarra">
+            {t.biblio.colNumber} {entry.paperNumber}
+          </p>
+
+          <dl className="mt-6 divide-y divide-carbon/8 border-y border-carbon/8">
+            {metadata.map((row) => (
+              <div key={row.label} className="flex items-start justify-between gap-6 py-2.5 text-sm">
+                <dt className="shrink-0 font-semibold uppercase tracking-wider text-[11px] text-pizarra">
+                  {row.label}
+                </dt>
+                <dd className="text-right font-semibold text-carbon">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-auto flex flex-col gap-2.5 pt-7">
+            <a
+              href={entry.file}
+              download
+              className="rounded-full bg-teal px-6 py-3 text-center text-sm font-bold text-blanco transition-colors hover:bg-teal-deep"
+            >
+              ↓ {t.biblio.download}
+            </a>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full border border-carbon/15 px-6 py-3 text-sm font-bold text-carbon transition-colors hover:border-carbon/40"
+            >
+              {t.library.close}
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* The viewer takes whatever height is left — one scrollbar, not two. */}
-      <object
-        key={entry.file}
-        data={entry.file}
-        type="application/pdf"
-        aria-label={entry.title}
-        className="min-h-0 flex-1 bg-niebla"
-      >
-        <p className="p-6 text-sm text-pizarra">{t.library.previewMissing}</p>
-      </object>
     </Modal>
   )
 }
@@ -318,7 +378,17 @@ export function ResourceLibrary() {
             <tbody>
               {resources.map((resource) => (
                 <tr key={resource.id} className="border-b border-carbon/5 last:border-0 transition-colors hover:bg-teal-tint/50">
-                  <th scope="row" className="px-5 py-4 font-semibold text-carbon">{resource.title[lang]}</th>
+                  <th scope="row" className="px-5 py-4 font-semibold text-carbon">
+                    {/* Same affordance as the bibliography table: the title is
+                        the primary way into the preview, not just a label. */}
+                    <button
+                      type="button"
+                      onClick={() => openResource(resource)}
+                      className="text-left transition-colors hover:text-teal hover:underline focus-visible:text-teal"
+                    >
+                      {resource.title[lang]}
+                    </button>
+                  </th>
                   <td className="px-3 py-4 text-pizarra">{resource.language}</td>
                   <td className="px-3 py-4 text-pizarra">{resource.author}</td>
                   <td className="px-3 py-4 text-pizarra">{resource.year}</td>
@@ -353,7 +423,15 @@ export function ResourceLibrary() {
           {resources.map((resource) => (
             <li key={resource.id} className="rounded-xl border border-carbon/10 bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold leading-snug">{resource.title[lang]}</h3>
+                <h3 className="font-semibold leading-snug">
+                  <button
+                    type="button"
+                    onClick={() => openResource(resource)}
+                    className="text-left hover:text-teal hover:underline"
+                  >
+                    {resource.title[lang]}
+                  </button>
+                </h3>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${typeStyles[resource.type]}`}>
                   {t.library.types[resource.type]}
                 </span>

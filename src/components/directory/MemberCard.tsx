@@ -25,7 +25,11 @@ export const MemberCard = memo(function MemberCard({
 
   return (
     <li
-      className={`group relative flex flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-carbon/5 ${
+      /* `min-w-0`: a grid item defaults to `min-width: auto`, so a long member
+         name would push the card wider than its column and scroll the whole
+         page sideways at 320px. Allowing it to shrink lets the `truncate`
+         below actually do its job. */
+      className={`group relative flex min-w-0 flex-col rounded-2xl border p-5 transition-shadow hover:shadow-lg hover:shadow-carbon/5 ${
         highlighted
           ? 'border-teal bg-teal/5 shadow-lg shadow-teal/10'
           : 'border-carbon/10 bg-white/70'

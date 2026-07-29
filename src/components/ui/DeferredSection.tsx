@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 interface DeferredSectionProps {
+  /**
+   * The id the deferred child will carry once mounted. Held by the placeholder
+   * in the meantime so in-page anchors to that section resolve before it loads
+   * — without this, `#mapa` in the navbar and footer points at nothing until
+   * the reader has already scrolled past the map on their own.
+   */
+  anchorId?: string
   /** Reserved height while the section is not yet mounted, to avoid layout shift. */
   minHeight: number
   /** How far ahead of the viewport to start loading. */
@@ -19,6 +26,7 @@ interface DeferredSectionProps {
  * without IntersectionObserver render immediately rather than never.
  */
 export function DeferredSection({
+  anchorId,
   minHeight,
   rootMargin = '300px',
   children,
@@ -49,7 +57,18 @@ export function DeferredSection({
     return () => observer.disconnect()
   }, [visible, rootMargin])
 
+  /**
+   * A page opened straight at `#anchorId` has already missed its native hash
+   * scroll: nothing with that id exists in the served HTML, only after React
+   * mounts this placeholder. Redo the jump once it does.
+   */
+  useEffect(() => {
+    if (!anchorId || visible) return
+    if (window.location.hash !== `#${anchorId}`) return
+    holderRef.current?.scrollIntoView()
+  }, [anchorId, visible])
+
   if (visible) return <>{children}</>
 
-  return <div ref={holderRef} style={{ minHeight }} aria-hidden="true" />
+  return <div ref={holderRef} id={anchorId} style={{ minHeight }} aria-hidden="true" />
 }
