@@ -24,7 +24,7 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
   const capture = useCapture()
   const [query, setQuery] = useState('')
   const [language, setLanguage] = useState<string>(ALL)
-  const [sort, setSort] = useState<SortKey>('newest')
+  const [sort, setSort] = useState<SortKey>('number')
   const [expanded, setExpanded] = useState(false)
   const deferredQuery = useDeferredValue(query)
 
@@ -103,10 +103,10 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
             aria-label={t.biblio.sortNewest}
             className="rounded-full border border-carbon/15 bg-white px-3.5 py-2 text-xs font-semibold text-carbon outline-none focus:border-teal"
           >
+            <option value="number">{t.biblio.sortNumber}</option>
             <option value="newest">{t.biblio.sortNewest}</option>
             <option value="oldest">{t.biblio.sortOldest}</option>
             <option value="title">{t.biblio.sortTitle}</option>
-            <option value="number">{t.biblio.sortNumber}</option>
           </select>
           {hasFilters ? (
             <button
@@ -143,7 +143,9 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
                   <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colAuthors}</th>
                   <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colYear}</th>
                   <th scope="col" className="px-3 py-3 font-bold">{t.biblio.colLang}</th>
-                  <th scope="col" className="px-4 py-3 text-right font-bold">{t.library.colActions}</th>
+                  <th scope="col" className="w-44 px-4 py-3 text-right font-bold">
+                    {t.library.colActions}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-carbon/8">
@@ -168,21 +170,23 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
                         {entry.language}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => open(entry)}
-                        className="text-xs font-semibold text-teal hover:underline"
-                      >
-                        {t.biblio.open}
-                      </button>
-                      <a
-                        href={entry.file}
-                        download
-                        className="ml-3 text-xs font-semibold text-pizarra hover:text-carbon hover:underline"
-                      >
-                        ↓ {entry.sizeKb} KB
-                      </a>
+                    <td className="w-44 px-4 py-3">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => open(entry)}
+                          className="rounded-full border border-teal/30 px-3 py-1 text-[11px] font-bold whitespace-nowrap text-teal transition-colors hover:bg-teal hover:text-blanco"
+                        >
+                          {t.biblio.preview}
+                        </button>
+                        <a
+                          href={entry.file}
+                          download
+                          className="rounded-full border border-carbon/15 px-3 py-1 text-[11px] font-bold whitespace-nowrap text-pizarra transition-colors hover:border-carbon/40 hover:text-carbon"
+                        >
+                          ↓ {t.biblio.download}
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -207,17 +211,23 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
                   {entry.title}
                 </button>
                 <p className="mt-1 text-xs text-pizarra">{entry.authors}</p>
-                <div className="mt-2.5 flex items-center gap-4 text-xs">
-                  <span className="text-pizarra">{entry.year ?? t.biblio.noYear}</span>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="mr-auto text-xs text-pizarra">
+                    {entry.year ?? t.biblio.noYear}
+                  </span>
                   <button
                     type="button"
                     onClick={() => open(entry)}
-                    className="font-semibold text-teal hover:underline"
+                    className="rounded-full border border-teal/30 px-3 py-1 text-[11px] font-bold text-teal"
                   >
-                    {t.biblio.open}
+                    {t.biblio.preview}
                   </button>
-                  <a href={entry.file} download className="font-semibold text-pizarra hover:text-carbon">
-                    ↓ {entry.sizeKb} KB
+                  <a
+                    href={entry.file}
+                    download
+                    className="rounded-full border border-carbon/15 px-3 py-1 text-[11px] font-bold text-pizarra"
+                  >
+                    ↓ {t.biblio.download}
                   </a>
                 </div>
               </li>

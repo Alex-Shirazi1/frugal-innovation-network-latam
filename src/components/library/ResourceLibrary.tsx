@@ -214,49 +214,38 @@ function PaperPreviewModal({
 }) {
   const { t } = useI18n()
   return (
-    <Modal open onClose={onClose} labelledBy="paper-preview-title" wide>
-      <div className="flex items-center justify-between gap-4 border-b border-carbon/10 bg-carbon px-5 py-3 sm:rounded-t-3xl">
-        <p className="truncate text-xs font-semibold text-blanco/80">
-          <span className="mr-2 text-naranja" aria-hidden="true">▤</span>
-          {entry.paperNumber} · {entry.file.split('/').pop()}
-        </p>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t.library.close}
-          className="shrink-0 rounded-full px-2.5 py-1 text-sm text-blanco/70 transition-colors hover:bg-white/10 hover:text-blanco"
-        >
-          ✕
-        </button>
-      </div>
+    <Modal open onClose={onClose} labelledBy="paper-preview-title" wide fill>
+      {/* Fixed header: citation and actions stay put while the PDF scrolls. */}
+      <div className="shrink-0 border-b border-carbon/10 px-6 pb-4 pt-5 md:px-8">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="font-mono text-[11px] text-pizarra">{entry.paperNumber}</p>
+            <h3
+              id="paper-preview-title"
+              className="mt-1 font-display text-lg font-medium leading-tight text-carbon md:text-xl"
+            >
+              {entry.title}
+            </h3>
+            <p className="mt-1 truncate text-sm text-pizarra">{entry.authors}</p>
+            <p className="mt-0.5 text-xs text-pizarra/80">
+              {entry.year ?? t.biblio.noYear} · {entry.language} · {entry.sizeKb} KB
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t.library.close}
+            className="shrink-0 rounded-full px-2.5 py-1 text-lg text-pizarra transition-colors hover:bg-carbon/8 hover:text-carbon"
+          >
+            ✕
+          </button>
+        </div>
 
-      <div className="p-6 md:p-8">
-        <h3
-          id="paper-preview-title"
-          className="font-display text-xl font-medium leading-tight text-carbon md:text-2xl"
-        >
-          {entry.title}
-        </h3>
-        <p className="mt-2 text-sm text-pizarra">{entry.authors}</p>
-        <p className="mt-1 text-xs text-pizarra/80">
-          {entry.year ?? t.biblio.noYear} · {entry.language} · {entry.sizeKb} KB
-        </p>
-
-        <object
-          key={entry.file}
-          data={entry.file}
-          type="application/pdf"
-          aria-label={entry.title}
-          className="mt-5 h-[440px] w-full overflow-hidden rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[600px]"
-        >
-          <p className="p-6 text-sm text-pizarra">{t.library.previewMissing}</p>
-        </object>
-
-        <div className="mt-5 flex flex-wrap gap-2.5">
+        <div className="mt-3.5 flex flex-wrap gap-2">
           <a
             href={entry.file}
             download
-            className="rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep"
+            className="rounded-full bg-teal px-5 py-2 text-xs font-bold text-blanco transition-colors hover:bg-teal-deep"
           >
             ↓ {t.biblio.download}
           </a>
@@ -264,19 +253,23 @@ function PaperPreviewModal({
             href={entry.file}
             target="_blank"
             rel="noreferrer"
-            className="rounded-full border border-carbon/15 px-6 py-3 text-sm font-bold text-carbon transition-colors hover:border-carbon/40"
+            className="rounded-full border border-carbon/15 px-5 py-2 text-xs font-bold text-carbon transition-colors hover:border-carbon/40"
           >
             ↗ {t.library.openInNewTab}
           </a>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-carbon/15 px-6 py-3 text-sm font-bold text-carbon transition-colors hover:border-carbon/40"
-          >
-            {t.library.close}
-          </button>
         </div>
       </div>
+
+      {/* The viewer takes whatever height is left — one scrollbar, not two. */}
+      <object
+        key={entry.file}
+        data={entry.file}
+        type="application/pdf"
+        aria-label={entry.title}
+        className="min-h-0 flex-1 bg-niebla"
+      >
+        <p className="p-6 text-sm text-pizarra">{t.library.previewMissing}</p>
+      </object>
     </Modal>
   )
 }

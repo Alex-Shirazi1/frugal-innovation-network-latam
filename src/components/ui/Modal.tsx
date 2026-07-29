@@ -5,10 +5,26 @@ interface ModalProps {
   onClose: () => void
   labelledBy: string
   wide?: boolean
+  /**
+   * Fill the available height and let the content manage its own scrolling.
+   *
+   * Without this the dialog grows past the viewport and gets an outer
+   * scrollbar, which pushes the action buttons below the fold — so a preview
+   * containing a tall PDF viewer ends up with two nested scrollbars and no
+   * visible way to download.
+   */
+  fill?: boolean
   children: ReactNode
 }
 
-export function Modal({ open, onClose, labelledBy, wide = false, children }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  labelledBy,
+  wide = false,
+  fill = false,
+  children,
+}: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -47,7 +63,11 @@ export function Modal({ open, onClose, labelledBy, wide = false, children }: Mod
         aria-modal="true"
         aria-labelledby={labelledBy}
         tabIndex={-1}
-        className={`relative w-full ${wide ? 'sm:max-w-4xl' : 'sm:max-w-2xl'} max-h-[88dvh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-blanco shadow-2xl outline-none rise-in`}
+        className={`relative w-full ${wide ? 'sm:max-w-4xl' : 'sm:max-w-2xl'} ${
+          fill
+            ? 'flex h-[88dvh] flex-col overflow-hidden'
+            : 'max-h-[88dvh] overflow-y-auto'
+        } rounded-t-3xl sm:rounded-3xl bg-blanco shadow-2xl outline-none rise-in`}
       >
         {children}
       </div>
