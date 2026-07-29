@@ -54,11 +54,6 @@ interface ApiDataValue {
 const ApiDataContext = createContext<ApiDataValue | null>(null)
 
 /**
- * Loads every dataset through the active RelifDataSource. Renders instantly
- * from the bundled snapshot, then hydrates from the backend when reachable —
- * so the UI never blocks on the network and still works fully offline.
- */
-/**
  * Runs `task` once the browser is done with the work that matters for first
  * paint. `requestIdleCallback` is unavailable in Safari <16.4 and in jsdom, so
  * a timeout stands in; either way the deadline keeps hydration from being
@@ -73,6 +68,11 @@ function whenIdle(task: () => void, timeout = 2000): () => void {
   return () => clearTimeout(handle)
 }
 
+/**
+ * Loads every dataset through the active RelifDataSource. Renders instantly
+ * from the bundled snapshot, then hydrates from the backend when reachable —
+ * so the UI never blocks on the network and still works fully offline.
+ */
 export function ApiDataProvider({ children }: { children: ReactNode }) {
   // Lazy init: `useRef(createDataSource())` would re-run the factory on every
   // render and throw the result away.
@@ -157,7 +157,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
         return institutions.find((i) => i.id === affiliationId)?.name ?? null
       },
     }
-  }, [institutions, members, resources, conference, options, lastAddedId])
+  }, [dataSource, institutions, members, resources, conference, options, lastAddedId])
 
   return <ApiDataContext.Provider value={value}>{children}</ApiDataContext.Provider>
 }
