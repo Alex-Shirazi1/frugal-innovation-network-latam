@@ -5,6 +5,8 @@ import { SectionHeading } from '../ui/SectionHeading'
 import { Modal } from '../ui/Modal'
 import { useApiData } from '../../api/ApiDataContext'
 import type { Resource } from '../../api/types'
+import { BibliographyList } from './BibliographyList'
+import type { BibliographyEntry } from '../../data/bibliography'
 
 const typeStyles: Record<Resource['type'], string> = {
   PDF: 'bg-teal/10 text-teal-deep',
@@ -198,12 +200,94 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
   )
 }
 
+/**
+ * Preview for a bibliography paper. Simpler than the resource modal: these are
+ * third-party academic PDFs with no localized copy, so there is nothing to show
+ * but the citation and the document itself.
+ */
+function PaperPreviewModal({
+  entry,
+  onClose,
+}: {
+  entry: BibliographyEntry
+  onClose: () => void
+}) {
+  const { t } = useI18n()
+  return (
+    <Modal open onClose={onClose} labelledBy="paper-preview-title" wide>
+      <div className="flex items-center justify-between gap-4 border-b border-carbon/10 bg-carbon px-5 py-3 sm:rounded-t-3xl">
+        <p className="truncate text-xs font-semibold text-blanco/80">
+          <span className="mr-2 text-naranja" aria-hidden="true">▤</span>
+          {entry.paperNumber} · {entry.file.split('/').pop()}
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t.library.close}
+          className="shrink-0 rounded-full px-2.5 py-1 text-sm text-blanco/70 transition-colors hover:bg-white/10 hover:text-blanco"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="p-6 md:p-8">
+        <h3
+          id="paper-preview-title"
+          className="font-display text-xl font-medium leading-tight text-carbon md:text-2xl"
+        >
+          {entry.title}
+        </h3>
+        <p className="mt-2 text-sm text-pizarra">{entry.authors}</p>
+        <p className="mt-1 text-xs text-pizarra/80">
+          {entry.year ?? t.biblio.noYear} · {entry.language} · {entry.sizeKb} KB
+        </p>
+
+        <object
+          key={entry.file}
+          data={entry.file}
+          type="application/pdf"
+          aria-label={entry.title}
+          className="mt-5 h-[440px] w-full overflow-hidden rounded-xl bg-niebla ring-1 ring-carbon/10 md:h-[600px]"
+        >
+          <p className="p-6 text-sm text-pizarra">{t.library.previewMissing}</p>
+        </object>
+
+        <div className="mt-5 flex flex-wrap gap-2.5">
+          <a
+            href={entry.file}
+            download
+            className="rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep"
+          >
+            ↓ {t.biblio.download}
+          </a>
+          <a
+            href={entry.file}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full border border-carbon/15 px-6 py-3 text-sm font-bold text-carbon transition-colors hover:border-carbon/40"
+          >
+            ↗ {t.library.openInNewTab}
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-carbon/15 px-6 py-3 text-sm font-bold text-carbon transition-colors hover:border-carbon/40"
+          >
+            {t.library.close}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 export function ResourceLibrary() {
   const { lang, t } = useI18n()
   const { resources } = useApiData()
   const capture = useCapture()
   const [query, setQuery] = useState('')
   const [previewing, setPreviewing] = useState<Resource | null>(null)
+  const [previewingPaper, setPreviewingPaper] = useState<BibliographyEntry | null>(null)
 
   function openResource(resource: Resource) {
     capture('resource_opened', {
@@ -326,7 +410,12 @@ export function ResourceLibrary() {
           ))}
         </ul>
 
+        <BibliographyList onPreview={setPreviewingPaper} />
+
         {previewing ? <PreviewModal resource={previewing} onClose={() => setPreviewing(null)} /> : null}
+        {previewingPaper ? (
+          <PaperPreviewModal entry={previewingPaper} onClose={() => setPreviewingPaper(null)} />
+        ) : null}
       </div>
     </section>
   )
