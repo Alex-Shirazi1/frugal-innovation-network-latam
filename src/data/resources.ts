@@ -10,7 +10,13 @@ export interface Resource {
   author: string
   year: number
   type: ResourceType
-  /** Local mock path — real files migrate out of Google Drive later */
+  /**
+   * Path under public/docs. Four of these are the real documents migrated from
+   * the production site; the rest are generated placeholders until Allan
+   * supplies the originals. Dropping a real PDF in with the same filename needs
+   * no code change — see scripts/generate-placeholder-pdfs.mjs, which refuses to
+   * overwrite anything that is not one of its own placeholders.
+   */
   file: string
   summary: Localized
 }

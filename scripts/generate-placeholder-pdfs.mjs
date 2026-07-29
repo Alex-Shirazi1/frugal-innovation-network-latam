@@ -5,7 +5,7 @@
  *
  * Run with: node scripts/generate-placeholder-pdfs.mjs
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -159,8 +159,29 @@ function buildPdf(doc, docIndex) {
   return Buffer.from(body + xref + trailer, 'latin1')
 }
 
+/**
+ * Marker stamped into every generated page. Its presence is how we tell our own
+ * placeholders apart from documents migrated from the production site — without
+ * this check, re-running the script would silently destroy the real PDFs.
+ */
+const PLACEHOLDER_MARKER = 'DOCUMENTO DE MUESTRA'
+
+function isRealDocument(path) {
+  if (!existsSync(path)) return false
+  return !readFileSync(path, 'latin1').includes(PLACEHOLDER_MARKER)
+}
+
+let written = 0
+let kept = 0
 documents.forEach((doc, docIndex) => {
   const path = join(outDir, doc.file)
+  if (isRealDocument(path)) {
+    console.log(`kept   ${path} (real document, not overwriting)`)
+    kept += 1
+    return
+  }
   writeFileSync(path, buildPdf(doc, docIndex))
-  console.log(`wrote ${path}`)
+  console.log(`wrote  ${path}`)
+  written += 1
 })
+console.log(`\n${written} placeholder(s) generated, ${kept} real document(s) left untouched.`)
