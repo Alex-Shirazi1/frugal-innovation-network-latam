@@ -10,15 +10,29 @@ export const MIN_SCALE = 1
 export const MAX_SCALE = 48
 export const NODE_ZOOM_SCALE = 18
 
-/** Initial frame: Latin America (with Mexico and the Southern Cone in view). */
-function latamView(): ViewState {
-  const [x0, y0] = projectLatLon(34, -119)
-  const [x1, y1] = projectLatLon(-57, -31)
+/**
+ * Initial frame: the Atlantic-facing world — the Americas down the left, Europe
+ * and Africa on the right.
+ *
+ * The network is no longer only Latin American: it has members in Spain,
+ * France and Finland, and a frame fitted to Latin America opened with those
+ * four nodes off-screen, so the map understated the network's reach until the
+ * reader thought to zoom out. This frame puts all 37 located members on screen
+ * at once.
+ *
+ * `clampView` keeps the frame inside the canvas, which at this width means it
+ * sits flush against the antimeridian — hence the empty Pacific on the left
+ * edge. That is deliberate: pulling the frame east enough to remove it would
+ * push Alaska and the US West Coast out of view.
+ */
+function atlanticView(): ViewState {
+  const [x0, y0] = projectLatLon(72, -180)
+  const [x1, y1] = projectLatLon(-56, 87)
   const scale = Math.min(MAP_W / (x1 - x0), MAP_H / (y1 - y0))
   return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, scale }
 }
 
-export const INITIAL_VIEW: ViewState = latamView()
+export const INITIAL_VIEW: ViewState = atlanticView()
 
 export function clampView(view: ViewState): ViewState {
   const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, view.scale))
