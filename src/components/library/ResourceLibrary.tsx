@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCapture } from '../../lib/analytics'
+import { formatFileSize } from '../../lib/fileSize'
 import { useI18n } from '../../i18n/I18nContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Modal } from '../ui/Modal'
@@ -244,7 +245,7 @@ function PaperPreviewModal({
     { label: t.biblio.colAuthors, value: entry.authors },
     { label: t.biblio.colYear, value: entry.year ? String(entry.year) : t.biblio.noYear },
     { label: t.biblio.colLang, value: entry.language },
-    { label: t.biblio.colSize, value: `${entry.sizeKb} KB` },
+    { label: t.biblio.colSize, value: formatFileSize(entry.sizeKb) },
   ]
 
   return (
