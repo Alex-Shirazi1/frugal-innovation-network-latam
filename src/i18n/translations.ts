@@ -27,16 +27,20 @@ export const es = {
   origin: {
     kicker: 'Historia',
     title: 'Origen de la Red',
-    p1: 'La Red Latinoamericana de Innovación Frugal (RELIF) nace en 2020 como un esfuerzo colaborativo entre universidades jesuitas y aliados de toda la región para estudiar, enseñar y practicar la innovación frugal.',
-    p2: 'Desde entonces, la red articula encuentros anuales, investigación, formación de capacidades y proyectos aplicados que conectan la academia con las comunidades.',
-    mission: 'Misión',
-    missionText:
-      'Articular personas e instituciones para desarrollar capacidades de innovación frugal que generen valor social en América Latina.',
-    vision: 'Visión',
-    visionText:
-      'Ser la comunidad de referencia en innovación frugal de la región, con impacto medible en las comunidades que servimos.',
-    values: 'Valores',
-    valuesText: 'Colaboración, austeridad creativa, sostenibilidad y compromiso social.',
+    p1: 'La Red Latinoamericana de Innovación Frugal (RELIF) surgió en abril de 2018 por iniciativa de un grupo de profesores de las universidades de Santa Clara (California, EE. UU.), ITESO (México), Pontificia Universidad Javeriana (Bogotá, Colombia) y la Universidad Iberoamericana de Puebla (Puebla, México), con el objetivo de promover la justicia social y ambiental en Latinoamérica.',
+    p2: 'La RELIF nació como un espacio de diálogo, colaboración y trabajo donde la innovación frugal es el principal elemento que orienta nuestros objetivos y actividades.',
+    p3: 'Desde sus inicios hasta la fecha, la RELIF se ha abierto a la participación y membresía de universidades, empresas, organizaciones, profesionales y estudiantes interesados en la innovación frugal en Latinoamérica.',
+    foundedLabel: 'Fundada en',
+    foundedValue: 'Abril de 2018',
+    foundersTitle: 'Universidades fundadoras',
+    founderPlaces: {
+      scu: 'California, EE. UU.',
+      iteso: 'Guadalajara, México',
+      javeriana: 'Bogotá, Colombia',
+      iberoPuebla: 'Puebla, México',
+    },
+    pullQuote:
+      'La Red Latinoamericana de Innovación Frugal (RELIF) surge por iniciativa de un grupo de universidades jesuitas para promover la justicia social y ambiental en Latinoamérica a través de la innovación que se orienta al cuidado de nuestra casa común.',
   },
   conference: {
     kicker: 'Archivo del congreso',
@@ -321,16 +325,20 @@ export const en: Dictionary = {
   origin: {
     kicker: 'History',
     title: 'Origin of the Network',
-    p1: 'The Latin American Frugal Innovation Network (RELIF) was born in 2020 as a collaborative effort among Jesuit universities and allies across the region to study, teach, and practice frugal innovation.',
-    p2: 'Since then, the network has organized annual gatherings, research, capacity building, and applied projects that connect academia with communities.',
-    mission: 'Mission',
-    missionText:
-      'To connect people and institutions to build frugal innovation capabilities that create social value across Latin America.',
-    vision: 'Vision',
-    visionText:
-      'To be the region’s reference community for frugal innovation, with measurable impact in the communities we serve.',
-    values: 'Values',
-    valuesText: 'Collaboration, creative austerity, sustainability, and social commitment.',
+    p1: 'The Latin American Frugal Innovation Network (RELIF) emerged in April 2018 at the initiative of a group of professors from Santa Clara University (California, USA), ITESO (Mexico), Pontificia Universidad Javeriana (Bogotá, Colombia) and Universidad Iberoamericana de Puebla (Puebla, Mexico), with the aim of promoting social and environmental justice in Latin America.',
+    p2: 'RELIF was born as a space for dialogue, collaboration and work in which frugal innovation is the main element guiding our objectives and activities.',
+    p3: 'From its beginnings to today, RELIF has been open to the participation and membership of universities, companies, organizations, professionals and students interested in frugal innovation in Latin America.',
+    foundedLabel: 'Founded in',
+    foundedValue: 'April 2018',
+    foundersTitle: 'Founding universities',
+    founderPlaces: {
+      scu: 'California, USA',
+      iteso: 'Guadalajara, Mexico',
+      javeriana: 'Bogotá, Colombia',
+      iberoPuebla: 'Puebla, Mexico',
+    },
+    pullQuote:
+      'The Latin American Frugal Innovation Network (RELIF) emerged at the initiative of a group of Jesuit universities to promote social and environmental justice in Latin America through innovation oriented towards the care of our common home.',
   },
   conference: {
     kicker: 'Conference archive',
@@ -607,16 +615,20 @@ export const pt: Dictionary = {
   origin: {
     kicker: 'História',
     title: 'Origem da Rede',
-    p1: 'A Rede Latino-Americana de Inovação Frugal (RELIF) nasceu em 2020 como um esforço colaborativo entre universidades jesuítas e aliados de toda a região para estudar, ensinar e praticar a inovação frugal.',
-    p2: 'Desde então, a rede articula encontros anuais, pesquisa, formação de capacidades e projetos aplicados que conectam a academia às comunidades.',
-    mission: 'Missão',
-    missionText:
-      'Articular pessoas e instituições para desenvolver capacidades de inovação frugal que gerem valor social na América Latina.',
-    vision: 'Visão',
-    visionText:
-      'Ser a comunidade de referência em inovação frugal da região, com impacto mensurável nas comunidades que servimos.',
-    values: 'Valores',
-    valuesText: 'Colaboração, austeridade criativa, sustentabilidade e compromisso social.',
+    p1: 'A Rede Latino-Americana de Inovação Frugal (RELIF) surgiu em abril de 2018 por iniciativa de um grupo de professores das universidades de Santa Clara (Califórnia, EUA), ITESO (México), Pontificia Universidad Javeriana (Bogotá, Colômbia) e Universidad Iberoamericana de Puebla (Puebla, México), com o objetivo de promover a justiça social e ambiental na América Latina.',
+    p2: 'A RELIF nasceu como um espaço de diálogo, colaboração e trabalho no qual a inovação frugal é o principal elemento que orienta nossos objetivos e atividades.',
+    p3: 'Desde o seu início até hoje, a RELIF tem se aberto à participação e à associação de universidades, empresas, organizações, profissionais e estudantes interessados na inovação frugal na América Latina.',
+    foundedLabel: 'Fundada em',
+    foundedValue: 'Abril de 2018',
+    foundersTitle: 'Universidades fundadoras',
+    founderPlaces: {
+      scu: 'Califórnia, EUA',
+      iteso: 'Guadalajara, México',
+      javeriana: 'Bogotá, Colômbia',
+      iberoPuebla: 'Puebla, México',
+    },
+    pullQuote:
+      'A Rede Latino-Americana de Inovação Frugal (RELIF) surge por iniciativa de um grupo de universidades jesuítas para promover a justiça social e ambiental na América Latina por meio da inovação orientada ao cuidado da nossa casa comum.',
   },
   conference: {
     kicker: 'Arquivo do congresso',

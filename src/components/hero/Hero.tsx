@@ -1,7 +1,8 @@
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 
-const FOUNDING_YEAR = 2020
+/** The network was founded in April 2018 — see the Origin section. */
+const FOUNDING_YEAR = 2018
 
 /** Decorative ring of "people" dots, echoing the official logo mark. */
 function LogoRing() {
