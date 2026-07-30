@@ -550,7 +550,7 @@ export const en: Dictionary = {
     sortNumber: 'By catalogue number',
     colNumber: 'No.',
     colTitle: 'Title',
-    colAuthors: 'Authors',
+    colAuthors: 'Author',
     colYear: 'Year',
     colLang: 'Language',
     colSize: 'Size',
