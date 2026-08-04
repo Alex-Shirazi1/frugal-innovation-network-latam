@@ -17,15 +17,20 @@ export function Footer() {
   return (
     <footer className="bg-carbon text-blanco">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 py-8 text-center sm:flex-row sm:justify-between sm:gap-6 sm:text-left md:px-8">
-        <div className="rounded-lg bg-blanco p-2">
-          <img
-            src="/logo-relif.png"
-            alt="Red Latinoamericana de Innovación Frugal"
-            width="1997"
-            height="503"
-            className="h-7 w-auto"
-          />
-        </div>
+        {/*
+          The reversed lockup: white wordmark, full-colour mark, transparent
+          background. The light logo is opaque RGB with no alpha, so on the
+          carbon it needed a white chip behind it, which read as a sticker
+          stuck to the footer. This sits on the surface directly, and can run
+          slightly larger now that it carries no box.
+        */}
+        <img
+          src="/logo-relif-dark.png"
+          alt="Red Latinoamericana de Innovación Frugal"
+          width="640"
+          height="161"
+          className="h-9 w-auto"
+        />
 
         <p className="text-xs text-blanco/50">
           © {new Date().getFullYear()} RELIF · {t.footer.rights}
