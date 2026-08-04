@@ -277,11 +277,9 @@ export const es = {
     clear: 'Limpiar',
   },
   footer: {
-    contact: 'Contacto',
     tagline: 'Red Latinoamericana de Innovación Frugal',
     rights: 'Hecho con frugalidad en América Latina.',
     sitemap: 'Mapa del sitio',
-    social: 'Redes sociales',
   },
   common: {
     languageLabel: 'Idioma',
@@ -575,11 +573,9 @@ export const en: Dictionary = {
     clear: 'Clear',
   },
   footer: {
-    contact: 'Contact',
     tagline: 'Latin American Frugal Innovation Network',
     rights: 'Made frugally in Latin America.',
     sitemap: 'Site map',
-    social: 'Social media',
   },
   common: {
     languageLabel: 'Language',
@@ -865,11 +861,9 @@ export const pt: Dictionary = {
     clear: 'Limpar',
   },
   footer: {
-    contact: 'Contato',
     tagline: 'Rede Latino-Americana de Inovação Frugal',
     rights: 'Feito com frugalidade na América Latina.',
     sitemap: 'Mapa do site',
-    social: 'Redes sociais',
   },
   common: {
     languageLabel: 'Idioma',

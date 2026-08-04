@@ -25,15 +25,18 @@ export interface Resource {
  * The network's own documents, as actually published.
  *
  * This deliberately holds only documents that exist. An earlier version listed
- * nine entries including a MOOC guide, a 2024 meeting agenda, an English
- * edition of the framework and a standalone references PDF — none of which the
- * network publishes anywhere, on the site or in its Drive folder. They were
- * design fixtures, and showing them to Allan would have implied documents that
- * do not exist.
+ * nine entries including a MOOC guide, a 2024 meeting agenda and an English
+ * edition of the framework — none of which the network publishes anywhere, on
+ * the site or in its Drive folder. They were design fixtures, and showing them
+ * would have implied documents that do not exist.
  *
- * The academic references that "REFERENCIAS" used to point at are the 43-paper
- * bibliography (src/data/bibliography.ts), so they are no longer represented
- * here as a single file.
+ * One entry was cut on that basis in error: the standalone references PDF is
+ * real. The production site publishes img/Referencias-RELIF-0519.pdf (230 KB)
+ * and links it from the home page. It is not served here yet only because we do
+ * not hold a copy — it is on the ask list, not absent by design.
+ *
+ * Separately, the academic references that "REFERENCIAS" used to point at are
+ * also carried as the 43-paper bibliography (src/data/bibliography.ts).
  */
 export const resources: Resource[] = [
   {

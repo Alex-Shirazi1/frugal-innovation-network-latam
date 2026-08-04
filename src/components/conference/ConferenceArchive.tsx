@@ -137,12 +137,19 @@ function VideoWall() {
 
 export function ConferenceArchive() {
   const { t } = useI18n()
-  const { conference: { agendaDay1, agendaDay2 } } = useApiData()
+  const { conference: { agendaDay1, agendaDay2, speakers } } = useApiData()
   const [tab, setTab] = useState<Tab>('agenda')
 
+  /**
+   * The speakers tab is data-driven rather than hardcoded: the confirmed
+   * speaker list is empty, and an empty "Ponentes" tab reads as a broken
+   * section. It reappears on its own once the array is populated.
+   */
   const tabs: { id: Tab; label: string }[] = [
     { id: 'agenda', label: t.conference.agendaTab },
-    { id: 'speakers', label: t.conference.speakersTab },
+    ...(speakers.length > 0
+      ? [{ id: 'speakers' as const, label: t.conference.speakersTab }]
+      : []),
     { id: 'gallery', label: t.conference.galleryTab },
     { id: 'videos', label: t.conference.videosTab },
   ]

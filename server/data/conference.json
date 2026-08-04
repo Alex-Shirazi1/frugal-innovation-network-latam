@@ -120,68 +120,7 @@
       }
     }
   ],
-  "speakers": [
-    {
-      "name": "Kimura Elías",
-      "role": {
-        "es": "Ponente principal",
-        "en": "Keynote speaker",
-        "pt": "Palestrante principal"
-      },
-      "origin": "México",
-      "hue": 24
-    },
-    {
-      "name": "Gerardo Rodríguez Tapia",
-      "role": {
-        "es": "Panelista · Metodologías",
-        "en": "Panelist · Methodologies",
-        "pt": "Painelista · Metodologias"
-      },
-      "origin": "México",
-      "hue": 152
-    },
-    {
-      "name": "Miguel Montiel Vega",
-      "role": {
-        "es": "Panelista · Educación",
-        "en": "Panelist · Education",
-        "pt": "Painelista · Educação"
-      },
-      "origin": "México",
-      "hue": 200
-    },
-    {
-      "name": "Narayana I. Salvatierra González",
-      "role": {
-        "es": "Panelista · Comunidades",
-        "en": "Panelist · Communities",
-        "pt": "Painelista · Comunidades"
-      },
-      "origin": "México",
-      "hue": 84
-    },
-    {
-      "name": "Vicente Espinola Verdín",
-      "role": {
-        "es": "Panelista · Emprendimiento",
-        "en": "Panelist · Entrepreneurship",
-        "pt": "Painelista · Empreendedorismo"
-      },
-      "origin": "México",
-      "hue": 320
-    },
-    {
-      "name": "María Guadalupe López Molina",
-      "role": {
-        "es": "Panelista · Formación",
-        "en": "Panelist · Training",
-        "pt": "Painelista · Formação"
-      },
-      "origin": "México",
-      "hue": 264
-    }
-  ],
+  "speakers": [],
   "conferenceVideos": [
     {
       "youtubeId": "zcUO-IOQDz4",

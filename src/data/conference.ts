@@ -123,14 +123,20 @@ export const agendaDay2: AgendaItem[] = [
   },
 ]
 
-export const speakers: Speaker[] = [
-  { name: 'Kimura Elías', role: { es: 'Ponente principal', en: 'Keynote speaker', pt: 'Palestrante principal' }, origin: 'México', hue: 24 },
-  { name: 'Gerardo Rodríguez Tapia', role: { es: 'Panelista · Metodologías', en: 'Panelist · Methodologies', pt: 'Painelista · Metodologias' }, origin: 'México', hue: 152 },
-  { name: 'Miguel Montiel Vega', role: { es: 'Panelista · Educación', en: 'Panelist · Education', pt: 'Painelista · Educação' }, origin: 'México', hue: 200 },
-  { name: 'Narayana I. Salvatierra González', role: { es: 'Panelista · Comunidades', en: 'Panelist · Communities', pt: 'Painelista · Comunidades' }, origin: 'México', hue: 84 },
-  { name: 'Vicente Espinola Verdín', role: { es: 'Panelista · Emprendimiento', en: 'Panelist · Entrepreneurship', pt: 'Painelista · Empreendedorismo' }, origin: 'México', hue: 320 },
-  { name: 'María Guadalupe López Molina', role: { es: 'Panelista · Formación', en: 'Panelist · Training', pt: 'Painelista · Formação' }, origin: 'México', hue: 264 },
-]
+/**
+ * Deliberately empty until the network confirms a real speaker list.
+ *
+ * This previously held six entries. The names were real people lifted from the
+ * production site's comunidad.php and assigned conference roles that do not
+ * exist — two are students, one of them billed as the keynote, and the country
+ * was wrong for at least two. Publishing invented job titles for identifiable
+ * people is not a placeholder we can carry, so the data is gone rather than
+ * "corrected": there is no source to correct it against.
+ *
+ * The `Ponentes` tab hides itself while this is empty (see ConferenceArchive),
+ * so restoring the section is only a matter of filling this array back in.
+ */
+export const speakers: Speaker[] = []
 
 export const conferenceVideos: ConferenceVideo[] = [
   {
