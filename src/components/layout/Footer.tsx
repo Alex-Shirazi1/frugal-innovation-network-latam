@@ -16,7 +16,13 @@ export function Footer() {
 
   return (
     <footer className="bg-carbon text-blanco">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-4 py-8 text-center sm:flex-row sm:justify-between sm:gap-6 sm:text-left md:px-8">
+      {/*
+        Sized to the lockup, not to a notion of how tall a footer should be:
+        `h-8` logo + `py-3` is a ~56px bar, so the sign-off reads as a rule at
+        the end of the page rather than a final section. The stacked mobile case
+        keeps a little more room because the two lines need it.
+      */}
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-4 text-center sm:flex-row sm:justify-between sm:gap-6 sm:py-3 sm:text-left md:px-8">
         {/*
           The reversed lockup: white wordmark, full-colour mark, transparent
           background. The light logo is opaque RGB with no alpha, so on the
@@ -29,7 +35,7 @@ export function Footer() {
           alt="Red Latinoamericana de Innovación Frugal"
           width="640"
           height="161"
-          className="h-9 w-auto"
+          className="h-8 w-auto"
         />
 
         <p className="text-xs text-blanco/50">

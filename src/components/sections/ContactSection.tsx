@@ -22,10 +22,16 @@ export function ContactSection() {
   const { t, lang } = useI18n()
 
   return (
+    /*
+      Asymmetric padding, deliberately: the section rhythm above is kept, but
+      the bottom is trimmed. `--spacing-section` assumes another section
+      follows; below this one there is only a 56px sign-off bar, so the full
+      value left ~145px of dead air that read as part of the footer.
+    */
     <section
       id="contacto"
       aria-labelledby="contacto-heading"
-      className="bg-niebla/60 py-(--spacing-section)"
+      className="bg-niebla/60 pt-(--spacing-section) pb-16 md:pb-20"
     >
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <SectionHeading
@@ -59,7 +65,13 @@ export function ContactSection() {
 
         <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           {/* General inbox */}
-          <div className="min-w-0 rounded-3xl bg-carbon p-6 text-blanco sm:p-8">
+          {/*
+            `self-start`: a grid item stretches to the row by default, so this
+            card — a heading and two email addresses — was being pulled to the
+            height of the seven-channel social panel beside it, leaving roughly
+            350px of empty carbon. It now hugs its content.
+          */}
+          <div className="min-w-0 self-start rounded-3xl bg-carbon p-6 text-blanco sm:p-8">
             <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-naranja">
               {t.contact.generalTitle}
             </h3>
