@@ -4,28 +4,6 @@ import { useApiData } from '../../api/ApiDataContext'
 /** The network was founded in April 2018 — see the Origin section. */
 const FOUNDING_YEAR = 2018
 
-/** Decorative ring of "people" dots, echoing the official logo mark. */
-function LogoRing() {
-  const colors = ['#168599', '#f6a620', '#8ebc41', '#e94824']
-  const dots = Array.from({ length: 12 }, (_, i) => {
-    const angle = (i / 12) * Math.PI * 2 - Math.PI / 2
-    return {
-      cx: 100 + Math.cos(angle) * 72,
-      cy: 100 + Math.sin(angle) * 72,
-      r: i % 3 === 0 ? 13 : 9,
-      fill: colors[i % colors.length],
-    }
-  })
-  return (
-    <svg viewBox="0 0 200 200" className="h-full w-full" aria-hidden="true">
-      <circle cx="100" cy="100" r="46" fill="none" stroke="#168599" strokeOpacity="0.15" strokeWidth="2" />
-      {dots.map((dot, i) => (
-        <circle key={i} {...dot} opacity="0.9" />
-      ))}
-    </svg>
-  )
-}
-
 export function Hero() {
   const { t } = useI18n()
   const { institutions, memberCountries } = useApiData()
@@ -38,19 +16,19 @@ export function Hero() {
   ]
 
   return (
+    /*
+      No decorative mark in the hero. The one that used to sit on the right was
+      a generated approximation of the logo — twelve flat dots in the brand
+      palette — placed next to the real lockup in the navbar, which invited the
+      comparison and lost it. `relative overflow-hidden` on the section and
+      `relative` on the container existed only to position and clip it.
+    */
     <section
       id="top"
       aria-labelledby="hero-heading"
-      className="relative overflow-hidden bg-blanco pt-28 md:pt-36 pb-14 md:pb-20"
+      className="bg-blanco pt-28 md:pt-36 pb-14 md:pb-20"
     >
-      <div
-        aria-hidden="true"
-        className="absolute -right-24 top-24 hidden h-105 w-105 opacity-70 md:block lg:right-4 xl:right-24"
-      >
-        <LogoRing />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-4 md:px-8">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
         <p className="rise-in mb-5 inline-block border-l-4 border-naranja pl-3 text-xs md:text-sm font-bold uppercase tracking-[0.18em] text-teal">
           {t.hero.kicker}
         </p>
