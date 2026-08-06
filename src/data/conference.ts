@@ -4,12 +4,6 @@ export interface Localized {
   pt: string
 }
 
-export interface AgendaItem {
-  time: string
-  title: Localized
-  detail: Localized
-}
-
 export interface Speaker {
   name: string
   role: Localized
@@ -22,106 +16,24 @@ export interface ConferenceVideo {
   title: Localized
 }
 
-export interface GalleryTile {
-  id: string
-  caption: Localized
-  hueA: number
-  hueB: number
-  span: 'wide' | 'tall' | 'square'
-}
-
 /**
- * Local archive of the "Mundos de Transformación" conference.
- * Migrated from the external conference microsite so the event lives
- * inside this site permanently. Agenda details summarized from the
- * public conference program.
+ * The congress, as the network actually documents it.
+ *
+ * What this file used to hold was invented. There was a two-day agenda of
+ * eleven timed sessions ("Jueves 18", "Viernes 19"), six captioned gallery
+ * tiles, and a banner announcing a next gathering in Chile in 2027. The
+ * network's own conference microsite contradicts all of it:
+ * redinnovacionfrugal.lat/congreso publishes the event as 27–29 May 2026 in
+ * Bogotá — three days, not two, and different dates — its programa.php still
+ * reads "la página de programa estará disponible próximamente", so there was
+ * never a programme to summarise, and nothing anywhere mentions Chile or 2027.
+ * The Chile line was circular: its only source was the closing-plenary entry
+ * of the invented agenda.
+ *
+ * So this now carries only what the microsite states. Real photography and a
+ * real programme can be added when the network supplies them; they are absent,
+ * not pending a design decision.
  */
-export const agendaDay1: AgendaItem[] = [
-  {
-    time: '09:00',
-    title: { es: 'Apertura y bienvenida', en: 'Opening & welcome', pt: 'Abertura e boas-vindas' },
-    detail: {
-      es: 'Palabras de bienvenida del comité organizador y presentación de la red.',
-      en: 'Welcome remarks from the organizing committee and introduction to the network.',
-      pt: 'Palavras de boas-vindas do comitê organizador e apresentação da rede.',
-    },
-  },
-  {
-    time: '10:00',
-    title: { es: 'Panel: Metodologías frugales', en: 'Panel: Frugal methodologies', pt: 'Painel: Metodologias frugais' },
-    detail: {
-      es: 'Marcos y herramientas para diseñar soluciones con recursos escasos.',
-      en: 'Frameworks and tools for designing solutions under resource scarcity.',
-      pt: 'Marcos e ferramentas para projetar soluções com recursos escassos.',
-    },
-  },
-  {
-    time: '12:00',
-    title: { es: 'Educación y formación de capacidades', en: 'Education & capacity building', pt: 'Educação e formação de capacidades' },
-    detail: {
-      es: 'Cómo las universidades de la red enseñan innovación frugal en aula y territorio.',
-      en: 'How network universities teach frugal innovation in classrooms and communities.',
-      pt: 'Como as universidades da rede ensinam inovação frugal em sala de aula e no território.',
-    },
-  },
-  {
-    time: '15:00',
-    title: { es: 'Presentación de iniciativas', en: 'Initiative showcase', pt: 'Apresentação de iniciativas' },
-    detail: {
-      es: 'Casos y proyectos de miembros: salud, energía, agua y manufactura local.',
-      en: 'Member cases and projects: health, energy, water, and local manufacturing.',
-      pt: 'Casos e projetos de membros: saúde, energia, água e manufatura local.',
-    },
-  },
-  {
-    time: '17:00',
-    title: { es: 'Encuentro de comunidades', en: 'Community meetup', pt: 'Encontro de comunidades' },
-    detail: {
-      es: 'Espacio abierto de vinculación entre nodos de la red.',
-      en: 'Open networking space between network nodes.',
-      pt: 'Espaço aberto de articulação entre os nós da rede.',
-    },
-  },
-]
-
-export const agendaDay2: AgendaItem[] = [
-  {
-    time: '09:00',
-    title: { es: 'Sistemas de innovación en la región', en: 'Innovation systems in the region', pt: 'Sistemas de inovação na região' },
-    detail: {
-      es: 'Diálogo sobre políticas públicas y ecosistemas frugales latinoamericanos.',
-      en: 'Dialogue on public policy and Latin American frugal ecosystems.',
-      pt: 'Diálogo sobre políticas públicas e ecossistemas frugais latino-americanos.',
-    },
-  },
-  {
-    time: '11:00',
-    title: { es: 'Tecnologías digitales frugales', en: 'Frugal digital technologies', pt: 'Tecnologias digitais frugais' },
-    detail: {
-      es: 'Herramientas digitales de bajo costo para retos sociales.',
-      en: 'Low-cost digital tools for social challenges.',
-      pt: 'Ferramentas digitais de baixo custo para desafios sociais.',
-    },
-  },
-  {
-    time: '13:00',
-    title: { es: 'Trabajo por comisiones', en: 'Commission working sessions', pt: 'Trabalho por comissões' },
-    detail: {
-      es: 'Sesiones de las comisiones de formación, proyectos y eventos.',
-      en: 'Working sessions of the training, projects, and events commissions.',
-      pt: 'Sessões das comissões de formação, projetos e eventos.',
-    },
-  },
-  {
-    time: '16:00',
-    title: { es: 'Plenaria de cierre y próximos pasos', en: 'Closing plenary & next steps', pt: 'Plenária de encerramento e próximos passos' },
-    detail: {
-      es: 'Síntesis del congreso y anuncio del próximo encuentro en Chile.',
-      en: 'Conference synthesis and announcement of the next gathering in Chile.',
-      pt: 'Síntese do congresso e anúncio do próximo encontro no Chile.',
-    },
-  },
-]
 
 /**
  * Deliberately empty until the network confirms a real speaker list.
@@ -133,43 +45,45 @@ export const agendaDay2: AgendaItem[] = [
  * people is not a placeholder we can carry, so the data is gone rather than
  * "corrected": there is no source to correct it against.
  *
- * The `Ponentes` tab hides itself while this is empty (see ConferenceArchive),
- * so restoring the section is only a matter of filling this array back in.
+ * Filling this array back in restores the speaker grid (see ConferenceArchive).
  */
 export const speakers: Speaker[] = []
 
-export const conferenceVideos: ConferenceVideo[] = [
+/**
+ * Recordings of the RELIF 2021 annual meeting — NOT the Bogotá congress.
+ *
+ * These three sat under a "Videos" tab inside the congress archive, retitled to
+ * generic topic labels, which read as congress sessions. YouTube's own metadata
+ * says otherwise: all three are published by the network as "Encuentro Anual
+ * RELIF 2021", the virtual annual meeting of 18–19 November 2021. Their shared
+ * thumbnail carries those dates, and 18–19 November 2021 fell on a Thursday and
+ * a Friday — which is where the invented agenda's "Jueves 18 / Viernes 19" came
+ * from. The titles below are the real ones, and they render under their own
+ * heading rather than inside the congress card.
+ */
+export const annualMeetingVideos: ConferenceVideo[] = [
   {
     youtubeId: 'zcUO-IOQDz4',
     title: {
-      es: 'Innovación frugal y economía circular',
-      en: 'Frugal innovation & circular economy',
-      pt: 'Inovação frugal e economia circular',
+      es: 'RELIF 2021 A: Innovación frugal y economía circular',
+      en: 'RELIF 2021 A: Frugal innovation and circular economy',
+      pt: 'RELIF 2021 A: Inovação frugal e economia circular',
     },
   },
   {
     youtubeId: 'dxcd-KY-AIc',
     title: {
-      es: 'Innovación frugal: emprendimiento social',
-      en: 'Frugal innovation: social entrepreneurship',
-      pt: 'Inovação frugal: empreendedorismo social',
+      es: 'RELIF 2021 B: Emprendimiento social y femenino, economía social',
+      en: 'RELIF 2021 B: Social and women’s entrepreneurship, social economy',
+      pt: 'RELIF 2021 B: Empreendedorismo social e feminino, economia social',
     },
   },
   {
     youtubeId: '6o8G2N2rP3A',
     title: {
-      es: 'Innovación frugal en América Latina — Venkata',
-      en: 'Frugal Innovation in Latin America — Venkata',
-      pt: 'Inovação frugal na América Latina — Venkata',
+      es: 'Venkata: Innovación frugal en América Latina (nov. 2021)',
+      en: 'Venkata: Frugal innovation in Latin America (Nov 2021)',
+      pt: 'Venkata: Inovação frugal na América Latina (nov. 2021)',
     },
   },
-]
-
-export const galleryTiles: GalleryTile[] = [
-  { id: 'g1', caption: { es: 'Plenaria de apertura', en: 'Opening plenary', pt: 'Plenária de abertura' }, hueA: 32, hueB: 60, span: 'wide' },
-  { id: 'g2', caption: { es: 'Taller de metodologías', en: 'Methodologies workshop', pt: 'Oficina de metodologias' }, hueA: 152, hueB: 110, span: 'square' },
-  { id: 'g3', caption: { es: 'Panel de universidades', en: 'Universities panel', pt: 'Painel de universidades' }, hueA: 210, hueB: 180, span: 'tall' },
-  { id: 'g4', caption: { es: 'Comunidad RELIF', en: 'RELIF community', pt: 'Comunidade RELIF' }, hueA: 24, hueB: 350, span: 'square' },
-  { id: 'g5', caption: { es: 'Presentación de casos', en: 'Case showcase', pt: 'Apresentação de casos' }, hueA: 84, hueB: 130, span: 'square' },
-  { id: 'g6', caption: { es: 'Cierre del congreso', en: 'Closing session', pt: 'Encerramento do congresso' }, hueA: 264, hueB: 300, span: 'wide' },
 ]

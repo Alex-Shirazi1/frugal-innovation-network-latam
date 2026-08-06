@@ -10,13 +10,7 @@
 import { mockMembers } from '../../data/members'
 import { institutions } from '../../data/institutions'
 import { resources } from '../../data/resources'
-import {
-  agendaDay1,
-  agendaDay2,
-  conferenceVideos,
-  galleryTiles,
-  speakers,
-} from '../../data/conference'
+import { annualMeetingVideos, speakers } from '../../data/conference'
 import {
   countries,
   generalAreas,
@@ -51,7 +45,7 @@ export const bundledDataSource: RelifDataSource = {
   getInstitutions: async () => institutions,
   getMembers: async () => mockMembers,
   getResources: async () => resources,
-  getConference: async () => ({ agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles }),
+  getConference: async () => ({ speakers, annualMeetingVideos }),
   getOnboardingOptions: async () => ({
     countries,
     positionTypes,

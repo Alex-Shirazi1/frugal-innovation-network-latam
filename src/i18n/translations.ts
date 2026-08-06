@@ -43,22 +43,17 @@ export const es = {
       'La Red Latinoamericana de Innovación Frugal (RELIF) surge por iniciativa de un grupo de universidades jesuitas para promover la justicia social y ambiental en Latinoamérica a través de la innovación que se orienta al cuidado de nuestra casa común.',
   },
   conference: {
-    kicker: 'Archivo del congreso',
+    kicker: 'El congreso',
     title: 'Mundos de Transformación',
     subtitle:
-      'Nuestro congreso internacional reunió a la comunidad frugal de toda la región. Revive aquí la agenda, las personas y los momentos del encuentro.',
-    agendaTab: 'Agenda',
+      'Primer Congreso de Innovación Frugal, Tecnologías Sociales y Ciencia Ciudadana en América Latina.',
+    details: '27–29 de mayo de 2026 · Bogotá, Colombia',
+    siteCta: 'Sitio del congreso',
     speakersTab: 'Ponentes',
-    galleryTab: 'Galería',
-    videosTab: 'Videos',
-    day1: 'Jueves 18',
-    day2: 'Viernes 19',
-    nextTitle: 'Próximo encuentro · Chile 2027',
-    nextText:
-      'La red se reunirá el próximo año en Chile. Muy pronto abriremos la convocatoria de ponencias y el registro.',
-    nextCta: 'Quiero recibir novedades',
+    videosTitle: 'Encuentro Anual RELIF 2021',
+    videosNote:
+      'Grabaciones del encuentro virtual anual de la red, 18 y 19 de noviembre de 2021.',
     watchVideo: 'Ver video',
-    photoAlt: 'Fotografía del congreso Mundos de Transformación',
   },
   frugal: {
     kicker: 'Concepto',
@@ -337,22 +332,17 @@ export const en: Dictionary = {
       'The Latin American Frugal Innovation Network (RELIF) emerged at the initiative of a group of Jesuit universities to promote social and environmental justice in Latin America through innovation oriented towards the care of our common home.',
   },
   conference: {
-    kicker: 'Conference archive',
+    kicker: 'The congress',
     title: 'Worlds of Transformation',
     subtitle:
-      'Our international conference brought together the frugal community from across the region. Revisit the agenda, the people, and the moments here.',
-    agendaTab: 'Agenda',
+      'First Congress of Frugal Innovation, Social Technologies and Citizen Science in Latin America.',
+    details: '27–29 May 2026 · Bogotá, Colombia',
+    siteCta: 'Conference site',
     speakersTab: 'Speakers',
-    galleryTab: 'Gallery',
-    videosTab: 'Videos',
-    day1: 'Thursday 18',
-    day2: 'Friday 19',
-    nextTitle: 'Next gathering · Chile 2027',
-    nextText:
-      'The network will meet next year in Chile. The call for papers and registration will open soon.',
-    nextCta: 'Keep me posted',
+    videosTitle: 'RELIF 2021 Annual Meeting',
+    videosNote:
+      'Recordings of the network’s virtual annual meeting, 18–19 November 2021.',
     watchVideo: 'Watch video',
-    photoAlt: 'Photograph from the Worlds of Transformation conference',
   },
   frugal: {
     kicker: 'Concept',
@@ -623,22 +613,17 @@ export const pt: Dictionary = {
       'A Rede Latino-Americana de Inovação Frugal (RELIF) surge por iniciativa de um grupo de universidades jesuítas para promover a justiça social e ambiental na América Latina por meio da inovação orientada ao cuidado da nossa casa comum.',
   },
   conference: {
-    kicker: 'Arquivo do congresso',
+    kicker: 'O congresso',
     title: 'Mundos de Transformação',
     subtitle:
-      'Nosso congresso internacional reuniu a comunidade frugal de toda a região. Reviva aqui a agenda, as pessoas e os momentos do encontro.',
-    agendaTab: 'Agenda',
+      'Primeiro Congresso de Inovação Frugal, Tecnologias Sociais e Ciência Cidadã na América Latina.',
+    details: '27–29 de maio de 2026 · Bogotá, Colômbia',
+    siteCta: 'Site do congresso',
     speakersTab: 'Palestrantes',
-    galleryTab: 'Galeria',
-    videosTab: 'Vídeos',
-    day1: 'Quinta-feira 18',
-    day2: 'Sexta-feira 19',
-    nextTitle: 'Próximo encontro · Chile 2027',
-    nextText:
-      'A rede se reunirá no próximo ano no Chile. Em breve abriremos a chamada de trabalhos e as inscrições.',
-    nextCta: 'Quero receber novidades',
+    videosTitle: 'Encontro Anual RELIF 2021',
+    videosNote:
+      'Gravações do encontro virtual anual da rede, 18 e 19 de novembro de 2021.',
     watchVideo: 'Assistir vídeo',
-    photoAlt: 'Fotografia do congresso Mundos de Transformação',
   },
   frugal: {
     kicker: 'Conceito',

@@ -12,10 +12,7 @@ import { institutions } from '../src/data/institutions'
 import { mockMembers } from '../src/data/members'
 import { resources } from '../src/data/resources'
 import {
-  agendaDay1,
-  agendaDay2,
-  conferenceVideos,
-  galleryTiles,
+  annualMeetingVideos,
   speakers,
 } from '../src/data/conference'
 import {
@@ -38,7 +35,7 @@ describe('server/data JSON matches src/data (run `npm run seed` if not)', () => 
     ['institutions', institutions],
     ['members', mockMembers],
     ['resources', resources],
-    ['conference', { agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles }],
+    ['conference', { speakers, annualMeetingVideos }],
     [
       'onboarding-options',
       { countries, positionTypes, researchInterests, generalAreas, languageOptions },

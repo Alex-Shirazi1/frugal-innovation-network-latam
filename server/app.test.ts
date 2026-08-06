@@ -56,7 +56,7 @@ describe('public content endpoints', () => {
   it('serves conference data with all sections', async () => {
     const res = await request(app).get('/api/conference')
     expect(Object.keys(res.body.data)).toEqual(
-      expect.arrayContaining(['agendaDay1', 'agendaDay2', 'speakers', 'conferenceVideos', 'galleryTiles']),
+      expect.arrayContaining(['speakers', 'annualMeetingVideos']),
     )
   })
 

@@ -2,36 +2,9 @@ import { useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
-import type { AgendaItem } from '../../api/types'
 
-type Tab = 'agenda' | 'speakers' | 'gallery' | 'videos'
-
-function AgendaColumn({ label, items }: { label: string; items: AgendaItem[] }) {
-  const { lang } = useI18n()
-  return (
-    <div>
-      <h4 className="font-display text-lg font-semibold text-teal">{label}</h4>
-      <ol className="mt-4 space-y-0">
-        {items.map((item) => (
-          <li
-            key={item.time + item.title.es}
-            className="relative border-l-2 border-carbon/10 pb-6 pl-5 last:pb-0"
-          >
-            <span
-              className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-teal"
-              aria-hidden="true"
-            />
-            <p className="text-xs font-semibold uppercase tracking-wider text-pizarra">
-              {item.time}
-            </p>
-            <h5 className="mt-0.5 font-semibold">{item.title[lang]}</h5>
-            <p className="mt-1 text-sm leading-relaxed text-pizarra">{item.detail[lang]}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
+/** The network's own microsite for the congress — the source for everything here. */
+const CONFERENCE_URL = 'https://redinnovacionfrugal.lat/congreso/index.php'
 
 function SpeakerGrid() {
   const { lang } = useI18n()
@@ -59,42 +32,13 @@ function SpeakerGrid() {
   )
 }
 
-function Gallery() {
-  const { lang, t } = useI18n()
-  const { conference: { galleryTiles } } = useApiData()
-  const spanClass = { wide: 'sm:col-span-2', tall: 'sm:row-span-2', square: '' } as const
-  return (
-    <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3 auto-rows-[minmax(7rem,1fr)]">
-      {galleryTiles.map((tile) => (
-        <li
-          key={tile.id}
-          className={`group relative overflow-hidden rounded-2xl ${spanClass[tile.span]}`}
-        >
-          {/* Placeholder tiles — real event photography drops in during content migration */}
-          <div
-            role="img"
-            aria-label={`${t.conference.photoAlt}: ${tile.caption[lang]}`}
-            className="h-full w-full transition-transform duration-500 group-hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, ${['#168599', '#8ebc41', '#f6a620', '#e94824'][tile.hueA % 4]}, #203236)`,
-            }}
-          />
-          <p className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-carbon/70 to-transparent px-3 pb-2 pt-6 text-xs font-medium text-blanco">
-            {tile.caption[lang]}
-          </p>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 function VideoWall() {
   const { lang, t } = useI18n()
-  const { conference: { conferenceVideos } } = useApiData()
+  const { conference: { annualMeetingVideos } } = useApiData()
   const [activeId, setActiveId] = useState<string | null>(null)
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {conferenceVideos.map((video) => (
+      {annualMeetingVideos.map((video) => (
         <li key={video.youtubeId} className="overflow-hidden rounded-2xl border border-carbon/10 bg-white/70">
           <div className="relative aspect-video bg-carbon">
             {activeId === video.youtubeId ? (
@@ -135,24 +79,25 @@ function VideoWall() {
   )
 }
 
+/**
+ * The congress, limited to what the network publishes about it.
+ *
+ * This was a tabbed archive — Agenda, Gallery, Videos — and two of the three
+ * tabs held invented content: an eleven-session timetable for a programme the
+ * network never published, and six gradient tiles captioned as event
+ * photographs (with `role="img"` and an alt text asserting they were
+ * photographs, so assistive tech was told something false). A teal banner below
+ * announced a next gathering in "Chile 2027", sourced from nothing but the
+ * closing-plenary line of the invented agenda, and its "keep me posted" button
+ * scrolled to the membership form.
+ *
+ * With those gone there is one panel left, so the tab strip goes too: a single
+ * tab is just a heading that looks clickable. The facts in the header are from
+ * the microsite, which is linked so a reader can check them.
+ */
 export function ConferenceArchive() {
   const { t } = useI18n()
-  const { conference: { agendaDay1, agendaDay2, speakers } } = useApiData()
-  const [tab, setTab] = useState<Tab>('agenda')
-
-  /**
-   * The speakers tab is data-driven rather than hardcoded: the confirmed
-   * speaker list is empty, and an empty "Ponentes" tab reads as a broken
-   * section. It reappears on its own once the array is populated.
-   */
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'agenda', label: t.conference.agendaTab },
-    ...(speakers.length > 0
-      ? [{ id: 'speakers' as const, label: t.conference.speakersTab }]
-      : []),
-    { id: 'gallery', label: t.conference.galleryTab },
-    { id: 'videos', label: t.conference.videosTab },
-  ]
+  const { conference: { speakers } } = useApiData()
 
   return (
     <section id="congreso" aria-labelledby="congreso-heading" className="py-(--spacing-section)">
@@ -166,51 +111,36 @@ export function ConferenceArchive() {
               subtitle={t.conference.subtitle}
             />
 
-            <div role="tablist" aria-label={t.conference.title} className="flex flex-wrap gap-2 -mb-2">
-              {tabs.map((item) => (
-                <button
-                  key={item.id}
-                  role="tab"
-                  type="button"
-                  aria-selected={tab === item.id}
-                  onClick={() => setTab(item.id)}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                    tab === item.id
-                      ? 'bg-carbon text-blanco'
-                      : 'bg-transparent text-pizarra hover:bg-carbon/5'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+            <p className="text-sm font-semibold text-teal">{t.conference.details}</p>
+
+            <a
+              href={CONFERENCE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-block rounded-full border-2 border-carbon/15 px-5 py-2.5 text-sm font-bold text-carbon transition-colors hover:border-teal hover:text-teal"
+            >
+              {t.conference.siteCta} ↗
+            </a>
           </div>
 
           <div className="px-5 py-8 md:px-10 md:py-10">
-            {tab === 'agenda' ? (
-              <div className="grid gap-10 md:grid-cols-2">
-                <AgendaColumn label={t.conference.day1} items={agendaDay1} />
-                <AgendaColumn label={t.conference.day2} items={agendaDay2} />
-              </div>
+            {speakers.length > 0 ? (
+              <>
+                <h3 className="mb-4 font-display text-lg font-semibold text-carbon">
+                  {t.conference.speakersTab}
+                </h3>
+                <SpeakerGrid />
+              </>
             ) : null}
-            {tab === 'speakers' ? <SpeakerGrid /> : null}
-            {tab === 'gallery' ? <Gallery /> : null}
-            {tab === 'videos' ? <VideoWall /> : null}
-          </div>
 
-          {/* Future conference call-to-action */}
-          <aside className="flex flex-col gap-4 bg-teal px-5 py-7 text-blanco sm:flex-row sm:items-center sm:justify-between md:px-10">
-            <div>
-              <h3 className="font-display text-xl md:text-2xl font-semibold">{t.conference.nextTitle}</h3>
-              <p className="mt-1 max-w-xl text-sm md:text-base text-blanco/80">{t.conference.nextText}</p>
+            <div className={speakers.length > 0 ? 'mt-10' : ''}>
+              <h3 className="font-display text-lg font-semibold text-carbon">
+                {t.conference.videosTitle}
+              </h3>
+              <p className="mt-1 mb-4 text-sm text-pizarra">{t.conference.videosNote}</p>
+              <VideoWall />
             </div>
-            <a
-              href="#unete"
-              className="shrink-0 rounded-full bg-naranja px-5 py-2.5 text-center text-sm font-semibold text-carbon transition-transform hover:-translate-y-0.5"
-            >
-              {t.conference.nextCta}
-            </a>
-          </aside>
+          </div>
         </article>
       </div>
     </section>

@@ -6,13 +6,7 @@
 export type { Member } from '../data/members'
 export type { Institution, InstitutionCategory } from '../data/institutions'
 export type { Resource, ResourceLang, ResourceType } from '../data/resources'
-export type {
-  AgendaItem,
-  ConferenceVideo,
-  GalleryTile,
-  Localized,
-  Speaker,
-} from '../data/conference'
+export type { ConferenceVideo, Localized, Speaker } from '../data/conference'
 export type {
   CountryOption,
   LanguageOption,
@@ -25,7 +19,7 @@ export type {
 export type { IntakeSubmission, IntakeErrorCode, ValidatedIntake } from '../domain/intake'
 
 import type { Member } from '../data/members'
-import type { AgendaItem, ConferenceVideo, GalleryTile, Speaker } from '../data/conference'
+import type { ConferenceVideo, Speaker } from '../data/conference'
 import type {
   CountryOption,
   LanguageOption,
@@ -42,11 +36,8 @@ export interface ApiResponse<T> {
 }
 
 export interface ConferenceData {
-  agendaDay1: AgendaItem[]
-  agendaDay2: AgendaItem[]
   speakers: Speaker[]
-  conferenceVideos: ConferenceVideo[]
-  galleryTiles: GalleryTile[]
+  annualMeetingVideos: ConferenceVideo[]
 }
 
 export interface OnboardingOptions {

@@ -290,7 +290,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       expect((await source.getInstitutions()).length).toBeGreaterThan(30)
       expect((await source.getResources()).length).toBeGreaterThan(0)
       expect(Object.keys(await source.getConference())).toEqual(
-        expect.arrayContaining(['agendaDay1', 'agendaDay2', 'speakers', 'conferenceVideos', 'galleryTiles']),
+        expect.arrayContaining(['speakers', 'annualMeetingVideos']),
       )
       const options = await source.getOnboardingOptions()
       expect(options.generalAreas.length).toBeGreaterThan(0)

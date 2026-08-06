@@ -21,13 +21,7 @@ import type {
 import { mockMembers } from '../data/members'
 import { institutions as bundledInstitutions } from '../data/institutions'
 import { resources as bundledResources } from '../data/resources'
-import {
-  agendaDay1,
-  agendaDay2,
-  conferenceVideos,
-  galleryTiles,
-  speakers,
-} from '../data/conference'
+import { annualMeetingVideos, speakers } from '../data/conference'
 import {
   countries,
   generalAreas,
@@ -83,13 +77,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
   const [institutions, setInstitutions] = useState<Institution[]>(bundledInstitutions)
   const [members, setMembers] = useState<Member[]>(mockMembers)
   const [resources, setResources] = useState<Resource[]>(bundledResources)
-  const [conference, setConference] = useState<ConferenceData>({
-    agendaDay1,
-    agendaDay2,
-    speakers,
-    conferenceVideos,
-    galleryTiles,
-  })
+  const [conference, setConference] = useState<ConferenceData>({ speakers, annualMeetingVideos })
   const [options, setOptions] = useState<OnboardingOptions>({
     countries,
     positionTypes,

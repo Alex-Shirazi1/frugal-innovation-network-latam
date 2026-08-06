@@ -14,11 +14,8 @@ import { institutions } from '../../src/data/institutions'
 import { mockMembers } from '../../src/data/members'
 import { resources } from '../../src/data/resources'
 import {
-  agendaDay1,
-  agendaDay2,
   speakers,
-  conferenceVideos,
-  galleryTiles,
+  annualMeetingVideos,
 } from '../../src/data/conference'
 import {
   countries,
@@ -40,7 +37,7 @@ function dump(name: string, value: unknown): void {
 dump('institutions', institutions)
 dump('members', mockMembers)
 dump('resources', resources)
-dump('conference', { agendaDay1, agendaDay2, speakers, conferenceVideos, galleryTiles })
+dump('conference', { speakers, annualMeetingVideos })
 dump('onboarding-options', {
   countries,
   positionTypes,

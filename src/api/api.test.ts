@@ -31,7 +31,7 @@ describe('bundledDataSource', () => {
     expect((await bundledDataSource.getInstitutions()).length).toBeGreaterThan(30)
     expect((await bundledDataSource.getResources()).length).toBeGreaterThan(0)
     expect(Object.keys(await bundledDataSource.getConference())).toEqual(
-      expect.arrayContaining(['agendaDay1', 'agendaDay2', 'speakers', 'conferenceVideos', 'galleryTiles']),
+      expect.arrayContaining(['speakers', 'annualMeetingVideos']),
     )
     const options = await bundledDataSource.getOnboardingOptions()
     expect(options.positionTypes).toContain('independent')
