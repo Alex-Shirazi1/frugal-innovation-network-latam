@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useCapture } from '../../lib/analytics'
 import { bibliography, type BibliographyEntry } from '../../data/bibliography'
+import { Select } from '../ui/Select'
 
 type SortKey = 'newest' | 'oldest' | 'title' | 'number'
 const ALL = 'all'
@@ -87,27 +88,27 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
           className="w-full max-w-sm rounded-full border border-carbon/15 bg-white px-5 py-2.5 text-sm outline-none transition-colors focus:border-teal"
         />
         <div className="flex flex-wrap items-center gap-2">
-          <select
+          <Select
+            variant="pill"
             value={language}
             onChange={(event) => setLanguage(event.target.value)}
             aria-label={t.biblio.colLang}
-            className="rounded-full border border-carbon/15 bg-white px-3.5 py-2 text-xs font-semibold text-carbon outline-none focus:border-teal"
           >
             <option value={ALL}>{t.biblio.allLanguages}</option>
             <option value="EN">EN</option>
             <option value="ES">ES</option>
-          </select>
-          <select
+          </Select>
+          <Select
+            variant="pill"
             value={sort}
             onChange={(event) => setSort(event.target.value as SortKey)}
             aria-label={t.biblio.sortNewest}
-            className="rounded-full border border-carbon/15 bg-white px-3.5 py-2 text-xs font-semibold text-carbon outline-none focus:border-teal"
           >
             <option value="number">{t.biblio.sortNumber}</option>
             <option value="newest">{t.biblio.sortNewest}</option>
             <option value="oldest">{t.biblio.sortOldest}</option>
             <option value="title">{t.biblio.sortTitle}</option>
-          </select>
+          </Select>
           {hasFilters ? (
             <button
               type="button"

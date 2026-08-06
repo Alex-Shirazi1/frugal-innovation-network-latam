@@ -3,6 +3,7 @@ import { useCapture } from '../../lib/analytics'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
+import { Select } from '../ui/Select'
 import { fieldLimits } from '../../data/onboardingOptions'
 import type { IntakeSubmission, PositionType, ResearchInterest } from '../../api/types'
 
@@ -356,18 +357,27 @@ export function OnboardingForm() {
                     />
                   </Field>
                 </div>
-                <Field label={t.onboarding.position} error={errors.position}>
-                  <select
-                    className={inputClass}
-                    value={form.position}
-                    onChange={(event) => update('position', event.target.value as PositionType)}
-                  >
-                    <option value="" disabled>—</option>
-                    {options.positionTypes.map((type) => (
-                      <option key={type} value={type}>{t.onboarding.positions[type]}</option>
-                    ))}
-                  </select>
-                </Field>
+                {/*
+                  A single child in the same two-column grid the name fields
+                  use, so it takes column one exactly. Six options with a
+                  13-character longest label do not want a 622px control — at
+                  full width the chevron ended up a long way from the value —
+                  and borrowing the grid aligns its right edge with the field
+                  above instead of picking an arbitrary max-width.
+                */}
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label={t.onboarding.position} error={errors.position}>
+                    <Select
+                      value={form.position}
+                      onChange={(event) => update('position', event.target.value as PositionType)}
+                    >
+                      <option value="" disabled>—</option>
+                      {options.positionTypes.map((type) => (
+                        <option key={type} value={type}>{t.onboarding.positions[type]}</option>
+                      ))}
+                    </Select>
+                  </Field>
+                </div>
                 <Field label={t.onboarding.jobPositionName} error={errors.jobPositionName}>
                   <input
                     className={inputClass}
@@ -384,8 +394,8 @@ export function OnboardingForm() {
             {step === 1 ? (
               <>
                 <Field label={t.onboarding.affiliation}>
-                  <select
-                    className={inputClass}
+                  <Select
+                    /* Institution names run long — this one earns the full width. */
                     value={form.affiliationId ?? ''}
                     onChange={(event) => update('affiliationId', event.target.value || null)}
                   >
@@ -393,12 +403,11 @@ export function OnboardingForm() {
                     {institutions.map((institution) => (
                       <option key={institution.id} value={institution.id}>{institution.name}</option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={t.onboarding.country} error={errors.country}>
-                    <select
-                      className={inputClass}
+                    <Select
                       value={form.country}
                       onChange={(event) => {
                         update('country', event.target.value)
@@ -409,11 +418,10 @@ export function OnboardingForm() {
                       {options.countries.map((country) => (
                         <option key={country.name} value={country.name}>{country.name}</option>
                       ))}
-                    </select>
+                    </Select>
                   </Field>
                   <Field label={t.onboarding.region} error={errors.region}>
-                    <select
-                      className={inputClass}
+                    <Select
                       value={form.region}
                       disabled={!form.country}
                       onChange={(event) => update('region', event.target.value)}
@@ -422,7 +430,7 @@ export function OnboardingForm() {
                       {regions.map((region) => (
                         <option key={region} value={region}>{region}</option>
                       ))}
-                    </select>
+                    </Select>
                   </Field>
                 </div>
               </>

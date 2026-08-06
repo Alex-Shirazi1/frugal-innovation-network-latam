@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
+import { Select } from '../ui/Select'
 import { MemberCard } from './MemberCard'
 import { MemberDetail } from './MemberDetail'
 import { placeLabel } from '../../data/onboardingOptions'
@@ -171,29 +172,31 @@ export function MemberDirectory() {
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-2 text-xs font-semibold text-pizarra">
             {t.directory.filterArea}
-            <select
+            <Select
+              variant="pill"
               value={area}
               onChange={(event) => setArea(event.target.value)}
-              className="rounded-full border border-carbon/15 bg-white/70 px-3.5 py-2 text-xs font-semibold text-carbon outline-none transition-colors focus:border-teal"
+              controlClassName="bg-white/70"
             >
               <option value={ALL}>{t.directory.allAreas}</option>
               {options.generalAreas.map((option) => (
                 <option key={option.id} value={option.id}>{option[lang]}</option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="flex items-center gap-2 text-xs font-semibold text-pizarra">
             {t.directory.filterCountry}
-            <select
+            <Select
+              variant="pill"
               value={country}
               onChange={(event) => setCountry(event.target.value)}
-              className="rounded-full border border-carbon/15 bg-white/70 px-3.5 py-2 text-xs font-semibold text-carbon outline-none transition-colors focus:border-teal"
+              controlClassName="bg-white/70"
             >
               <option value={ALL}>{t.directory.allCountries}</option>
               {memberCountryOptions.map((option) => (
                 <option key={option.canonical} value={option.canonical}>{option.label}</option>
               ))}
-            </select>
+            </Select>
           </label>
           {hasActiveFilters ? (
             <button
