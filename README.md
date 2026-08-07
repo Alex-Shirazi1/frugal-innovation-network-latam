@@ -63,32 +63,46 @@ Form submission → server-side validation → stored `pending` in SQLite → re
 
 ### New-member email notification
 
-Once a submission is safely in Firestore, the browser also pings
-[Web3Forms](https://web3forms.com), a form-to-email relay, so the network hears
+Once a submission is durably stored, the browser pings
+[FormSubmit](https://formsubmit.co), a form-to-email relay, so the network hears
 about it (`src/lib/notifyNewMember.ts`).
 
 ```
-join form → Firestore submissions/{id}        ← the record of truth
-                    └→ Web3Forms → redinnovacionfrugal@gmail.com
-                                   Subject: Solicitud de nueva membresía
+join form → submissions/{id}          ← the record of truth
+                 └→ FormSubmit → VITE_NOTIFY_EMAIL
+                                 Subject: Solicitud de nueva membresía
 ```
 
 There is no Cloud Function and no server: production is Hosting plus Firestore
 straight from the browser, and Functions would mean putting the project on a
-billing plan for a few dozen emails a month.
+billing plan for a few dozen emails a month. FormSubmit needs no account, and
+free tiers cannot bill you — there is no card on file to charge.
 
-The access key ships in the bundle. That is safe because the destination address
-is bound to the key on Web3Forms' side — an abuser can flood the network's own
-inbox but cannot relay mail anywhere else. The free tier is capped monthly, and
-burning that cap costs a notification, never an application: the submission is
-written first and stays visible at `/admin` whether or not the email goes out.
-Failures are swallowed for the same reason — telling someone their application
-failed when it did not would be worse than a missed email.
+The call lives in `ApiDataContext`, not in an adapter, so it fires against the
+local Express backend too — otherwise the only way to test that mail arrives
+would be to deploy. It is gated on `persisted`, so the bundled fallback (which
+validates happily and stores nothing) never mails about an application that was
+not kept.
 
-Setup: get an access key at web3forms.com (it is emailed to you; no account
-needed), then set `VITE_WEB3FORMS_KEY` — locally in `.env.local`, and in CI as a
-GitHub Actions secret wired into the build step. Leave it unset and no mail is
-sent and no request is made, the same contract PostHog follows here.
+Nothing here is load-bearing. The submission is written first and stays visible
+at `/admin` whether or not the mail goes out, which is why every failure is
+swallowed — telling someone their application failed when it did not would be
+worse than a missed email.
+
+**Setup.** Set `VITE_NOTIFY_EMAIL` to the destination inbox: `.env.local` for
+development, and a GitHub Actions secret of the same name for deploys. Never
+commit a real address — this repo is public. The first submission to a new
+address triggers a one-time confirmation email to it; nothing is delivered until
+someone clicks that link. Unset means no mail and no request at all, the same
+contract PostHog follows here.
+
+### What the join form does not do
+
+It does not add anyone to the directory. The form is an expression of interest:
+the network replies, meets the person, collects their organization's logo and
+letter, and only then sends the official form that creates a profile. Pending
+submissions live in `submissions/`, which is never publicly readable, and the
+directory renders approved records only.
 
 ## Modules (per spec)
 

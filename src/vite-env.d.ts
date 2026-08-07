@@ -16,12 +16,12 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
 
   /**
-   * Web3Forms access key, used to email the network when someone joins. Public
-   * by design — the destination address is bound to the key on Web3Forms' side,
-   * so it cannot be used to relay mail elsewhere. No key means no notification;
-   * submissions are still stored and still visible at /admin.
+   * Inbox that receives a "Solicitud de nueva membresía" email whenever someone
+   * completes the join form. Never hardcoded: this repo is public, and a
+   * committed address is a scraped address. Unset means no notification is sent
+   * and no request is made; submissions are still stored and visible at /admin.
    */
-  readonly VITE_WEB3FORMS_KEY?: string
+  readonly VITE_NOTIFY_EMAIL?: string
 
   /**
    * Firebase web config. API key, project id and app id must all be present for

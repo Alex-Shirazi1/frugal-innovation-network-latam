@@ -61,23 +61,26 @@ describe('notifyNewMember', () => {
   it('posts the exact subject Allan filters his inbox on', async () => {
     const fetchImpl = okFetch()
     await notifyNewMember({
-      accessKey: 'test-key',
       submission: makeSubmission(),
       institutionName: 'ITESO',
+      to: 'destino@example.org',
       fetchImpl,
     })
 
-    const body = JSON.parse(fetchImpl.mock.calls[0][1].body)
-    expect(body.subject).toBe('Solicitud de nueva membresía')
+    const [url, init] = fetchImpl.mock.calls[0]
+    const body = JSON.parse(init.body)
+    expect(body._subject).toBe('Solicitud de nueva membresía')
     expect(NOTIFICATION_SUBJECT).toBe('Solicitud de nueva membresía')
-    expect(body.access_key).toBe('test-key')
+    // The recipient is addressed in the URL, so it must be escaped: an
+    // unencoded '+' in an address would silently become a space.
+    expect(url).toBe('https://formsubmit.co/ajax/destino%40example.org')
   })
 
   it('reports the send', async () => {
     const result = await notifyNewMember({
-      accessKey: 'test-key',
       submission: makeSubmission(),
       institutionName: 'ITESO',
+      to: 'destino@example.org',
       fetchImpl: okFetch(),
     })
     expect(result).toEqual({ sent: true })
@@ -92,9 +95,9 @@ describe('notifyNewMember', () => {
     const fetchImpl = vi.fn().mockRejectedValue(new Error('offline'))
     await expect(
       notifyNewMember({
-        accessKey: 'test-key',
         submission: makeSubmission(),
         institutionName: null,
+        to: 'destino@example.org',
         fetchImpl,
       }),
     ).resolves.toEqual({ sent: false })
@@ -104,20 +107,20 @@ describe('notifyNewMember', () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false } as Response)
     await expect(
       notifyNewMember({
-        accessKey: 'test-key',
         submission: makeSubmission(),
         institutionName: null,
+        to: 'destino@example.org',
         fetchImpl,
       }),
     ).resolves.toEqual({ sent: false })
   })
 
-  it('makes no network call at all when no access key is configured', async () => {
+  it('makes no network call at all when no destination is configured', async () => {
     const fetchImpl = okFetch()
     const result = await notifyNewMember({
-      accessKey: '',
       submission: makeSubmission(),
       institutionName: null,
+      to: '',
       fetchImpl,
     })
     // Same contract PostHog follows in this repo: unset key means no requests,

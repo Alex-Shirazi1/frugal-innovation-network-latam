@@ -9,6 +9,7 @@ import {
 } from 'react'
 import { createDataSource } from './index'
 import { bundledDataSource } from './adapters/bundled'
+import { notifyNewMember } from '../lib/notifyNewMember'
 import type {
   ConferenceData,
   Institution,
@@ -39,8 +40,6 @@ interface ApiDataValue {
   resources: Resource[]
   conference: ConferenceData
   options: OnboardingOptions
-  lastAddedId: string | null
-  addMember: (member: Member) => void
   submitIntake: (submission: IntakeSubmission) => Promise<IntakeResult>
   institutionName: (affiliationId: string | null) => string | null
 }
@@ -85,7 +84,6 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
     generalAreas,
     languageOptions,
   })
-  const [lastAddedId, setLastAddedId] = useState<string | null>(null)
 
   /**
    * Every dataset above already renders from the bundled snapshot, so this
@@ -130,22 +128,41 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
       resources,
       conference,
       options,
-      lastAddedId,
-      addMember: (member: Member) => {
-        setMembers((prev) => [member, ...prev])
-        setLastAddedId(member.id)
-      },
-      submitIntake: (submission: IntakeSubmission) =>
-        dataSource.submitIntake(submission).catch(
+      /**
+       * The single funnel for every submission, whatever adapter is behind it.
+       *
+       * The notification lives here rather than inside an adapter so it fires
+       * on the local Express backend too — otherwise the only way to test that
+       * the network actually receives an email would be to deploy. It is gated
+       * on `persisted`, so the bundled fallback (which validates happily and
+       * stores nothing) never mails anyone about an application that was not
+       * kept.
+       */
+      submitIntake: async (submission: IntakeSubmission) => {
+        const result = await dataSource.submitIntake(submission).catch(
           // Both adapters failed (or bundled threw): degrade to local processing.
           () => bundledDataSource.submitIntake(submission),
-        ),
+        )
+
+        if (result.success && result.persisted) {
+          // Not awaited: the application is already stored, so the submitter
+          // should not wait on an email — nor be told anything failed if it
+          // does. notifyNewMember never rejects.
+          void notifyNewMember({
+            submission,
+            institutionName:
+              institutions.find((i) => i.id === submission.affiliationId)?.name ?? null,
+          })
+        }
+
+        return result
+      },
       institutionName: (affiliationId: string | null) => {
         if (!affiliationId) return null
         return institutions.find((i) => i.id === affiliationId)?.name ?? null
       },
     }
-  }, [dataSource, institutions, members, resources, conference, options, lastAddedId])
+  }, [dataSource, institutions, members, resources, conference, options])
 
   return <ApiDataContext.Provider value={value}>{children}</ApiDataContext.Provider>
 }

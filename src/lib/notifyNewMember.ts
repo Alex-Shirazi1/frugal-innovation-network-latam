@@ -5,25 +5,32 @@
  * and his team replies to arrange a conversation. The subject line is fixed
  * because he filters his inbox on it.
  *
- * Delivery goes through Web3Forms, a form-to-email relay, rather than a server
+ * Delivery goes through FormSubmit, a form-to-email relay, rather than a server
  * of our own — production is Firebase Hosting plus Firestore straight from the
  * browser, so there is no backend to send from, and a Cloud Function would mean
  * putting the project on a billing plan for a few dozen emails a month.
  *
- * The access key is public by design and ships in the bundle. That is safe here
- * because the destination address is bound to the key on Web3Forms' side, so
- * the worst an abuser can do is flood the network's own inbox — not relay mail
- * to arbitrary recipients. The free tier is capped monthly, and if that cap is
- * ever burned the consequence is a missed notification, never a lost
- * application: the submission is written to Firestore first and is visible at
- * /admin regardless of whether this call succeeds.
+ * FormSubmit addresses the recipient directly in the endpoint, which is why the
+ * destination is configuration rather than a vendor-side setting: pointing this
+ * at a different inbox is an env var, not a new account. It needs no signup —
+ * the first submission to a new address triggers a one-time confirmation email
+ * to that address, and nothing is delivered until someone clicks it.
+ *
+ * The address is NOT hardcoded, deliberately: this repository is public, and a
+ * mail address committed to it is a mail address in every scraper's list.
+ *
+ * Nothing here is load-bearing for the application itself. The submission is
+ * stored before this runs and stays visible at /admin whether or not the mail
+ * goes out, which is why every failure below is swallowed.
  */
 import type { IntakeSubmission } from '../api/types'
 
 /** Fixed: Allan filters his inbox on this exact string. */
 export const NOTIFICATION_SUBJECT = 'Solicitud de nueva membresía'
 
-const ENDPOINT = 'https://api.web3forms.com/submit'
+/** AJAX variant: returns JSON and sends CORS headers, unlike the plain POST
+ *  endpoint, which expects a browser form navigation. */
+const ENDPOINT_BASE = 'https://formsubmit.co/ajax/'
 
 const POSITION_LABELS: Record<string, string> = {
   staff: 'Personal administrativo',
@@ -70,9 +77,10 @@ export function notificationFields(
 }
 
 export interface NotifyOptions {
-  accessKey: string
   submission: IntakeSubmission
   institutionName: string | null
+  /** Destination inbox. Defaults to `VITE_NOTIFY_EMAIL`; injectable for tests. */
+  to?: string
   /** Injectable for tests; defaults to the platform fetch. */
   fetchImpl?: typeof fetch
 }
@@ -86,21 +94,25 @@ export interface NotifyOptions {
  * reported only in the return value, for callers that want to log it.
  */
 export async function notifyNewMember({
-  accessKey,
   submission,
   institutionName,
+  to = import.meta.env.VITE_NOTIFY_EMAIL ?? '',
   fetchImpl = fetch,
 }: NotifyOptions): Promise<{ sent: boolean }> {
-  if (!accessKey) return { sent: false }
+  // No address configured means no request at all — the same contract analytics
+  // follows here, so a fork of this site never mails a stranger's inbox.
+  if (!to) return { sent: false }
 
   try {
-    const response = await fetchImpl(ENDPOINT, {
+    const response = await fetchImpl(`${ENDPOINT_BASE}${encodeURIComponent(to)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
-        access_key: accessKey,
-        subject: NOTIFICATION_SUBJECT,
-        from_name: 'Sitio RELIF',
+        _subject: NOTIFICATION_SUBJECT,
+        // Suppresses FormSubmit's interstitial captcha page. Harmless for a
+        // JSON call, and the form already carries its own honeypot.
+        _captcha: 'false',
+        _template: 'table',
         ...notificationFields(submission, institutionName),
       }),
     })

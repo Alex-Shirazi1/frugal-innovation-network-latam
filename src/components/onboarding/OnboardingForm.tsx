@@ -139,7 +139,7 @@ function ChipGroup({
 
 export function OnboardingForm() {
   const { t, lang } = useI18n()
-  const { addMember, submitIntake, institutions, options } = useApiData()
+  const { submitIntake, institutions, options } = useApiData()
   const capture = useCapture()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState<IntakeSubmission>(emptyForm)
@@ -219,7 +219,17 @@ export function OnboardingForm() {
       return
     }
 
-    addMember(result.data)
+    /*
+     * Deliberately does NOT add the submitter to the directory.
+     *
+     * This used to call addMember(), which prepended them to the local list so
+     * they appeared in the members strip the moment they hit send. That
+     * contradicts how the network actually works: the form is an expression of
+     * interest, and a profile is published only after the network has met the
+     * person and collected their organization's logo and letter. Showing them
+     * on the site immediately — even client-side, even until the next reload —
+     * told applicants they were members when they were not.
+     */
     capture('onboarding_submitted', {
       country: form.country,
       region: form.region,

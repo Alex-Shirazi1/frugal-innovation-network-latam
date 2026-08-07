@@ -68,7 +68,6 @@ function InstitutionConveyor() {
 
 interface MemberConveyorProps {
   members: Member[]
-  highlightedId: string | null
   onOpen: (member: Member) => void
   /** The section's content column, used as the width the cards must fit into. */
   columnRef: RefObject<HTMLDivElement | null>
@@ -92,7 +91,7 @@ const CONTENT_COLUMN = 'mx-auto max-w-7xl px-4 md:px-8'
  * Hovering or tabbing in pauses the drift (see `.conveyor` in global.css),
  * which is what makes the cards clickable rather than decorative.
  */
-function MemberConveyor({ members, highlightedId, onOpen, columnRef }: MemberConveyorProps) {
+function MemberConveyor({ members, onOpen, columnRef }: MemberConveyorProps) {
   const { t, lang } = useI18n()
   const listRef = useRef<HTMLUListElement>(null)
   const [overflows, setOverflows] = useState(false)
@@ -137,7 +136,6 @@ function MemberConveyor({ members, highlightedId, onOpen, columnRef }: MemberCon
         <MemberCard
           key={member.id}
           member={member}
-          highlighted={member.id === highlightedId}
           onOpen={onOpen}
           className="w-72 shrink-0"
         />
@@ -181,7 +179,7 @@ function MemberConveyor({ members, highlightedId, onOpen, columnRef }: MemberCon
 
 export function MemberDirectory() {
   const { t, lang } = useI18n()
-  const { members, lastAddedId, institutionName, options } = useApiData()
+  const { members, institutionName, options } = useApiData()
   const [query, setQuery] = useState('')
   const [position, setPosition] = useState<PositionFilter>(ALL)
   const [area, setArea] = useState<string>(ALL)
@@ -373,12 +371,7 @@ export function MemberDirectory() {
           content column reads as a broken grid rather than as something moving.
           Searching narrows what is on the strip; it never replaces the strip. */}
       {filtered.length > 0 ? (
-        <MemberConveyor
-          members={filtered}
-          highlightedId={lastAddedId}
-          onOpen={setSelected}
-          columnRef={columnRef}
-        />
+        <MemberConveyor members={filtered} onOpen={setSelected} columnRef={columnRef} />
       ) : null}
 
       {selected ? <MemberDetail member={selected} onClose={() => setSelected(null)} /> : null}

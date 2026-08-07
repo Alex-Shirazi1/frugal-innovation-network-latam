@@ -23,8 +23,6 @@
  */
 import { validateIntake } from '../../domain/intake'
 import { getDb, type FirebaseConfig } from '../../lib/firebase'
-import { notifyNewMember } from '../../lib/notifyNewMember'
-import { institutionName } from '../../data/members'
 import { bundledDataSource } from './bundled'
 import type { RelifDataSource } from '../dataSource'
 import type { IntakeResult, IntakeSubmission, Member } from '../types'
@@ -90,19 +88,6 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
         collection(db, SUBMISSIONS),
         toSubmissionDocument(submission, createdAt),
       )
-
-      /*
-       * Notify the network — deliberately after the write, deliberately not
-       * awaited into the result. The application is already safe in Firestore
-       * at this point, so a mail failure must not turn into an error the
-       * submitter sees. `notifyNewMember` never rejects; the catch is belt and
-       * braces for an unexpected synchronous throw.
-       */
-      void notifyNewMember({
-        accessKey: import.meta.env.VITE_WEB3FORMS_KEY ?? '',
-        submission,
-        institutionName: institutionName(submission.affiliationId),
-      }).catch(() => undefined)
 
       // Durably stored and awaiting moderation. The record returned here is the
       // locally derived one — the submitter cannot see the queue.
