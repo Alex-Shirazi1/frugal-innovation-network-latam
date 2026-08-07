@@ -41,6 +41,22 @@ export default defineConfig({
           globals: true,
         },
       },
+      /**
+       * The Cloud Functions codebase deploys on its own and has its own
+       * package.json, but its tests run here so `npm test` at the root stays the
+       * single command that proves the repo — one less thing to explain at
+       * handoff. Only the pure formatting module is covered; the trigger itself
+       * is firebase-admin glue best exercised against the emulator.
+       */
+      {
+        extends: true,
+        test: {
+          name: 'functions',
+          include: ['functions/src/**/*.test.ts'],
+          environment: 'node',
+          globals: true,
+        },
+      },
     ],
   },
 })

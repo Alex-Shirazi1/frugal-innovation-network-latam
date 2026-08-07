@@ -61,6 +61,42 @@ All responses use the `{ success, data, error }` envelope.
 
 Form submission → server-side validation → stored `pending` in SQLite → reviewed at **`/admin`** (unlinked route; auth enforced server-side by `ADMIN_KEY`, rate-limited, constant-time compared) → on approve, the member appears in the public directory served by `GET /api/members`. Pending entries are never exposed publicly.
 
+### New-member email notification (`functions/`)
+
+When a submission lands in Firestore, `notifyNewSubmission` emails the network
+so someone can follow up. It does not send the mail itself — it formats the
+message and writes it to a `mail` collection, which the official
+[Trigger Email from Firestore](https://extensions.dev/extensions/firebase/firestore-send-email)
+extension picks up and delivers. SMTP credentials therefore live in the
+extension's config, never in this repo.
+
+```
+submissions/{id} created → notifyNewSubmission → mail/{id} → extension → SMTP
+                                                                          ↓
+                                          redinnovacionfrugal@gmail.com
+                                          Subject: Solicitud de nueva membresía
+```
+
+`firestore.rules` denies the `mail` collection to every client; only the
+function's Admin SDK can write there, so it cannot be used as an open relay.
+
+First-time setup:
+
+1. Upgrade the Firebase project to the **Blaze** plan — Cloud Functions requires
+   a billing account. The function is capped at 3 instances to bound the cost.
+2. `npx firebase ext:install firebase/firestore-send-email` — set the collection
+   to `mail`, and point SMTP at the network's own Gmail with an app password.
+3. `cp functions/.env.example functions/.env` and adjust if the recipient or the
+   admin URL differ from the defaults.
+4. `npm --prefix functions run deploy`
+
+To exercise the trigger locally without deploying:
+
+```bash
+npm --prefix functions run build
+npx firebase emulators:start --only firestore,functions
+```
+
 ## Modules (per spec)
 
 | # | Module | Where |

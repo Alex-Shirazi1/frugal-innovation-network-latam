@@ -1,4 +1,12 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import {
+  useDeferredValue,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
@@ -13,14 +21,34 @@ type PositionFilter = PositionType | 'all'
 /** Sentinel for "no filter applied", shared by all three filter controls. */
 const ALL = 'all'
 
+/**
+ * Seconds each item spends crossing the viewport. Both conveyors derive their
+ * duration from this so a 54-card track and a 30-pill track travel at the same
+ * apparent speed instead of the longer one sprinting to keep the same lap time.
+ */
+const CONVEYOR_SECONDS_PER_ITEM = 2.4
+
 function InstitutionConveyor() {
   const { t } = useI18n()
   const { institutions } = useApiData()
   // Track is duplicated so the loop is seamless; aria-hidden on the copy.
   const names = institutions.map((i) => i.name)
   return (
-    <div className="conveyor overflow-hidden border-y border-carbon/10 bg-white/50 py-4" aria-label={t.directory.institutionsTitle}>
-      <div className="conveyor-track flex w-max gap-3">
+    <div
+      /* `motion-reduce`: with the animation off the track is just a very wide
+         row, so hand the reader a scrollbar instead of clipping the tail. */
+      className="conveyor overflow-hidden motion-reduce:overflow-x-auto border-y border-carbon/10 bg-white/50 py-4"
+      /* `aria-label` on a bare div names nothing — a div has no implicit role
+         for the label to attach to, so this strip was previously unlabelled to
+         assistive tech. `group` is the right weight: it names the strip without
+         claiming to be a landmark. */
+      role="group"
+      aria-label={t.directory.institutionsTitle}
+    >
+      <div
+        className="conveyor-track flex w-max gap-3"
+        style={{ '--conveyor-duration': `${names.length * CONVEYOR_SECONDS_PER_ITEM}s` } as CSSProperties}
+      >
         {[false, true].map((isCopy) => (
           <ul key={String(isCopy)} className="flex gap-3" aria-hidden={isCopy}>
             {names.map((name) => (
@@ -38,6 +66,119 @@ function InstitutionConveyor() {
   )
 }
 
+interface MemberConveyorProps {
+  members: Member[]
+  highlightedId: string | null
+  onOpen: (member: Member) => void
+  /** The section's content column, used as the width the cards must fit into. */
+  columnRef: RefObject<HTMLDivElement | null>
+}
+
+/** Container classes shared with the section body, so a strip that is not
+ *  scrolling starts exactly where the heading and the filters start. */
+const CONTENT_COLUMN = 'mx-auto max-w-7xl px-4 md:px-8'
+
+/**
+ * The directory, always.
+ *
+ * Allan's note on the call was that a wall of member cards is the wrong shape
+ * for this section — nobody reads 54 of them, and at 200 members it stops being
+ * a page. So the strip is not a resting state that a search replaces; searching
+ * and filtering just change which cards are on it.
+ *
+ * Motion is conditional on need: once the cards no longer reach past the
+ * viewport there is nothing to scroll to, and a four-card track sliding on a
+ * loop reads as a glitch. Below that threshold the strip simply sits still.
+ * Hovering or tabbing in pauses the drift (see `.conveyor` in global.css),
+ * which is what makes the cards clickable rather than decorative.
+ */
+function MemberConveyor({ members, highlightedId, onOpen, columnRef }: MemberConveyorProps) {
+  const { t, lang } = useI18n()
+  const listRef = useRef<HTMLUListElement>(null)
+  const [overflows, setOverflows] = useState(false)
+
+  useLayoutEffect(() => {
+    const list = listRef.current
+    const column = columnRef.current
+    if (!list || !column) return
+
+    /*
+     * Compared against the section's own content column rather than the full
+     * viewport, because that is where a non-scrolling strip is laid out — and
+     * measured off the first list, never off the track, since the track is what
+     * gains the duplicate copy and the column padding. Measuring the track
+     * would feed this decision its own output and oscillate; the list's width
+     * depends only on how many cards are in it.
+     */
+    // A computed padding can come back as '' (no stylesheet applied yet), and
+    // parseFloat('') is NaN — which would silently make every comparison below
+    // false and pin the strip to "fits" forever.
+    const pixels = (value: string): number => {
+      const parsed = Number.parseFloat(value)
+      return Number.isFinite(parsed) ? parsed : 0
+    }
+
+    const measure = () => {
+      const style = getComputedStyle(column)
+      const available = column.clientWidth - pixels(style.paddingLeft) - pixels(style.paddingRight)
+      setOverflows(list.scrollWidth > available)
+    }
+
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(column)
+    observer.observe(list)
+    return () => observer.disconnect()
+  }, [members, columnRef])
+
+  const cards = (
+    <>
+      {members.map((member) => (
+        <MemberCard
+          key={member.id}
+          member={member}
+          highlighted={member.id === highlightedId}
+          onOpen={onOpen}
+          className="w-72 shrink-0"
+        />
+      ))}
+    </>
+  )
+
+  return (
+    <div
+      className="conveyor overflow-hidden motion-reduce:overflow-x-auto py-1"
+      role="group"
+      aria-label={t.directory.carouselLabel}
+      lang={lang}
+    >
+      <div
+        className={`flex gap-4 ${overflows ? 'conveyor-track w-max' : CONTENT_COLUMN}`}
+        style={
+          overflows
+            ? ({
+                '--conveyor-duration': `${members.length * CONVEYOR_SECONDS_PER_ITEM}s`,
+              } as CSSProperties)
+            : undefined
+        }
+      >
+        <ul ref={listRef} className="flex gap-4">
+          {cards}
+        </ul>
+        {/* The duplicate exists only to hide the loop seam, so it is pointless
+            when nothing is looping. Where it is rendered, `inert` keeps its
+            cards out of the tab order and out of the accessibility tree —
+            otherwise a keyboard user tabs through every member twice. */}
+        {overflows ? (
+          <ul className="flex gap-4" aria-hidden inert>
+            {cards}
+          </ul>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
 export function MemberDirectory() {
   const { t, lang } = useI18n()
   const { members, lastAddedId, institutionName, options } = useApiData()
@@ -46,6 +187,7 @@ export function MemberDirectory() {
   const [area, setArea] = useState<string>(ALL)
   const [country, setCountry] = useState<string>(ALL)
   const [selected, setSelected] = useState<Member | null>(null)
+  const columnRef = useRef<HTMLDivElement>(null)
   const deferredQuery = useDeferredValue(query)
 
   // Only offer countries that actually have members, so no filter yields zero.
@@ -140,7 +282,7 @@ export function MemberDirectory() {
 
       <InstitutionConveyor />
 
-      <div className="mx-auto max-w-7xl px-4 md:px-8 pt-8">
+      <div ref={columnRef} className={`${CONTENT_COLUMN} pt-8`}>
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <input
             type="search"
@@ -210,30 +352,34 @@ export function MemberDirectory() {
         </div>
 
         <p className="mb-4 text-sm text-pizarra" role="status">
-          {t.directory.showing} {filtered.length} {t.directory.people}
+          {/* Narrow searches routinely land on one result now that the strip
+              never expands into a grid, so "1 personas" is on screen often
+              enough to be worth the branch. */}
+          {t.directory.showing} {filtered.length}{' '}
+          {filtered.length === 1 ? t.directory.person : t.directory.people}
+          {hasActiveFilters ? null : (
+            <span className="block text-xs md:ml-2 md:inline">{t.directory.browseHint}</span>
+          )}
         </p>
 
-        {filtered.length > 0 ? (
-          <ul
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            style={{ contentVisibility: 'auto' }}
-            lang={lang}
-          >
-            {filtered.map((member) => (
-              <MemberCard
-                key={member.id}
-                member={member}
-                highlighted={member.id === lastAddedId}
-                onOpen={setSelected}
-              />
-            ))}
-          </ul>
-        ) : (
+        {filtered.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-carbon/20 p-10 text-center text-pizarra">
             {t.directory.noResults}
           </p>
-        )}
+        ) : null}
       </div>
+
+      {/* Full-bleed, like the institution strip above it: a marquee pinned to the
+          content column reads as a broken grid rather than as something moving.
+          Searching narrows what is on the strip; it never replaces the strip. */}
+      {filtered.length > 0 ? (
+        <MemberConveyor
+          members={filtered}
+          highlightedId={lastAddedId}
+          onOpen={setSelected}
+          columnRef={columnRef}
+        />
+      ) : null}
 
       {selected ? <MemberDetail member={selected} onClose={() => setSelected(null)} /> : null}
     </section>

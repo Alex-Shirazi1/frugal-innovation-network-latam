@@ -12,9 +12,16 @@
  *   submissions/  write-only for the public, readable only by a moderator
  *   members/      world-readable, contains approved records only
  *
- * Approval copies a document across (see adminApi). There are no Cloud
- * Functions anywhere in this design — Functions requires the Blaze plan and a
- * billing account, and Allan was explicit that hosting costs must not rise.
+ * Approval copies a document across (see adminApi). Reads and writes from the
+ * browser stay on this path — firestore.rules is the security boundary.
+ *
+ * One Cloud Function now sits behind it: `notifyNewSubmission` in functions/,
+ * which emails the network when a submission lands. That reverses an earlier
+ * constraint in this file ("no Cloud Functions anywhere"), which was written
+ * when the project had to stay on the free Spark plan. Allan has since
+ * confirmed the network can fund hosting, and email cannot be sent from the
+ * client without handing it SMTP credentials. The function is capped at three
+ * instances so the bill stays bounded.
  */
 import { validateIntake } from '../../domain/intake'
 import { getDb, type FirebaseConfig } from '../../lib/firebase'

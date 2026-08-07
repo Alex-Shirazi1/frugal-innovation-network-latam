@@ -372,8 +372,8 @@
   {
     "id": "mock-12",
     "firstName": "Antonia",
-    "lastName": "Paredes Paredes",
-    "fullName": "Antonia Paredes Paredes",
+    "lastName": "Paredes Villanueva",
+    "fullName": "Antonia Paredes Villanueva",
     "title": {
       "es": "Investigadora en Sostenibilidad",
       "en": "Sustainability Researcher",
@@ -834,8 +834,8 @@
   {
     "id": "mock-27",
     "firstName": "Valentina",
-    "lastName": "Miranda Navarro",
-    "fullName": "Valentina Miranda Navarro",
+    "lastName": "Cortés Campos",
+    "fullName": "Valentina Cortés Campos",
     "title": {
       "es": "Mtra. en Políticas Públicas",
       "en": "MA in Public Policy",
@@ -859,14 +859,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/valentina-miranda",
+    "socialUrl": "https://linkedin.com/in/valentina-cortés",
     "avatarHue": 189
   },
   {
     "id": "mock-28",
     "firstName": "Mateo",
-    "lastName": "Ríos Ibarra",
-    "fullName": "Mateo Ríos Ibarra",
+    "lastName": "Campos Escobar",
+    "fullName": "Mateo Campos Escobar",
     "title": {
       "es": "Ingeniero de Producto",
       "en": "Product Engineer",
@@ -889,14 +889,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/mateo-ríos",
+    "socialUrl": "https://scholar.example.org/mateo-campos",
     "avatarHue": 236
   },
   {
     "id": "mock-29",
     "firstName": "Camila",
-    "lastName": "Vergara Cortés",
-    "fullName": "Camila Vergara Cortés",
+    "lastName": "Cabrera Paredes",
+    "fullName": "Camila Cabrera Paredes",
     "title": {
       "es": "Gestora de Proyectos Sociales",
       "en": "Social Projects Manager",
@@ -927,8 +927,8 @@
   {
     "id": "mock-30",
     "firstName": "Santiago",
-    "lastName": "Bustos Quintero",
-    "fullName": "Santiago Bustos Quintero",
+    "lastName": "Arriaga Vergara",
+    "fullName": "Santiago Arriaga Vergara",
     "title": {
       "es": "Dra. en Diseño e Innovación",
       "en": "PhD in Design & Innovation",
@@ -951,14 +951,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/santiago-bustos",
+    "socialUrl": "https://linkedin.com/in/santiago-arriaga",
     "avatarHue": 330
   },
   {
     "id": "mock-31",
     "firstName": "Lucía",
-    "lastName": "Cortés Ferreira",
-    "fullName": "Lucía Cortés Ferreira",
+    "lastName": "Aguilar Fuentes",
+    "fullName": "Lucía Aguilar Fuentes",
     "title": {
       "es": "Profesor de Ingeniería",
       "en": "Professor of Engineering",
@@ -982,14 +982,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/lucía-cortés",
+    "socialUrl": "https://scholar.example.org/lucía-aguilar",
     "avatarHue": 17
   },
   {
     "id": "mock-32",
     "firstName": "Sebastián",
-    "lastName": "Campos Ríos",
-    "fullName": "Sebastián Campos Ríos",
+    "lastName": "Delgado Peña",
+    "fullName": "Sebastián Delgado Peña",
     "title": {
       "es": "Investigadora en Sostenibilidad",
       "en": "Sustainability Researcher",
@@ -1019,8 +1019,8 @@
   {
     "id": "mock-33",
     "firstName": "Isabella",
-    "lastName": "Cabrera Zamora",
-    "fullName": "Isabella Cabrera Zamora",
+    "lastName": "Ochoa Tapia",
+    "fullName": "Isabella Ochoa Tapia",
     "title": {
       "es": "Consultor en Innovación Social",
       "en": "Social Innovation Consultant",
@@ -1044,14 +1044,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/isabella-cabrera",
+    "socialUrl": "https://linkedin.com/in/isabella-ochoa",
     "avatarHue": 111
   },
   {
     "id": "mock-34",
     "firstName": "Diego",
-    "lastName": "Arriaga Aguilar",
-    "fullName": "Diego Arriaga Aguilar",
+    "lastName": "Ferreira Villanueva",
+    "fullName": "Diego Ferreira Villanueva",
     "title": {
       "es": "Coordinadora de Vinculación",
       "en": "Outreach Coordinator",
@@ -1074,14 +1074,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/diego-arriaga",
+    "socialUrl": "https://scholar.example.org/diego-ferreira",
     "avatarHue": 158
   },
   {
     "id": "mock-35",
     "firstName": "Mariana",
-    "lastName": "Aguilar Molina",
-    "fullName": "Mariana Aguilar Molina",
+    "lastName": "Paredes Cabrera",
+    "fullName": "Mariana Paredes Cabrera",
     "title": {
       "es": "Estudiante de Doctorado",
       "en": "Doctoral Student",
@@ -1112,8 +1112,8 @@
   {
     "id": "mock-36",
     "firstName": "Joaquín",
-    "lastName": "Delgado Restrepo",
-    "fullName": "Joaquín Delgado Restrepo",
+    "lastName": "Peña Salazar",
+    "fullName": "Joaquín Peña Salazar",
     "title": {
       "es": "Director de Emprendimiento",
       "en": "Director of Entrepreneurship",
@@ -1136,14 +1136,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/joaquín-delgado",
+    "socialUrl": "https://linkedin.com/in/joaquín-peña",
     "avatarHue": 252
   },
   {
     "id": "mock-37",
     "firstName": "Fernanda",
-    "lastName": "Ochoa Campos",
-    "fullName": "Fernanda Ochoa Campos",
+    "lastName": "Ibarra Peña",
+    "fullName": "Fernanda Ibarra Peña",
     "title": {
       "es": "Mtra. en Políticas Públicas",
       "en": "MA in Public Policy",
@@ -1167,14 +1167,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/fernanda-ochoa",
+    "socialUrl": "https://scholar.example.org/fernanda-ibarra",
     "avatarHue": 299
   },
   {
     "id": "mock-38",
     "firstName": "Emiliano",
-    "lastName": "Ferreira Escobar",
-    "fullName": "Emiliano Ferreira Escobar",
+    "lastName": "Restrepo Bustos",
+    "fullName": "Emiliano Restrepo Bustos",
     "title": {
       "es": "Ingeniero de Producto",
       "en": "Product Engineer",
@@ -1204,8 +1204,8 @@
   {
     "id": "mock-39",
     "firstName": "Antonia",
-    "lastName": "Paredes Paredes",
-    "fullName": "Antonia Paredes Paredes",
+    "lastName": "Villanueva Herrera",
+    "fullName": "Antonia Villanueva Herrera",
     "title": {
       "es": "Gestora de Proyectos Sociales",
       "en": "Social Projects Manager",
@@ -1229,14 +1229,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/antonia-paredes",
+    "socialUrl": "https://linkedin.com/in/antonia-villanueva",
     "avatarHue": 33
   },
   {
     "id": "mock-40",
     "firstName": "Tomás",
-    "lastName": "Peña Vergara",
-    "fullName": "Tomás Peña Vergara",
+    "lastName": "Sandoval Ochoa",
+    "fullName": "Tomás Sandoval Ochoa",
     "title": {
       "es": "Dra. en Diseño e Innovación",
       "en": "PhD in Design & Innovation",
@@ -1259,14 +1259,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/tomás-peña",
+    "socialUrl": "https://scholar.example.org/tomás-sandoval",
     "avatarHue": 80
   },
   {
     "id": "mock-41",
     "firstName": "Renata",
-    "lastName": "Ibarra Fuentes",
-    "fullName": "Renata Ibarra Fuentes",
+    "lastName": "Zamora Miranda",
+    "fullName": "Renata Zamora Miranda",
     "title": {
       "es": "Profesor de Ingeniería",
       "en": "Professor of Engineering",
@@ -1297,8 +1297,8 @@
   {
     "id": "mock-42",
     "firstName": "Gabriel",
-    "lastName": "Restrepo Delgado",
-    "fullName": "Gabriel Restrepo Delgado",
+    "lastName": "Fuentes Sandoval",
+    "fullName": "Gabriel Fuentes Sandoval",
     "title": {
       "es": "Investigadora en Sostenibilidad",
       "en": "Sustainability Researcher",
@@ -1321,14 +1321,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/gabriel-restrepo",
+    "socialUrl": "https://linkedin.com/in/gabriel-fuentes",
     "avatarHue": 174
   },
   {
     "id": "mock-43",
     "firstName": "Ximena",
-    "lastName": "Villanueva Tapia",
-    "fullName": "Ximena Villanueva Tapia",
+    "lastName": "Herrera Arriaga",
+    "fullName": "Ximena Herrera Arriaga",
     "title": {
       "es": "Consultor en Innovación Social",
       "en": "Social Innovation Consultant",
@@ -1352,14 +1352,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/ximena-villanueva",
+    "socialUrl": "https://scholar.example.org/ximena-herrera",
     "avatarHue": 221
   },
   {
     "id": "mock-44",
     "firstName": "Andrés",
-    "lastName": "Sandoval Villanueva",
-    "fullName": "Andrés Sandoval Villanueva",
+    "lastName": "Quintero Navarro",
+    "fullName": "Andrés Quintero Navarro",
     "title": {
       "es": "Coordinadora de Vinculación",
       "en": "Outreach Coordinator",
@@ -1389,8 +1389,8 @@
   {
     "id": "mock-45",
     "firstName": "Paula",
-    "lastName": "Zamora Cabrera",
-    "fullName": "Paula Zamora Cabrera",
+    "lastName": "Escobar Ibarra",
+    "fullName": "Paula Escobar Ibarra",
     "title": {
       "es": "Estudiante de Doctorado",
       "en": "Doctoral Student",
@@ -1414,14 +1414,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/paula-zamora",
+    "socialUrl": "https://linkedin.com/in/paula-escobar",
     "avatarHue": 315
   },
   {
     "id": "mock-46",
     "firstName": "Rodrigo",
-    "lastName": "Fuentes Salazar",
-    "fullName": "Rodrigo Fuentes Salazar",
+    "lastName": "Salazar Cortés",
+    "fullName": "Rodrigo Salazar Cortés",
     "title": {
       "es": "Director de Emprendimiento",
       "en": "Director of Entrepreneurship",
@@ -1444,14 +1444,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/rodrigo-fuentes",
+    "socialUrl": "https://scholar.example.org/rodrigo-salazar",
     "avatarHue": 2
   },
   {
     "id": "mock-47",
     "firstName": "Daniela",
-    "lastName": "Herrera Peña",
-    "fullName": "Daniela Herrera Peña",
+    "lastName": "Navarro Quintero",
+    "fullName": "Daniela Navarro Quintero",
     "title": {
       "es": "Mtra. en Políticas Públicas",
       "en": "MA in Public Policy",
@@ -1482,8 +1482,8 @@
   {
     "id": "mock-48",
     "firstName": "Felipe",
-    "lastName": "Quintero Bustos",
-    "fullName": "Felipe Quintero Bustos",
+    "lastName": "Molina Ferreira",
+    "fullName": "Felipe Molina Ferreira",
     "title": {
       "es": "Ingeniero de Producto",
       "en": "Product Engineer",
@@ -1506,14 +1506,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/felipe-quintero",
+    "socialUrl": "https://linkedin.com/in/felipe-molina",
     "avatarHue": 96
   },
   {
     "id": "mock-49",
     "firstName": "Carolina",
-    "lastName": "Escobar Herrera",
-    "fullName": "Carolina Escobar Herrera",
+    "lastName": "Tapia Ríos",
+    "fullName": "Carolina Tapia Ríos",
     "title": {
       "es": "Gestora de Proyectos Sociales",
       "en": "Social Projects Manager",
@@ -1537,14 +1537,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/carolina-escobar",
+    "socialUrl": "https://scholar.example.org/carolina-tapia",
     "avatarHue": 143
   },
   {
     "id": "mock-50",
     "firstName": "Nicolás",
-    "lastName": "Salazar Ochoa",
-    "fullName": "Nicolás Salazar Ochoa",
+    "lastName": "Miranda Zamora",
+    "fullName": "Nicolás Miranda Zamora",
     "title": {
       "es": "Dra. en Diseño e Innovación",
       "en": "PhD in Design & Innovation",
@@ -1574,8 +1574,8 @@
   {
     "id": "mock-51",
     "firstName": "Alejandra",
-    "lastName": "Navarro Miranda",
-    "fullName": "Alejandra Navarro Miranda",
+    "lastName": "Ríos Aguilar",
+    "fullName": "Alejandra Ríos Aguilar",
     "title": {
       "es": "Profesor de Ingeniería",
       "en": "Professor of Engineering",
@@ -1599,14 +1599,14 @@
       "es",
       "en"
     ],
-    "socialUrl": "https://linkedin.com/in/alejandra-navarro",
+    "socialUrl": "https://linkedin.com/in/alejandra-ríos",
     "avatarHue": 237
   },
   {
     "id": "mock-52",
     "firstName": "Bruno",
-    "lastName": "Molina Sandoval",
-    "fullName": "Bruno Molina Sandoval",
+    "lastName": "Vergara Molina",
+    "fullName": "Bruno Vergara Molina",
     "title": {
       "es": "Investigadora en Sostenibilidad",
       "en": "Sustainability Researcher",
@@ -1629,14 +1629,14 @@
     "languages": [
       "es"
     ],
-    "socialUrl": "https://scholar.example.org/bruno-molina",
+    "socialUrl": "https://scholar.example.org/bruno-vergara",
     "avatarHue": 284
   },
   {
     "id": "mock-53",
     "firstName": "Julieta",
-    "lastName": "Tapia Arriaga",
-    "fullName": "Julieta Tapia Arriaga",
+    "lastName": "Bustos Restrepo",
+    "fullName": "Julieta Bustos Restrepo",
     "title": {
       "es": "Consultor en Innovación Social",
       "en": "Social Innovation Consultant",

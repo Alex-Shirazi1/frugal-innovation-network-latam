@@ -65,7 +65,9 @@ body {
   );
 }
 
-/* Scrolling conveyor for member institutions */
+/* Scrolling conveyor, used twice: the institution pill strip and the member
+   card carousel. The track holds two identical copies of the list and travels
+   exactly half its width, so the loop point is invisible. */
 @keyframes conveyor {
   from {
     transform: translateX(0);
@@ -76,10 +78,17 @@ body {
 }
 
 .conveyor-track {
-  animation: conveyor 55s linear infinite;
+  /* Per-instance duration: the two tracks hold very different item counts, and
+     a shared duration would make the longer one race. Each caller sets the
+     variable from its own item count to keep the travel speed constant. */
+  animation: conveyor var(--conveyor-duration, 55s) linear infinite;
 }
 
-.conveyor:hover .conveyor-track {
+/* Pausing is what makes the member carousel usable at all — the cards are
+   clickable, and you cannot click a moving target. `focus-within` gives keyboard
+   users the same reprieve as `hover` gives pointer users. */
+.conveyor:hover .conveyor-track,
+.conveyor:focus-within .conveyor-track {
   animation-play-state: paused;
 }
 

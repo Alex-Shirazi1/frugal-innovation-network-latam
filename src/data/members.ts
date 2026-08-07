@@ -116,9 +116,23 @@ function regionForCity(city: string): string {
 }
 
 function buildMember(index: number): Member {
+  /*
+   * Both name pools hold 27 entries and TOTAL_MEMBERS is 54, so a plain
+   * `index % length` on every part repeated the whole name on the second lap:
+   * members 0-26 and 27-53 were the same 27 people twice over. Adding the lap
+   * number to the surname indices offsets the second pass, so 54 members get 54
+   * distinct names. Invisible in a paginated grid; glaring in a carousel.
+   */
+  const lap = Math.floor(index / firstNames.length)
   const first = firstNames[index % firstNames.length]
-  const last = lastNames[(index * 7 + 3) % lastNames.length]
-  const secondLast = lastNames[(index * 11 + 9) % lastNames.length]
+  const lastIndex = (index * 7 + 3 + lap) % lastNames.length
+  let secondLastIndex = (index * 11 + 9 + lap * 2) % lastNames.length
+  // Otherwise the two surnames collide and you get "Antonia Paredes Paredes".
+  if (secondLastIndex === lastIndex) {
+    secondLastIndex = (secondLastIndex + 1) % lastNames.length
+  }
+  const last = lastNames[lastIndex]
+  const secondLast = lastNames[secondLastIndex]
   const isIndependent = index % 9 === 4
   const institution = isIndependent
     ? null

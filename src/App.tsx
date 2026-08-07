@@ -47,8 +47,11 @@ export default function App() {
               </Suspense>
             </DeferredSection>
             <MemberDirectory />
-            <ResourceLibrary />
+            {/* The join form follows the directory directly: Allan's note was
+                that burying it under the library made visitors scroll past the
+                members they had just been browsing to find the way in. */}
             <OnboardingForm />
+            <ResourceLibrary />
             <ContactSection />
           </main>
           <Footer />

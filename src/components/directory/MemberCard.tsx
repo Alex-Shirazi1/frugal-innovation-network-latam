@@ -8,6 +8,9 @@ interface MemberCardProps {
   member: Member
   highlighted?: boolean
   onOpen?: (member: Member) => void
+  /** Extra classes for the card shell. The carousel uses it to pin a width,
+   *  since a flex row gives items no column to inherit one from. */
+  className?: string
 }
 
 function initialsOf(firstName: string, lastName: string): string {
@@ -18,6 +21,7 @@ export const MemberCard = memo(function MemberCard({
   member,
   highlighted,
   onOpen,
+  className = '',
 }: MemberCardProps) {
   const { lang, t } = useI18n()
   const { institutionName, options } = useApiData()
@@ -33,7 +37,7 @@ export const MemberCard = memo(function MemberCard({
         highlighted
           ? 'border-teal bg-teal/5 shadow-lg shadow-teal/10'
           : 'border-carbon/10 bg-white/70'
-      }`}
+      } ${className}`}
     >
       <div className="flex items-center gap-3.5">
         <span

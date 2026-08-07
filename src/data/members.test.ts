@@ -19,6 +19,25 @@ describe('seed member data integrity', () => {
   })
 
   /**
+   * Unique ids are not enough: the name pools hold 27 entries each and the
+   * directory holds 54 members, so indexing every part by `index % length` gave
+   * two people the same name. The carousel shows the whole list at once, which
+   * makes any repeat read as a rendering bug.
+   */
+  it('gives every member a distinct name', () => {
+    const names = mockMembers.map((m) => m.fullName)
+    const repeated = names.filter((name, i) => names.indexOf(name) !== i)
+    expect(repeated).toEqual([])
+  })
+
+  it('never repeats a surname within one member’s own name', () => {
+    const doubled = mockMembers
+      .map((m) => m.lastName.split(' '))
+      .filter((parts) => parts[0] === parts[1])
+    expect(doubled).toEqual([])
+  })
+
+  /**
    * The intake validator whitelists country/region pairs. Seed members bypass
    * that validator, so nothing else stops them drifting into pairs the form
    * would reject — which is how `region` ended up holding a city name.

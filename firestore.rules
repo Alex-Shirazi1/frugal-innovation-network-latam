@@ -119,6 +119,15 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Outbound mail queue for the Trigger Email extension. The catch-all below
+    // already denies this, but a collection whose documents cause mail to be
+    // sent deserves to be denied by name rather than by omission: any client
+    // write here would be an open relay. Only the notifyNewSubmission Cloud
+    // Function writes to it, via the Admin SDK, which bypasses these rules.
+    match /mail/{mailId} {
+      allow read, write: if false;
+    }
+
     // Anything not matched above is denied.
     match /{document=**} {
       allow read, write: if false;

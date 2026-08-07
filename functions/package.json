@@ -1,0 +1,22 @@
+{
+  "name": "relif-functions",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "//test": "Tests live in the root vitest projects config; run `npm test` at the repo root.",
+    "serve": "npm run build && firebase emulators:start --only functions,firestore",
+    "deploy": "npm run build && firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.2.0",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  }
+}
