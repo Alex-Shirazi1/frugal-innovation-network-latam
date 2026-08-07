@@ -1,7 +1,8 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useCapture } from '../../lib/analytics'
-import { bibliography, type BibliographyEntry } from '../../data/bibliography'
+import type { BibliographyEntry } from '../../data/bibliography'
+import { useApiData } from '../../api/ApiDataContext'
 import { Select } from '../ui/Select'
 
 type SortKey = 'newest' | 'oldest' | 'title' | 'number'
@@ -21,6 +22,8 @@ const INITIAL_VISIBLE = 12
  * cards: at this count the job is scanning and finding, not browsing.
  */
 export function BibliographyList({ onPreview }: { onPreview?: (entry: BibliographyEntry) => void }) {
+  // Firestore when the network has populated it, the bundled seed otherwise.
+  const { bibliography } = useApiData()
   const { t, lang } = useI18n()
   const capture = useCapture()
   const [query, setQuery] = useState('')
@@ -52,7 +55,7 @@ export function BibliographyList({ onPreview }: { onPreview?: (entry: Bibliograp
       sorted.sort((a, b) => a.paperNumber.localeCompare(b.paperNumber))
     }
     return sorted
-  }, [deferredQuery, language, sort, lang])
+  }, [bibliography, deferredQuery, language, sort, lang])
 
   const hasFilters = query !== '' || language !== ALL
   const visible = expanded ? filtered : filtered.slice(0, INITIAL_VISIBLE)

@@ -43,6 +43,8 @@ export function createDataSource(): RelifDataSource {
     )
     const deferred: RelifDataSource = {
       getInstitutions: () => firestorePromise.then((s) => s.getInstitutions()),
+      getInitiatives: () => firestorePromise.then((s) => s.getInitiatives()),
+      getBibliography: () => firestorePromise.then((s) => s.getBibliography()),
       getMembers: () => firestorePromise.then((s) => s.getMembers()),
       getResources: () => firestorePromise.then((s) => s.getResources()),
       getConference: () => firestorePromise.then((s) => s.getConference()),

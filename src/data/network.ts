@@ -252,25 +252,3 @@ export const commissions: Localized[] = [
   },
 ]
 
-/**
- * Where each initiative actually leads. The redesign previously described these
- * six initiatives with no destinations, which is arguably worse than omitting
- * them — a reader could see the podcast named but had no way to listen.
- */
-export const initiativeLinks: Record<string, { url: string; cta: Localized } | undefined> = {
-  encuentros: undefined, // covered in depth by the conference section
-  podcast: {
-    url: 'https://open.spotify.com/show/6UgcfOT7HTt8OX5vIxQw0U',
-    cta: { es: 'Escuchar en Spotify', en: 'Listen on Spotify', pt: 'Ouvir no Spotify' },
-  },
-  casos: {
-    url: 'https://www.youtube.com/@redlatinoamericanadeinnova2173',
-    cta: { es: 'Ver los casos', en: 'Watch the cases', pt: 'Ver os casos' },
-  },
-  mooc: {
-    url: 'https://www.edx.org/es/learn/sustainability/pontificia-universidad-javeriana-innovacion-frugal-soluciones-sostenibles-con-los-recursos-a-tu-alcance',
-    cta: { es: 'Ver el curso en edX', en: 'View the course on edX', pt: 'Ver o curso no edX' },
-  },
-  investigacion: undefined,
-  herramientas: undefined,
-}

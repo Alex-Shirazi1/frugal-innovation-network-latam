@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
   commissions,
-  initiativeLinks,
   networkEmails,
   networkValues,
   regionalContacts,
@@ -9,7 +8,6 @@ import {
 } from './network'
 import { socialIconPaths } from './socialIcons'
 import { es, en, pt } from '../i18n/translations'
-import { initiativeOrder } from '../components/sections/InitiativesSection'
 
 const dictionaries = { es, en, pt } as const
 const langs = ['es', 'en', 'pt'] as const
@@ -124,37 +122,3 @@ describe('about content', () => {
   })
 })
 
-describe('initiative links', () => {
-  /**
-   * The dictionaries store initiatives as parallel arrays and the component
-   * joins them to destinations by index. If someone adds an initiative to the
-   * translations without extending initiativeOrder, the wrong card would get
-   * the wrong link — or a link would silently vanish.
-   */
-  it('stays aligned with the translated initiative lists', () => {
-    for (const lang of langs) {
-      expect(dictionaries[lang].initiatives.items).toHaveLength(initiativeOrder.length)
-    }
-  })
-
-  it('only references keys that exist in initiativeLinks', () => {
-    for (const key of initiativeOrder) {
-      expect(Object.hasOwn(initiativeLinks, key)).toBe(true)
-    }
-  })
-
-  it('gives the podcast, cases and MOOC real destinations with translated CTAs', () => {
-    for (const key of ['podcast', 'casos', 'mooc'] as const) {
-      const link = initiativeLinks[key]
-      expect(link, `${key} should have a destination`).toBeDefined()
-      expect(link!.url.startsWith('https://')).toBe(true)
-      for (const lang of langs) expect(link!.cta[lang]).toBeTruthy()
-    }
-  })
-
-  it('points the podcast at Spotify and the cases at YouTube', () => {
-    expect(initiativeLinks.podcast!.url).toContain('open.spotify.com')
-    expect(initiativeLinks.casos!.url).toContain('youtube.com')
-    expect(initiativeLinks.mooc!.url).toContain('edx.org')
-  })
-})

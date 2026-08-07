@@ -1,3 +1,5 @@
+import type { Initiative } from '../data/initiatives'
+import type { BibliographyEntry } from '../data/bibliography'
 import type {
   ConferenceData,
   Institution,
@@ -16,6 +18,9 @@ import type {
  */
 export interface RelifDataSource {
   getInstitutions(): Promise<Institution[]>
+  /** Editable content: Firestore when populated, the bundled seed otherwise. */
+  getInitiatives(): Promise<Initiative[]>
+  getBibliography(): Promise<BibliographyEntry[]>
   getMembers(): Promise<Member[]>
   getResources(): Promise<Resource[]>
   getConference(): Promise<ConferenceData>

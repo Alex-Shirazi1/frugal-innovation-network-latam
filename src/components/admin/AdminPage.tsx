@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { adminApi, type AdminSession } from '../../api/adminApi'
+import { InitiativesEditor } from './InitiativesEditor'
+import { BibliographyEditor } from './BibliographyEditor'
 import type { PendingMember } from '../../api/types'
 import {
   generalAreas,
@@ -217,7 +219,21 @@ function PendingCard({
   )
 }
 
+/**
+ * The panel's three jobs. Membership was the original one; the other two are
+ * the sections Allan asked to maintain himself, and they only exist on the
+ * Firestore backend — the Express prototype has no write path for content.
+ */
+const TABS = [
+  { id: 'solicitudes', label: 'Solicitudes' },
+  { id: 'iniciativas', label: 'Iniciativas' },
+  { id: 'bibliografia', label: 'Bibliografía' },
+] as const
+
+type TabId = (typeof TABS)[number]['id']
+
 export function AdminPage() {
+  const [tab, setTab] = useState<TabId>('solicitudes')
   const [session, setSession] = useState<AdminSession | null>(null)
   const [restoring, setRestoring] = useState(true)
   const [pending, setPending] = useState<PendingMember[] | null>(null)
@@ -295,7 +311,7 @@ export function AdminPage() {
               RELIF · Administración
             </p>
             <h1 className="mt-1 font-display text-3xl font-semibold text-carbon">
-              Solicitudes de membresía
+              Administración del sitio
             </h1>
             <p className="mt-1 text-xs text-pizarra">{session.label}</p>
           </div>
@@ -319,7 +335,45 @@ export function AdminPage() {
           </div>
         </div>
 
-        {error ? (
+        <div className="mt-6 flex flex-wrap gap-1.5" role="tablist" aria-label="Secciones">
+          {TABS.map((entry) => (
+            <button
+              key={entry.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === entry.id}
+              onClick={() => setTab(entry.id)}
+              className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
+                tab === entry.id
+                  ? 'bg-carbon text-blanco'
+                  : 'border border-carbon/15 text-pizarra hover:border-carbon/35'
+              }`}
+            >
+              {entry.label}
+            </button>
+          ))}
+        </div>
+
+        {tab !== 'solicitudes' && session.backend !== 'firestore' ? (
+          <p className="mt-8 rounded-2xl border border-dashed border-carbon/25 p-6 text-sm text-pizarra">
+            La edición de contenido requiere el backend de Firebase. Este panel está conectado al
+            servidor local de desarrollo, que sólo administra solicitudes.
+          </p>
+        ) : null}
+
+        {tab === 'iniciativas' && session.backend === 'firestore' ? (
+          <div className="mt-8">
+            <InitiativesEditor />
+          </div>
+        ) : null}
+
+        {tab === 'bibliografia' && session.backend === 'firestore' ? (
+          <div className="mt-8">
+            <BibliographyEditor />
+          </div>
+        ) : null}
+
+        {error && tab === 'solicitudes' ? (
           <p
             role="alert"
             className="mt-6 rounded-xl border border-naranja/40 bg-naranja/10 p-4 text-sm text-carbon"
@@ -328,17 +382,17 @@ export function AdminPage() {
           </p>
         ) : null}
 
-        {pending === null && !error ? (
+        {tab === 'solicitudes' && pending === null && !error ? (
           <p className="mt-10 text-sm text-pizarra">Cargando solicitudes…</p>
         ) : null}
 
-        {pending !== null && pending.length === 0 ? (
+        {tab === 'solicitudes' && pending !== null && pending.length === 0 ? (
           <p className="mt-10 rounded-2xl border border-dashed border-carbon/20 p-10 text-center text-sm text-pizarra">
             No hay solicitudes pendientes.
           </p>
         ) : null}
 
-        {pending !== null && pending.length > 0 ? (
+        {tab === 'solicitudes' && pending !== null && pending.length > 0 ? (
           <>
             <p className="mt-6 text-sm text-pizarra" role="status">
               {pending.length} solicitud{pending.length === 1 ? '' : 'es'} pendiente

@@ -10,6 +10,8 @@
 import { mockMembers } from '../../data/members'
 import { institutions } from '../../data/institutions'
 import { resources } from '../../data/resources'
+import { initiatives } from '../../data/initiatives'
+import { bibliography } from '../../data/bibliography'
 import { annualMeetingVideos, speakers } from '../../data/conference'
 import {
   countries,
@@ -43,6 +45,8 @@ export async function processIntakeLocally(submission: IntakeSubmission): Promis
 
 export const bundledDataSource: RelifDataSource = {
   getInstitutions: async () => institutions,
+  getInitiatives: async () => initiatives,
+  getBibliography: async () => bibliography,
   getMembers: async () => mockMembers,
   getResources: async () => resources,
   getConference: async () => ({ speakers, annualMeetingVideos }),

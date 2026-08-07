@@ -18,6 +18,9 @@ import { readFirebaseConfig, getAuthClient, getDb } from '../lib/firebase'
 import { resolveDataSourceKind } from './index'
 import { avatarHueFor, positionTitles } from '../domain/intake'
 import type { ApiResponse, Member, PendingMember, PositionType } from './types'
+import type { Initiative } from '../data/initiatives'
+import type { BibliographyEntry } from '../data/bibliography'
+import { bundledDataSource } from './adapters/bundled'
 
 export type AdminBackend = 'firestore' | 'http'
 
@@ -236,6 +239,96 @@ const httpAdmin = {
       sessionStorage.getItem(KEY_STORAGE) ?? '',
       { method: 'POST' },
     )
+  },
+}
+
+
+/* --------------------------------------------------- Editable site content */
+
+/**
+ * Iniciativas and the bibliography, the two sections Allan asked to be able to
+ * maintain himself.
+ *
+ * Firestore only — there is no Express equivalent, deliberately. The instructor
+ * requires Firebase as the backend, `firestore.rules` is what actually enforces
+ * moderator-only writes, and a second write path through the prototype server
+ * would be a second thing to secure for no benefit. Reads still work on every
+ * adapter, so the public site is unaffected by which backend is configured.
+ */
+export const contentAdmin = {
+  /**
+   * How many documents the collection actually holds.
+   *
+   * The public read path falls back to the bundled seed when a collection is
+   * empty, so the site showing six cards does not mean six documents exist.
+   * The editor has to tell those apart: saving an edit to a seed card would
+   * make the collection non-empty and instantly hide the five cards that were
+   * never imported. Import is therefore a deliberate first step, and this is
+   * how the panel knows whether it has happened.
+   */
+  async count(kind: 'initiatives' | 'bibliography'): Promise<number> {
+    const db = await getDb(requireConfig())
+    const { collection, getCountFromServer } = await import('firebase/firestore')
+    const snapshot = await getCountFromServer(collection(db, kind))
+    return snapshot.data().count
+  },
+
+  async saveInitiative(initiative: Initiative): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { doc, setDoc } = await import('firebase/firestore')
+    const { id, ...fields } = initiative
+    await setDoc(doc(db, 'initiatives', id), fields)
+  },
+
+  async deleteInitiative(id: string): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { deleteDoc, doc } = await import('firebase/firestore')
+    await deleteDoc(doc(db, 'initiatives', id))
+  },
+
+  async saveBibliographyEntry(entry: BibliographyEntry): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { doc, setDoc } = await import('firebase/firestore')
+    const { id, ...fields } = entry
+    await setDoc(doc(db, 'bibliography', id), fields)
+  },
+
+  async deleteBibliographyEntry(id: string): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { deleteDoc, doc } = await import('firebase/firestore')
+    await deleteDoc(doc(db, 'bibliography', id))
+  },
+
+  /**
+   * Copies the bundled seed into Firestore so there is something to edit.
+   *
+   * Until this runs, both collections are empty and the site renders the seed —
+   * which means the admin panel would otherwise show cards that exist on the
+   * page but not in the database, and "edit" would have nothing to edit. Import
+   * is explicit rather than automatic: a silent first-write on page load would
+   * be a surprising thing for opening a dashboard to do.
+   */
+  async importSeed(kind: 'initiatives' | 'bibliography'): Promise<number> {
+    const db = await getDb(requireConfig())
+    const { collection, doc, getDocs, writeBatch } = await import('firebase/firestore')
+    const existing = await getDocs(collection(db, kind))
+    if (!existing.empty) throw new Error('already-populated')
+
+    const records: Array<Record<string, unknown> & { id: string }> =
+      kind === 'initiatives'
+        ? (await bundledDataSource.getInitiatives()).map((i) => ({ ...i }))
+        : (await bundledDataSource.getBibliography()).map((b) => ({ ...b }))
+
+    // Batched so a half-imported collection cannot exist: it either all lands
+    // or none of it does, and a partial import would look like deliberate
+    // curation to whoever opened the panel next.
+    const batch = writeBatch(db)
+    for (const record of records) {
+      const { id, ...fields } = record
+      batch.set(doc(db, kind, id), fields)
+    }
+    await batch.commit()
+    return records.length
   },
 }
 

@@ -47,6 +47,8 @@ export function createHttpDataSource(
 
   return {
     getInstitutions: () => get('/institutions'),
+    getInitiatives: () => get('/initiatives'),
+    getBibliography: () => get('/bibliography'),
     getMembers: () => get('/members'),
     getResources: () => get('/resources'),
     getConference: () => get('/conference'),

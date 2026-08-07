@@ -124,6 +124,54 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // ---- Editable site content -------------------------------------------
+    // Iniciativas and the bibliography: shown to everyone, written only by a
+    // moderator. Shape is validated even for admins — a typo in the dashboard
+    // should not be able to write a document the renderer cannot read.
+
+    function editableText(value) {
+      return value is map
+        && value.keys().hasOnly(['es', 'en', 'pt'])
+        && requiredText(value.es, 300)
+        && (!('en' in value.keys()) || textWithin(value.en, 300))
+        && (!('pt' in value.keys()) || textWithin(value.pt, 300));
+    }
+
+    function validInitiative(data) {
+      return data.keys().hasOnly(['order', 'title', 'text', 'url', 'cta'])
+        && data.keys().hasAll(['order', 'title', 'text'])
+        && data.order is int
+        && editableText(data.title)
+        && editableText(data.text)
+        && (!('url' in data.keys()) || data.url == null
+            || (textWithin(data.url, 500) && data.url.matches('https?://.*')))
+        && (!('cta' in data.keys()) || data.cta == null || editableText(data.cta));
+    }
+
+    function validBibliographyEntry(data) {
+      return data.keys().hasOnly(['paperNumber', 'title', 'authors', 'year', 'language', 'file', 'sizeKb'])
+        && data.keys().hasAll(['paperNumber', 'title', 'authors', 'language', 'file'])
+        && requiredText(data.paperNumber, 20)
+        && requiredText(data.title, 500)
+        && textWithin(data.authors, 500)
+        && (data.year == null || data.year is int)
+        && data.language in ['EN', 'ES']
+        && requiredText(data.file, 500)
+        && (!('sizeKb' in data.keys()) || data.sizeKb is number);
+    }
+
+    match /initiatives/{initiativeId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validInitiative(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /bibliography/{entryId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validBibliographyEntry(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
     // Anything not matched above is denied.
     match /{document=**} {
       allow read, write: if false;

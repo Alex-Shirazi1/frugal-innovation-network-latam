@@ -8,9 +8,16 @@
  * rather than at runtime. That also keeps document reads near zero, which
  * matters on the free tier.
  *
- * Two collections, mirroring the Express prototype:
- *   submissions/  write-only for the public, readable only by a moderator
- *   members/      world-readable, contains approved records only
+ * Collections:
+ *   submissions/   write-only for the public, readable only by a moderator
+ *   members/       world-readable, contains approved records only
+ *   initiatives/   world-readable, moderator-writable — the Iniciativas cards
+ *   bibliography/  world-readable, moderator-writable — the reading list
+ *
+ * The last two are content the network edits at runtime, which is why they are
+ * here rather than in the repo like the rest of the site copy. Both fall back
+ * to the bundled seed when their collection is empty, so an unpopulated project
+ * renders the same site it always did rather than two blank sections.
  *
  * Approval copies a document across (see adminApi). Reads and writes from the
  * browser stay on this path — firestore.rules is the security boundary.
@@ -26,9 +33,13 @@ import { getDb, type FirebaseConfig } from '../../lib/firebase'
 import { bundledDataSource } from './bundled'
 import type { RelifDataSource } from '../dataSource'
 import type { IntakeResult, IntakeSubmission, Member } from '../types'
+import type { Initiative } from '../../data/initiatives'
+import type { BibliographyEntry } from '../../data/bibliography'
 
 export const SUBMISSIONS = 'submissions'
 export const MEMBERS = 'members'
+export const INITIATIVES = 'initiatives'
+export const BIBLIOGRAPHY = 'bibliography'
 
 /** Only these keys may reach Firestore; the rules reject anything else. */
 function toSubmissionDocument(submission: IntakeSubmission, createdAt: string) {
@@ -61,6 +72,30 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
     getResources: bundledDataSource.getResources,
     getConference: bundledDataSource.getConference,
     getOnboardingOptions: bundledDataSource.getOnboardingOptions,
+
+    /**
+     * Empty collection means "not populated yet", not "the network deleted
+     * everything" — Firestore cannot distinguish those, and defaulting to the
+     * seed is the recoverable direction to be wrong in. Deleting every card
+     * from the admin panel restores the seed rather than blanking the section;
+     * that is a deliberate trade, documented here because it will surprise
+     * someone eventually.
+     */
+    async getInitiatives(): Promise<Initiative[]> {
+      const db = await getDb(config)
+      const { collection, getDocs, orderBy, query } = await import('firebase/firestore')
+      const snapshot = await getDocs(query(collection(db, INITIATIVES), orderBy('order')))
+      if (snapshot.empty) return bundledDataSource.getInitiatives()
+      return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Initiative, 'id'>), id: d.id }))
+    },
+
+    async getBibliography(): Promise<BibliographyEntry[]> {
+      const db = await getDb(config)
+      const { collection, getDocs, orderBy, query } = await import('firebase/firestore')
+      const snapshot = await getDocs(query(collection(db, BIBLIOGRAPHY), orderBy('paperNumber')))
+      if (snapshot.empty) return bundledDataSource.getBibliography()
+      return snapshot.docs.map((d) => ({ ...(d.data() as Omit<BibliographyEntry, 'id'>), id: d.id }))
+    },
 
     async getMembers(): Promise<Member[]> {
       const db = await getDb(config)

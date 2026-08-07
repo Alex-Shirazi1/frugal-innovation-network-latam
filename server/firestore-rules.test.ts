@@ -198,6 +198,95 @@ describe.skipIf(!available)('firestore.rules', () => {
     })
   })
 
+  describe('editable site content', () => {
+    const initiative = (overrides: Record<string, unknown> = {}) => {
+      const payload: Record<string, unknown> = {
+        order: 0,
+        title: { es: 'Encuentros anuales', en: 'Annual gatherings' },
+        text: { es: 'Congresos y encuentros de la comunidad frugal.' },
+        url: 'https://example.org/encuentros',
+        cta: { es: 'Ver más' },
+        ...overrides,
+      }
+      for (const [key, value] of Object.entries(payload)) {
+        if (value === undefined) delete payload[key]
+      }
+      return payload
+    }
+
+    const entry = (overrides: Record<string, unknown> = {}) => {
+      const payload: Record<string, unknown> = {
+        paperNumber: '001',
+        title: 'Frugal innovation in practice',
+        authors: 'Prabhu, J.',
+        year: 2020,
+        language: 'EN',
+        file: '/docs/biblio/001.pdf',
+        sizeKb: 420,
+        ...overrides,
+      }
+      for (const [key, value] of Object.entries(payload)) {
+        if (value === undefined) delete payload[key]
+      }
+      return payload
+    }
+
+    it('is readable by anyone — it is site content, not personal data', async () => {
+      await assertSucceeds(getDoc(doc(anon(), 'initiatives/encuentros')))
+      await assertSucceeds(getDoc(doc(anon(), 'bibliography/biblio-001')))
+    })
+
+    it('cannot be written by the public or by a plain signed-in user', async () => {
+      await assertFails(setDoc(doc(anon(), 'initiatives/x'), initiative()))
+      await assertFails(setDoc(doc(signedIn(), 'initiatives/x'), initiative()))
+      await assertFails(setDoc(doc(anon(), 'bibliography/x'), entry()))
+      await assertFails(setDoc(doc(signedIn(), 'bibliography/x'), entry()))
+      await assertFails(deleteDoc(doc(signedIn(), 'initiatives/x')))
+    })
+
+    it('can be created, edited and deleted by a moderator', async () => {
+      await assertSucceeds(setDoc(doc(admin(), 'initiatives/x'), initiative()))
+      await assertSucceeds(setDoc(doc(admin(), 'initiatives/x'), initiative({ order: 3 })))
+      await assertSucceeds(deleteDoc(doc(admin(), 'initiatives/x')))
+      await assertSucceeds(setDoc(doc(admin(), 'bibliography/x'), entry()))
+      await assertSucceeds(deleteDoc(doc(admin(), 'bibliography/x')))
+    })
+
+    /**
+     * Shape is validated even for admins. A typo in the dashboard should not be
+     * able to store a document the public renderer cannot read — the section
+     * would break for every visitor, and the rules are the last place that can
+     * still say no.
+     */
+    it.each([
+      ['no Spanish title', { title: { en: 'English only' } }],
+      ['blank Spanish title', { title: { es: '' } }],
+      ['title that is not a map', { title: 'Encuentros' }],
+      ['unexpected language key', { title: { es: 'Hola', fr: 'Bonjour' } }],
+      ['missing description', { text: undefined }],
+      ['non-integer order', { order: 1.5 }],
+      ['javascript: url', { url: 'javascript:alert(1)' }],
+      ['unknown field', { rogue: true }],
+    ])('rejects an initiative with %s, even from a moderator', async (_label, patch) => {
+      await assertFails(setDoc(doc(admin(), 'initiatives/x'), initiative(patch)))
+    })
+
+    it.each([
+      ['no title', { title: '' }],
+      ['no paper number', { paperNumber: undefined }],
+      ['no file', { file: undefined }],
+      ['an unsupported language', { language: 'FR' }],
+      ['a non-numeric year', { year: 'dos mil veinte' }],
+      ['an unknown field', { rogue: true }],
+    ])('rejects a bibliography entry with %s, even from a moderator', async (_label, patch) => {
+      await assertFails(setDoc(doc(admin(), 'bibliography/x'), entry(patch)))
+    })
+
+    it('accepts an entry with no year, since some documents do not state one', async () => {
+      await assertSucceeds(setDoc(doc(admin(), 'bibliography/x'), entry({ year: null })))
+    })
+  })
+
   describe('everything else', () => {
     it('denies access to undeclared collections', async () => {
       await assertFails(setDoc(doc(anon(), 'secrets/x'), { a: 1 }))

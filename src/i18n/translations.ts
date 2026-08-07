@@ -78,14 +78,6 @@ export const es = {
   initiatives: {
     kicker: 'Qué hacemos',
     title: 'Iniciativas',
-    items: [
-      { title: 'Encuentros anuales', text: 'Congresos y encuentros que reúnen a la comunidad frugal de la región.' },
-      { title: 'Podcast Onda Frugal', text: 'Conversaciones con innovadoras e innovadores frugales de América Latina.' },
-      { title: 'Casos de innovación', text: 'Documentación de casos reales de innovación frugal en la región.' },
-      { title: 'MOOC en edX', text: 'Curso en línea: cómo innovar con escasos recursos.' },
-      { title: 'Investigación', text: 'Proyectos académicos que estudian la frugalidad desde múltiples disciplinas.' },
-      { title: 'Diseño de herramientas', text: 'Metodologías y marcos de trabajo abiertos, como el Marco RELIF.' },
-    ],
   },
   map: {
     kicker: 'La red en el territorio',
@@ -374,14 +366,6 @@ export const en: Dictionary = {
   initiatives: {
     kicker: 'What we do',
     title: 'Initiatives',
-    items: [
-      { title: 'Annual gatherings', text: 'Conferences and meetings that bring together the region’s frugal community.' },
-      { title: 'Onda Frugal podcast', text: 'Conversations with frugal innovators from across Latin America.' },
-      { title: 'Innovation cases', text: 'Documentation of real frugal innovation cases in the region.' },
-      { title: 'MOOC on edX', text: 'Online course: how to innovate with scarce resources.' },
-      { title: 'Research', text: 'Academic projects studying frugality across multiple disciplines.' },
-      { title: 'Tool design', text: 'Open methodologies and frameworks, such as the RELIF Framework.' },
-    ],
   },
   map: {
     kicker: 'The network on the ground',
@@ -662,14 +646,6 @@ export const pt: Dictionary = {
   initiatives: {
     kicker: 'O que fazemos',
     title: 'Iniciativas',
-    items: [
-      { title: 'Encontros anuais', text: 'Congressos e encontros que reúnem a comunidade frugal da região.' },
-      { title: 'Podcast Onda Frugal', text: 'Conversas com inovadoras e inovadores frugais da América Latina.' },
-      { title: 'Casos de inovação', text: 'Documentação de casos reais de inovação frugal na região.' },
-      { title: 'MOOC no edX', text: 'Curso on-line: como inovar com poucos recursos.' },
-      { title: 'Pesquisa', text: 'Projetos acadêmicos que estudam a frugalidade a partir de múltiplas disciplinas.' },
-      { title: 'Design de ferramentas', text: 'Metodologias e marcos de trabalho abertos, como o Marco RELIF.' },
-    ],
   },
   map: {
     kicker: 'A rede no território',

@@ -20,6 +20,8 @@ import type {
   Resource,
 } from './types'
 import { mockMembers } from '../data/members'
+import { initiatives as bundledInitiatives, type Initiative } from '../data/initiatives'
+import { bibliography as bundledBibliography, type BibliographyEntry } from '../data/bibliography'
 import { institutions as bundledInstitutions } from '../data/institutions'
 import { resources as bundledResources } from '../data/resources'
 import { annualMeetingVideos, speakers } from '../data/conference'
@@ -37,6 +39,8 @@ interface ApiDataValue {
   mappedInstitutions: Array<Institution & { coords: [number, number] }>
   memberCountries: string[]
   members: Member[]
+  initiatives: Initiative[]
+  bibliography: BibliographyEntry[]
   resources: Resource[]
   conference: ConferenceData
   options: OnboardingOptions
@@ -75,6 +79,8 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
   const dataSource = dataSourceRef.current
   const [institutions, setInstitutions] = useState<Institution[]>(bundledInstitutions)
   const [members, setMembers] = useState<Member[]>(mockMembers)
+  const [initiatives, setInitiatives] = useState<Initiative[]>(bundledInitiatives)
+  const [bibliography, setBibliography] = useState<BibliographyEntry[]>(bundledBibliography)
   const [resources, setResources] = useState<Resource[]>(bundledResources)
   const [conference, setConference] = useState<ConferenceData>({ speakers, annualMeetingVideos })
   const [options, setOptions] = useState<OnboardingOptions>({
@@ -104,6 +110,8 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
 
       void Promise.allSettled([
         hydrate(source.getInstitutions(), setInstitutions),
+        hydrate(source.getInitiatives(), setInitiatives),
+        hydrate(source.getBibliography(), setBibliography),
         hydrate(source.getMembers(), setMembers),
         hydrate(source.getResources(), setResources),
         hydrate(source.getConference(), setConference),
@@ -125,6 +133,8 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
       mappedInstitutions,
       memberCountries: [...new Set(institutions.map((i) => i.country))],
       members,
+      initiatives,
+      bibliography,
       resources,
       conference,
       options,
@@ -162,7 +172,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
         return institutions.find((i) => i.id === affiliationId)?.name ?? null
       },
     }
-  }, [dataSource, institutions, members, resources, conference, options])
+  }, [dataSource, institutions, members, initiatives, bibliography, resources, conference, options])
 
   return <ApiDataContext.Provider value={value}>{children}</ApiDataContext.Provider>
 }

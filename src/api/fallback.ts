@@ -20,6 +20,8 @@ export function createFallbackDataSource(
 
   return {
     getInstitutions: () => withFallback('getInstitutions', (s) => s.getInstitutions()),
+    getInitiatives: () => withFallback('getInitiatives', (s) => s.getInitiatives()),
+    getBibliography: () => withFallback('getBibliography', (s) => s.getBibliography()),
     getMembers: () => withFallback('getMembers', (s) => s.getMembers()),
     getResources: () => withFallback('getResources', (s) => s.getResources()),
     getConference: () => withFallback('getConference', (s) => s.getConference()),
