@@ -23,9 +23,10 @@ const PORT = 8080
 
 /** A payload that satisfies every generated rule. */
 function validSubmission(overrides: Record<string, unknown> = {}) {
-  return {
+  const payload: Record<string, unknown> = {
     firstName: 'Ada',
     lastName: 'Lovelace',
+    email: 'ada.lovelace@example.org',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
     biography: 'Trabaja en innovación frugal aplicada a salud comunitaria.',
@@ -41,6 +42,16 @@ function validSubmission(overrides: Record<string, unknown> = {}) {
     createdAt: '2026-07-28T00:00:00.000Z',
     ...overrides,
   }
+  /*
+   * An override of `undefined` means "omit this field", not "send undefined".
+   * The Firestore SDK throws on undefined values, so leaving them in would make
+   * an assertFails pass because the client rejected the write — never reaching
+   * the rules, which is the thing under test.
+   */
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === undefined) delete payload[key]
+  }
+  return payload
 }
 
 let testEnv: RulesTestEnvironment | undefined
@@ -109,6 +120,15 @@ describe.skipIf(!available)('firestore.rules', () => {
       ['javascript: social url', { socialUrl: 'javascript:alert(1)' }],
       ['non-list interests', { interestIds: 'salud' }],
       ['numeric first name', { firstName: 42 }],
+      // The rules are the only email check a client cannot skip, so they carry
+      // the same weight here as the taxonomy whitelists above.
+      ['missing email', { email: undefined }],
+      ['blank email', { email: '' }],
+      ['email with no at sign', { email: 'ada.example.org' }],
+      ['email with no domain dot', { email: 'ada@example' }],
+      ['email with a space', { email: 'ada lovelace@example.org' }],
+      ['numeric email', { email: 42 }],
+      ['overlong email', { email: `${'a'.repeat(250)}@example.org` }],
     ])('rejects %s', async (_label, patch) => {
       await assertFails(addDoc(collection(anon(), 'submissions'), validSubmission(patch)))
     })
