@@ -134,6 +134,16 @@ function PendingCard({
           {entry.jobPositionName ? (
             <p className="text-xs font-medium text-carbon">{entry.jobPositionName}</p>
           ) : null}
+          {/* The queue's whole purpose is to start a conversation, so the
+              address is a link rather than text to copy out by hand. */}
+          {entry.email ? (
+            <a
+              href={`mailto:${entry.email}`}
+              className="mt-1 block text-xs font-medium text-teal hover:underline"
+            >
+              {entry.email}
+            </a>
+          ) : null}
           <p className="mt-1 text-xs text-pizarra">
             {institutionLabel(entry.affiliationId)} · {placeLabel(entry.region, 'es')},{' '}
             {placeLabel(entry.country, 'es')}

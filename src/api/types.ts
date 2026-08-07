@@ -64,7 +64,14 @@ export interface IntakeResult {
 }
 
 /** A pending submission as seen by a moderator. */
+/**
+ * A submission awaiting moderation. Carries `email` on top of `Member` because
+ * the queue is where the network picks up the thread — and because `Member`
+ * itself must never hold an address: that type is what the world-readable
+ * directory renders.
+ */
 export interface PendingMember extends Member {
+  email: string
   status: 'pending' | 'approved'
   createdAt: string
 }

@@ -177,6 +177,9 @@ export const es = {
     firstNamePlaceholder: 'Ej. María Fernanda',
     lastName: 'Apellido(s)',
     lastNamePlaceholder: 'Ej. López Hernández',
+    email: 'Correo electrónico',
+    emailPlaceholder: 'Ej. maria.lopez@universidad.edu',
+    emailHint: 'Aquí te escribiremos para continuar el proceso. No se publica en el directorio.',
     position: 'Tipo de posición',
     positions: {
       staff: 'Personal administrativo',
@@ -218,6 +221,7 @@ export const es = {
     retry: 'Intentar de nuevo',
     errors: {
       required: 'Este campo es obligatorio',
+      invalidEmail: 'Escribe un correo electrónico válido',
       url: 'Ingresa una URL válida (https://…)',
       interests: 'Selecciona al menos un interés',
       areas: 'Selecciona al menos un área general',
@@ -469,6 +473,9 @@ export const en: Dictionary = {
     firstNamePlaceholder: 'e.g. María Fernanda',
     lastName: 'Last name',
     lastNamePlaceholder: 'e.g. López Hernández',
+    email: 'Email address',
+    emailPlaceholder: 'e.g. maria.lopez@university.edu',
+    emailHint: 'This is where we will write to continue the process. It is not published in the directory.',
     position: 'Type of position',
     positions: {
       staff: 'Staff',
@@ -510,6 +517,7 @@ export const en: Dictionary = {
     retry: 'Try again',
     errors: {
       required: 'This field is required',
+      invalidEmail: 'Enter a valid email address',
       url: 'Enter a valid URL (https://…)',
       interests: 'Select at least one interest',
       areas: 'Select at least one general area',
@@ -753,6 +761,9 @@ export const pt: Dictionary = {
     firstNamePlaceholder: 'Ex. María Fernanda',
     lastName: 'Sobrenome(s)',
     lastNamePlaceholder: 'Ex. López Hernández',
+    email: 'E-mail',
+    emailPlaceholder: 'Ex. maria.lopez@universidade.edu',
+    emailHint: 'É para aqui que escreveremos para continuar o processo. Não é publicado no diretório.',
     position: 'Tipo de posição',
     positions: {
       staff: 'Equipe administrativa',
@@ -794,6 +805,7 @@ export const pt: Dictionary = {
     retry: 'Tentar novamente',
     errors: {
       required: 'Este campo é obrigatório',
+      invalidEmail: 'Digite um e-mail válido',
       url: 'Insira uma URL válida (https://…)',
       interests: 'Selecione pelo menos um interesse',
       areas: 'Selecione pelo menos uma área geral',

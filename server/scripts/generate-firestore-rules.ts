@@ -40,6 +40,7 @@ const regionMap = (): string => {
 const CLIENT_FIELDS = [
   'firstName',
   'lastName',
+  'email',
   'position',
   'jobPositionName',
   'biography',
@@ -58,6 +59,7 @@ const CLIENT_FIELDS = [
 const REQUIRED_FIELDS = [
   'firstName',
   'lastName',
+  'email',
   'position',
   'country',
   'region',
@@ -137,6 +139,11 @@ service cloud.firestore {
         && data.keys().hasAll(${list(REQUIRED_FIELDS)})
         && requiredText(data.firstName, ${fieldLimits.firstName})
         && requiredText(data.lastName, ${fieldLimits.lastName})
+        // Enforced here as well as in the validator: rules are the only check a
+        // client cannot skip, and an application with no reply address is
+        // useless to the network.
+        && requiredText(data.email, ${fieldLimits.email})
+        && data.email.matches('^[^\\\\s@]+@[^\\\\s@]+[.][^\\\\s@]+$')
         && positionTypes().hasAny([data.position])
         && textWithin(data.jobPositionName, ${fieldLimits.jobPositionName})
         && textWithin(data.biography, ${fieldLimits.biography})

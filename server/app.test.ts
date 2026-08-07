@@ -10,6 +10,7 @@ const ADMIN = { 'x-admin-key': 'test-admin-key' }
 const validIntake: IntakeSubmission = {
   firstName: 'Ana',
   lastName: 'Prueba García',
+  email: 'ana.prueba@example.org',
   position: 'researcher',
   jobPositionName: 'Investigadora Asociada',
   biography: 'Trabaja en salud comunitaria y energía asequible.',
@@ -190,6 +191,39 @@ describe('admin approval queue', () => {
 
     const queue = await request(app).get('/api/admin/pending').set(ADMIN)
     expect(queue.body.data).toHaveLength(0)
+  })
+
+  /**
+   * `/api/members` is the public directory. An applicant consents to their
+   * name, affiliation and interests being published — not to their address
+   * being on the open web, which is a different promise entirely.
+   */
+  it('never exposes an applicant email on the public directory', async () => {
+    const created = await request(app).post('/api/members/intake').send(validIntake)
+    await request(app).post(`/api/admin/members/${created.body.data.id}/approve`).set(ADMIN)
+
+    const members = await request(app).get('/api/members')
+    const published = members.body.data.find(
+      (m: { fullName: string }) => m.fullName === 'Ana Prueba García',
+    )
+    expect(published).toBeDefined()
+    expect(published).not.toHaveProperty('email')
+    // Belt and braces: the address must not appear anywhere in the payload,
+    // including on a field nobody thought to check.
+    expect(JSON.stringify(members.body.data)).not.toContain('ana.prueba@example.org')
+  })
+
+  it('does show the email on the moderation queue, which is admin-only', async () => {
+    await request(app).post('/api/members/intake').send(validIntake)
+    const queue = await request(app).get('/api/admin/pending').set(ADMIN)
+    expect(queue.body.data[0].email).toBe('ana.prueba@example.org')
+  })
+
+  it('rejects a submission with no reply address', async () => {
+    const { email: _dropped, ...withoutEmail } = validIntake
+    const response = await request(app).post('/api/members/intake').send(withoutEmail)
+    expect(response.status).toBe(400)
+    expect(response.body.error).toBe('missing-required')
   })
 
   it('reject removes the submission entirely', async () => {

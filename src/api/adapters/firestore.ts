@@ -35,6 +35,9 @@ function toSubmissionDocument(submission: IntakeSubmission, createdAt: string) {
   return {
     firstName: submission.firstName.trim(),
     lastName: submission.lastName.trim(),
+    // Lives on the submission only. `submissions` is admin-readable; `members`,
+    // which is world-readable, never receives this field.
+    email: submission.email.trim().toLowerCase(),
     position: submission.position,
     jobPositionName: submission.jobPositionName.trim(),
     biography: submission.biography.trim(),

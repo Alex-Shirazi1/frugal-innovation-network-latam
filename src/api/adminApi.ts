@@ -36,6 +36,8 @@ export interface AdminSession {
 interface SubmissionDocument {
   firstName: string
   lastName: string
+  /** Contact address for the network. Never published — see toPublishedMember. */
+  email: string
   position: PositionType
   jobPositionName: string
   biography: string
@@ -55,6 +57,11 @@ interface SubmissionDocument {
  * Builds the published record from a submission. Display fields are derived
  * here, never taken from the submitter — the same rule the intake validator
  * applies, so an approved record cannot carry a forged identity.
+ *
+ * Written field by field rather than by spreading the submission, which is what
+ * keeps `email` off the public record: `members` is world-readable, so an
+ * applicant's address reaching it would put it on the open web. Adding a field
+ * here is a deliberate act; a spread would have published it by default.
  */
 function toPublishedMember(d: SubmissionDocument): Omit<Member, 'id'> {
   const fullName = `${d.firstName} ${d.lastName}`
@@ -139,6 +146,9 @@ const firestoreAdmin = {
       return {
         ...toPublishedMember(data),
         id: docSnap.id,
+        // Added back on top of the published shape, not carried through it: the
+        // queue needs a reply address, the directory must never have one.
+        email: data.email ?? '',
         status: data.status,
         createdAt: data.createdAt,
       }

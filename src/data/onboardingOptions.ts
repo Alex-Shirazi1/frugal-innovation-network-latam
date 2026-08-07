@@ -217,6 +217,8 @@ export const languageOptions: LanguageOption[] = [
 export const fieldLimits = {
   firstName: 60,
   lastName: 80,
+  /** RFC 5321's maximum for a whole address. */
+  email: 254,
   jobPositionName: 120,
   biography: 800,
   socialUrl: 300,

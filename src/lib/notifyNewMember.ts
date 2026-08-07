@@ -26,6 +26,11 @@
  * stored before this runs and stays visible at /admin whether or not the mail
  * goes out, which is why every failure below is swallowed.
  */
+import {
+  generalAreas,
+  languageOptions,
+  researchInterests,
+} from '../data/onboardingOptions'
 import type { IntakeSubmission } from '../api/types'
 
 /** Fixed: Allan filters his inbox on this exact string. */
@@ -35,6 +40,12 @@ export const NOTIFICATION_SUBJECT = 'Solicitud de nueva membresía'
  *  endpoint, which expects a browser form navigation. */
 const ENDPOINT_BASE = 'https://formsubmit.co/ajax/'
 
+/**
+ * Position labels are spelled out here rather than read from a data file
+ * because `positionTypes` is a bare list of ids — the display strings live in
+ * the i18n bundle, keyed for the UI's chosen language, and this mail is always
+ * Spanish regardless of what language the applicant filled the form in.
+ */
 const POSITION_LABELS: Record<string, string> = {
   staff: 'Personal administrativo',
   faculty: 'Docente',
@@ -49,8 +60,25 @@ function text(value: string | null | undefined): string {
   return value != null && value.trim() !== '' ? value.trim() : NOT_PROVIDED
 }
 
-function list(values: readonly string[] | undefined): string {
-  return values && values.length > 0 ? values.join(', ') : NOT_PROVIDED
+/**
+ * Renders selected ids as the Spanish labels a reader recognises.
+ *
+ * The first version of this mail printed the raw ids — "salud, agua",
+ * "ingenieria", "es" — because it lived in a separate Cloud Functions bundle
+ * that could not import the app's data without dragging the whole module graph
+ * into the deploy. Now that it runs in the browser alongside everything else,
+ * that constraint is gone and there is no reason to make Allan decode ids.
+ *
+ * An id with no matching option falls back to the id rather than vanishing: a
+ * value we cannot label is still information, and silently dropping it would
+ * understate what the applicant selected.
+ */
+function labelled(
+  ids: readonly string[] | undefined,
+  options: readonly { id: string; es: string }[],
+): string {
+  if (!ids || ids.length === 0) return NOT_PROVIDED
+  return ids.map((id) => options.find((option) => option.id === id)?.es ?? id).join(', ')
 }
 
 /**
@@ -65,14 +93,16 @@ export function notificationFields(
 ): Record<string, string> {
   return {
     Nombre: `${submission.firstName} ${submission.lastName}`.trim() || NOT_PROVIDED,
+    // Second row on purpose: replying is the next action after reading the name.
+    Correo: text(submission.email),
     'Tipo de posición': POSITION_LABELS[submission.position] ?? text(submission.position),
     Puesto: text(submission.jobPositionName),
     Afiliación: institutionName ?? 'Independiente',
     País: text(submission.country),
     Región: text(submission.region),
-    Intereses: list(submission.interestIds),
-    'Áreas generales': list(submission.generalAreaIds),
-    Idiomas: list(submission.languages),
+    Intereses: labelled(submission.interestIds, researchInterests),
+    'Áreas generales': labelled(submission.generalAreaIds, generalAreas),
+    Idiomas: labelled(submission.languages, languageOptions),
     'Enlace profesional': text(submission.socialUrl),
     'Consentimiento de publicación': submission.consentToPublish ? 'Sí' : 'No',
     Biografía: text(submission.biography),

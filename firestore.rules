@@ -84,10 +84,15 @@ service cloud.firestore {
     }
 
     function validSubmission(data) {
-      return data.keys().hasOnly(['firstName', 'lastName', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
-        && data.keys().hasAll(['firstName', 'lastName', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
+      return data.keys().hasOnly(['firstName', 'lastName', 'email', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
+        && data.keys().hasAll(['firstName', 'lastName', 'email', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
         && requiredText(data.firstName, 60)
         && requiredText(data.lastName, 80)
+        // Enforced here as well as in the validator: rules are the only check a
+        // client cannot skip, and an application with no reply address is
+        // useless to the network.
+        && requiredText(data.email, 254)
+        && data.email.matches('^[^\\s@]+@[^\\s@]+[.][^\\s@]+$')
         && positionTypes().hasAny([data.position])
         && textWithin(data.jobPositionName, 120)
         && textWithin(data.biography, 800)

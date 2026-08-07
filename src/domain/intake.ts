@@ -27,6 +27,15 @@ import type { Localized } from '../data/conference'
 export interface IntakeSubmission {
   firstName: string
   lastName: string
+  /**
+   * How the network replies. This is the whole point of the form — Allan's
+   * first move on any application is to email the person to arrange a
+   * conversation — so it is required, unlike every other contact field.
+   *
+   * Never published. It rides on the submission and stops there; `Member`, the
+   * shape the world-readable directory renders, has no email field at all.
+   */
+  email: string
   position: PositionType | ''
   jobPositionName: string
   biography: string
@@ -43,6 +52,7 @@ export interface IntakeSubmission {
 
 export type IntakeErrorCode =
   | 'missing-required'
+  | 'invalid-email'
   | 'invalid-location'
   | 'invalid-affiliation'
   | 'missing-interests'
@@ -54,8 +64,20 @@ export type IntakeErrorCode =
   | 'rate-limited'
   | 'network'
 
-/** Fields the server derives. A client can never set these. */
-export type ValidatedIntake = Omit<Member, 'id' | 'avatarHue'> & { avatarHue: number }
+/**
+ * Fields the server derives. A client can never set these.
+ *
+ * `email` is added on top of `Member` rather than being part of it: `Member` is
+ * what the public directory renders and what the world-readable `members`
+ * collection holds, so an email on that type would be an email on the open web.
+ * Carrying it here keeps it available to the moderation queue and the
+ * notification while making its exclusion from the published record structural
+ * rather than something a future edit has to remember.
+ */
+export type ValidatedIntake = Omit<Member, 'id' | 'avatarHue'> & {
+  avatarHue: number
+  email: string
+}
 
 export interface IntakeValidation {
   ok: boolean
@@ -76,6 +98,17 @@ const knownInterestIds = new Set(researchInterests.map((i) => i.id))
 const knownAreaIds = new Set(generalAreas.map((a) => a.id))
 const knownLanguageIds = new Set(languageOptions.map((l) => l.id))
 const knownAffiliationIds = new Set(institutions.map((i) => i.id))
+
+/**
+ * Deliberately permissive: one @, something either side, a dot in the domain,
+ * no whitespace. Stricter patterns reject addresses that are actually valid
+ * (plus-tags, new TLDs, unicode locals) and the only real proof an address
+ * works is mail arriving at it. This exists to catch typos and empty strings,
+ * not to adjudicate RFC 5322.
+ */
+export function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
 
 export function isValidUrl(value: string): boolean {
   try {
@@ -123,6 +156,15 @@ export function validateIntake(body: unknown): IntakeValidation {
     return { ok: false, error: 'too-long' }
   }
 
+  // Checked before the location and taxonomy work below so a submission with no
+  // reply address fails on that, rather than on whichever field happens to be
+  // validated first.
+  const email = asString(raw.email).toLowerCase()
+  if (!email) return { ok: false, error: 'missing-required' }
+  if (email.length > fieldLimits.email || !isValidEmail(email)) {
+    return { ok: false, error: 'invalid-email' }
+  }
+
   // Consent is checked before anything is normalized, so a non-consenting
   // payload never produces a storable record even by accident.
   if (raw.consentToPublish !== true) {
@@ -168,6 +210,7 @@ export function validateIntake(body: unknown): IntakeValidation {
     member: {
       firstName,
       lastName,
+      email,
       fullName,
       title: positionTitles[position as PositionType],
       position: position as PositionType,

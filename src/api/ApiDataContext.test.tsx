@@ -34,6 +34,7 @@ describe('ApiDataProvider / useApiData', () => {
     await result.current.submitIntake({
       firstName: 'Ada',
       lastName: 'Lovelace',
+      email: 'ada@example.org',
       position: 'independent',
       jobPositionName: 'Consultora',
       biography: 'Trabaja en soluciones de bajo costo con comunidades rurales.',

@@ -5,11 +5,13 @@ import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
 import { Select } from '../ui/Select'
 import { fieldLimits } from '../../data/onboardingOptions'
+import { isValidEmail } from '../../domain/intake'
 import type { IntakeSubmission, PositionType, ResearchInterest } from '../../api/types'
 
 type ErrorKey =
   | 'firstName'
   | 'lastName'
+  | 'email'
   | 'position'
   | 'jobPositionName'
   | 'country'
@@ -32,6 +34,7 @@ const LAST_STEP = TOTAL_STEPS - 1
 const emptyForm: IntakeSubmission = {
   firstName: '',
   lastName: '',
+  email: '',
   position: '',
   jobPositionName: '',
   biography: '',
@@ -165,6 +168,12 @@ export function OnboardingForm() {
       if (!form.lastName.trim()) next.lastName = t.onboarding.errors.required
       else if (form.lastName.trim().length > fieldLimits.lastName)
         next.lastName = t.onboarding.errors.tooLong
+      // Required, and the only field the network genuinely cannot proceed
+      // without — every application is answered by email.
+      if (!form.email.trim()) next.email = t.onboarding.errors.required
+      else if (form.email.trim().length > fieldLimits.email)
+        next.email = t.onboarding.errors.tooLong
+      else if (!isValidEmail(form.email.trim())) next.email = t.onboarding.errors.invalidEmail
       if (!form.position) next.position = t.onboarding.errors.required
       if (form.jobPositionName.trim().length > fieldLimits.jobPositionName)
         next.jobPositionName = t.onboarding.errors.tooLong
@@ -207,6 +216,7 @@ export function OnboardingForm() {
         consent: code === 'consent-required' ? t.onboarding.errors.consent : undefined,
         biography: code === 'too-long' ? t.onboarding.errors.tooLong : undefined,
         firstName: code === 'missing-required' ? t.onboarding.errors.required : undefined,
+        email: code === 'invalid-email' ? t.onboarding.errors.invalidEmail : undefined,
       })
       return
     }
@@ -364,6 +374,24 @@ export function OnboardingForm() {
                       placeholder={t.onboarding.lastNamePlaceholder}
                       autoComplete="family-name"
                       maxLength={fieldLimits.lastName}
+                    />
+                  </Field>
+                  <Field
+                    label={t.onboarding.email}
+                    error={errors.email}
+                    hint={t.onboarding.emailHint}
+                  >
+                    <input
+                      className={inputClass}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      required
+                      value={form.email}
+                      onChange={(event) => update('email', event.target.value)}
+                      placeholder={t.onboarding.emailPlaceholder}
+                      aria-invalid={errors.email ? true : undefined}
+                      maxLength={fieldLimits.email}
                     />
                   </Field>
                 </div>

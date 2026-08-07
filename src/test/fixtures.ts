@@ -34,6 +34,7 @@ export function makeSubmission(overrides: Partial<IntakeSubmission> = {}): Intak
   return {
     firstName: 'Ana',
     lastName: 'Prueba García',
+    email: 'ana.prueba@example.org',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
     biography: 'Trabaja en salud comunitaria y energía asequible.',

@@ -40,8 +40,17 @@ describe('notificationFields', () => {
     expect(fields['Tipo de posición']).toBe('Investigador/a')
     expect(fields['Afiliación']).toBe('ITESO')
     expect(fields['País']).toBe('México')
-    expect(fields['Intereses']).toBe('salud, agua')
+    // Labels, not ids: Allan reads this mail, and "salud, agua" made him decode
+    // the taxonomy to work out what someone actually selected.
+    expect(fields['Intereses']).toBe('Salud frugal, Agua y saneamiento')
+    expect(fields['Áreas generales']).toBe('Ingeniería')
+    expect(fields['Idiomas']).toBe('Español, Inglés')
     expect(fields['Consentimiento de publicación']).toBe('Sí')
+  })
+
+  it('carries the reply address, which is the actionable part of the mail', () => {
+    const fields = notificationFields(makeSubmission({ email: 'ada@example.org' }), 'ITESO')
+    expect(fields['Correo']).toBe('ada@example.org')
   })
 
   it('names an unaffiliated applicant as independent rather than blank', () => {
@@ -53,6 +62,11 @@ describe('notificationFields', () => {
     const fields = notificationFields(makeSubmission({ socialUrl: '' }), 'ITESO')
     expect(fields['Enlace profesional']).toBe('—')
     expect(Object.values(fields).join(' ')).not.toContain('undefined')
+  })
+
+  it('falls back to the raw id when an option is unknown, rather than dropping it', () => {
+    const fields = notificationFields(makeSubmission({ interestIds: ['salud', 'no-existe'] }), 'ITESO')
+    expect(fields['Intereses']).toBe('Salud frugal, no-existe')
   })
 
   it('records a withheld publication consent', () => {
