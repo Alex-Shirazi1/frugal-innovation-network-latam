@@ -54,6 +54,11 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          # Web3Forms access key — emails the network on each new-member
+          # submission. Public by design (the destination is bound to the key on
+          # their side), but kept as a secret so a fork does not inherit it and
+          # mail the network's inbox. Unset means no notification is sent.
+          VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
 
       # firestore.rules is generated from src/data/onboardingOptions.ts, so it can
       # only be trusted if it matches that data (checked by the drift test in

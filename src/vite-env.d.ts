@@ -16,6 +16,14 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
 
   /**
+   * Web3Forms access key, used to email the network when someone joins. Public
+   * by design — the destination address is bound to the key on Web3Forms' side,
+   * so it cannot be used to relay mail elsewhere. No key means no notification;
+   * submissions are still stored and still visible at /admin.
+   */
+  readonly VITE_WEB3FORMS_KEY?: string
+
+  /**
    * Firebase web config. API key, project id and app id must all be present for
    * the Firestore adapter to activate; the auth domain is derived from the
    * project id when omitted. These are publishable client identifiers, not

@@ -15,16 +15,16 @@
  * Approval copies a document across (see adminApi). Reads and writes from the
  * browser stay on this path — firestore.rules is the security boundary.
  *
- * One Cloud Function now sits behind it: `notifyNewSubmission` in functions/,
- * which emails the network when a submission lands. That reverses an earlier
- * constraint in this file ("no Cloud Functions anywhere"), which was written
- * when the project had to stay on the free Spark plan. Allan has since
- * confirmed the network can fund hosting, and email cannot be sent from the
- * client without handing it SMTP credentials. The function is capped at three
- * instances so the bill stays bounded.
+ * There are still no Cloud Functions in this design: Functions requires the
+ * Blaze plan and a billing account, and the site has to keep running without
+ * one. The email the network gets on each submission therefore goes out from
+ * the browser through a form-to-email relay — see lib/notifyNewMember.ts for
+ * why that is safe with a public key.
  */
 import { validateIntake } from '../../domain/intake'
 import { getDb, type FirebaseConfig } from '../../lib/firebase'
+import { notifyNewMember } from '../../lib/notifyNewMember'
+import { institutionName } from '../../data/members'
 import { bundledDataSource } from './bundled'
 import type { RelifDataSource } from '../dataSource'
 import type { IntakeResult, IntakeSubmission, Member } from '../types'
@@ -90,6 +90,19 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
         collection(db, SUBMISSIONS),
         toSubmissionDocument(submission, createdAt),
       )
+
+      /*
+       * Notify the network — deliberately after the write, deliberately not
+       * awaited into the result. The application is already safe in Firestore
+       * at this point, so a mail failure must not turn into an error the
+       * submitter sees. `notifyNewMember` never rejects; the catch is belt and
+       * braces for an unexpected synchronous throw.
+       */
+      void notifyNewMember({
+        accessKey: import.meta.env.VITE_WEB3FORMS_KEY ?? '',
+        submission,
+        institutionName: institutionName(submission.affiliationId),
+      }).catch(() => undefined)
 
       // Durably stored and awaiting moderation. The record returned here is the
       // locally derived one — the submitter cannot see the queue.

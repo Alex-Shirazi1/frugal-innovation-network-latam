@@ -61,41 +61,34 @@ All responses use the `{ success, data, error }` envelope.
 
 Form submission → server-side validation → stored `pending` in SQLite → reviewed at **`/admin`** (unlinked route; auth enforced server-side by `ADMIN_KEY`, rate-limited, constant-time compared) → on approve, the member appears in the public directory served by `GET /api/members`. Pending entries are never exposed publicly.
 
-### New-member email notification (`functions/`)
+### New-member email notification
 
-When a submission lands in Firestore, `notifyNewSubmission` emails the network
-so someone can follow up. It does not send the mail itself — it formats the
-message and writes it to a `mail` collection, which the official
-[Trigger Email from Firestore](https://extensions.dev/extensions/firebase/firestore-send-email)
-extension picks up and delivers. SMTP credentials therefore live in the
-extension's config, never in this repo.
+Once a submission is safely in Firestore, the browser also pings
+[Web3Forms](https://web3forms.com), a form-to-email relay, so the network hears
+about it (`src/lib/notifyNewMember.ts`).
 
 ```
-submissions/{id} created → notifyNewSubmission → mail/{id} → extension → SMTP
-                                                                          ↓
-                                          redinnovacionfrugal@gmail.com
-                                          Subject: Solicitud de nueva membresía
+join form → Firestore submissions/{id}        ← the record of truth
+                    └→ Web3Forms → redinnovacionfrugal@gmail.com
+                                   Subject: Solicitud de nueva membresía
 ```
 
-`firestore.rules` denies the `mail` collection to every client; only the
-function's Admin SDK can write there, so it cannot be used as an open relay.
+There is no Cloud Function and no server: production is Hosting plus Firestore
+straight from the browser, and Functions would mean putting the project on a
+billing plan for a few dozen emails a month.
 
-First-time setup:
+The access key ships in the bundle. That is safe because the destination address
+is bound to the key on Web3Forms' side — an abuser can flood the network's own
+inbox but cannot relay mail anywhere else. The free tier is capped monthly, and
+burning that cap costs a notification, never an application: the submission is
+written first and stays visible at `/admin` whether or not the email goes out.
+Failures are swallowed for the same reason — telling someone their application
+failed when it did not would be worse than a missed email.
 
-1. Upgrade the Firebase project to the **Blaze** plan — Cloud Functions requires
-   a billing account. The function is capped at 3 instances to bound the cost.
-2. `npx firebase ext:install firebase/firestore-send-email` — set the collection
-   to `mail`, and point SMTP at the network's own Gmail with an app password.
-3. `cp functions/.env.example functions/.env` and adjust if the recipient or the
-   admin URL differ from the defaults.
-4. `npm --prefix functions run deploy`
-
-To exercise the trigger locally without deploying:
-
-```bash
-npm --prefix functions run build
-npx firebase emulators:start --only firestore,functions
-```
+Setup: get an access key at web3forms.com (it is emailed to you; no account
+needed), then set `VITE_WEB3FORMS_KEY` — locally in `.env.local`, and in CI as a
+GitHub Actions secret wired into the build step. Leave it unset and no mail is
+sent and no request is made, the same contract PostHog follows here.
 
 ## Modules (per spec)
 
