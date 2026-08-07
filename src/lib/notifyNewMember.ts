@@ -10,14 +10,17 @@
  * browser, so there is no backend to send from, and a Cloud Function would mean
  * putting the project on a billing plan for a few dozen emails a month.
  *
- * FormSubmit addresses the recipient directly in the endpoint, which is why the
- * destination is configuration rather than a vendor-side setting: pointing this
- * at a different inbox is an env var, not a new account. It needs no signup —
- * the first submission to a new address triggers a one-time confirmation email
- * to that address, and nothing is delivered until someone clicks it.
+ * FormSubmit addresses the destination in the endpoint, so pointing this at a
+ * different inbox is a config change, not a new account. It needs no signup —
+ * the first submission to a new address triggers a one-time activation email to
+ * that address, and NOTHING is delivered until someone clicks the link in it.
  *
- * The address is NOT hardcoded, deliberately: this repository is public, and a
- * mail address committed to it is a mail address in every scraper's list.
+ * The target should be the opaque alias FormSubmit issues in that activation
+ * email, not the address itself. Vite bakes this value into the bundle, so a
+ * naked address would be readable by anyone who views source on the live site;
+ * the alias resolves to the inbox on FormSubmit's side and reveals nothing. A
+ * plain address still works, which is what makes first-time setup possible —
+ * see README for the swap.
  *
  * Nothing here is load-bearing for the application itself. The submission is
  * stored before this runs and stays visible at /admin whether or not the mail
@@ -86,7 +89,8 @@ export interface NotifyResult {
 export interface NotifyOptions {
   submission: IntakeSubmission
   institutionName: string | null
-  /** Destination inbox. Defaults to `VITE_NOTIFY_EMAIL`; injectable for tests. */
+  /** FormSubmit alias, or an address during first-time setup. Defaults to
+   *  `VITE_NOTIFY_TARGET`; injectable for tests. */
   to?: string
   /** Injectable for tests; defaults to the platform fetch. */
   fetchImpl?: typeof fetch
@@ -103,10 +107,10 @@ export interface NotifyOptions {
 export async function notifyNewMember({
   submission,
   institutionName,
-  to = import.meta.env.VITE_NOTIFY_EMAIL ?? '',
+  to = import.meta.env.VITE_NOTIFY_TARGET ?? '',
   fetchImpl = fetch,
 }: NotifyOptions): Promise<NotifyResult> {
-  // No address configured means no request at all — the same contract analytics
+  // Nothing configured means no request at all — the same contract analytics
   // follows here, so a fork of this site never mails a stranger's inbox.
   if (!to) return { sent: false }
 

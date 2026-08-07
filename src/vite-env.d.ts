@@ -16,12 +16,13 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
 
   /**
-   * Inbox that receives a "Solicitud de nueva membresía" email whenever someone
-   * completes the join form. Never hardcoded: this repo is public, and a
-   * committed address is a scraped address. Unset means no notification is sent
-   * and no request is made; submissions are still stored and visible at /admin.
+   * Where "Solicitud de nueva membresía" is delivered when someone completes the
+   * join form. Prefer the opaque FormSubmit alias over a plain address: Vite
+   * bakes this into the bundle, so an address here is readable on the live site.
+   * Unset means no notification is sent and no request is made; submissions are
+   * still stored and visible at /admin.
    */
-  readonly VITE_NOTIFY_EMAIL?: string
+  readonly VITE_NOTIFY_TARGET?: string
 
   /**
    * Firebase web config. API key, project id and app id must all be present for

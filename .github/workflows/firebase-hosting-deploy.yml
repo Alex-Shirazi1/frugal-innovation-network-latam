@@ -54,10 +54,10 @@ jobs:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          # Inbox notified on each new-member submission. A secret rather than a
-          # committed constant because this repo is public and the value is a
-          # real mail address. Unset means no notification is sent.
-          VITE_NOTIFY_EMAIL: ${{ secrets.VITE_NOTIFY_EMAIL }}
+          # FormSubmit alias that new-member notifications are delivered to. A
+          # secret rather than a committed constant so the destination can be
+          # repointed without a code change. Unset means no notification is sent.
+          VITE_NOTIFY_TARGET: ${{ secrets.VITE_NOTIFY_TARGET }}
 
       # firestore.rules is generated from src/data/onboardingOptions.ts, so it can
       # only be trusted if it matches that data (checked by the drift test in
