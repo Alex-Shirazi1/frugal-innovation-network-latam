@@ -25,8 +25,12 @@ function makeSubmission(overrides: Partial<IntakeSubmission> = {}): IntakeSubmis
   } as IntakeSubmission
 }
 
+/** FormSubmit answers a delivered message with `{ success: true }`. */
 function okFetch() {
-  return vi.fn().mockResolvedValue({ ok: true } as Response)
+  return vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ success: true }),
+  } as unknown as Response)
 }
 
 describe('notificationFields', () => {
@@ -101,6 +105,65 @@ describe('notifyNewMember', () => {
         fetchImpl,
       }),
     ).resolves.toEqual({ sent: false })
+  })
+
+  /**
+   * The failure mode nobody would notice: FormSubmit answers an unactivated
+   * address with a 200 whose body says the mail was not sent. Trusting the
+   * status code alone reported every one of those as delivered.
+   */
+  it('treats a 200 carrying success:"false" as unsent, not as delivered', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: 'false',
+        message: "This form needs Activation. We've sent you an email...",
+      }),
+    } as unknown as Response)
+
+    const result = await notifyNewMember({
+      submission: makeSubmission(),
+      institutionName: null,
+      to: 'destino@example.org',
+      fetchImpl,
+    })
+
+    expect(result.sent).toBe(false)
+    expect(result.reason).toContain('Activation')
+  })
+
+  it('also handles a boolean false, in case the provider stops stringifying it', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: false }),
+    } as unknown as Response)
+
+    await expect(
+      notifyNewMember({
+        submission: makeSubmission(),
+        institutionName: null,
+        to: 'destino@example.org',
+        fetchImpl,
+      }),
+    ).resolves.toMatchObject({ sent: false })
+  })
+
+  it('does not choke on a body that is not JSON', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => {
+        throw new Error('not json')
+      },
+    } as unknown as Response)
+
+    await expect(
+      notifyNewMember({
+        submission: makeSubmission(),
+        institutionName: null,
+        to: 'destino@example.org',
+        fetchImpl,
+      }),
+    ).resolves.toEqual({ sent: true })
   })
 
   it('reports a rejected request as unsent without throwing', async () => {

@@ -51,7 +51,7 @@ function list(values: readonly string[] | undefined): string {
 }
 
 /**
- * Web3Forms renders every non-reserved key as a row in the email, so the field
+ * FormSubmit renders every non-reserved key as a row in the email, so the field
  * names here are what Allan actually reads. They are Spanish for that reason —
  * this is internal mail to the network, not UI, so it does not follow the
  * visitor's chosen language.
@@ -76,6 +76,13 @@ export function notificationFields(
   }
 }
 
+export interface NotifyResult {
+  sent: boolean
+  /** Provider-supplied explanation when a request succeeded but no mail went
+   *  out — most often "this form needs activation". */
+  reason?: string
+}
+
 export interface NotifyOptions {
   submission: IntakeSubmission
   institutionName: string | null
@@ -98,7 +105,7 @@ export async function notifyNewMember({
   institutionName,
   to = import.meta.env.VITE_NOTIFY_EMAIL ?? '',
   fetchImpl = fetch,
-}: NotifyOptions): Promise<{ sent: boolean }> {
+}: NotifyOptions): Promise<NotifyResult> {
   // No address configured means no request at all — the same contract analytics
   // follows here, so a fork of this site never mails a stranger's inbox.
   if (!to) return { sent: false }
@@ -116,7 +123,23 @@ export async function notifyNewMember({
         ...notificationFields(submission, institutionName),
       }),
     })
-    return { sent: response.ok }
+    if (!response.ok) return { sent: false }
+
+    /*
+     * A 200 is not proof of delivery. FormSubmit answers an unactivated
+     * address with HTTP 200 and `{"success":"false","message":"This form needs
+     * Activation..."}` — so checking `response.ok` alone reports a send that
+     * never happened, which is the one failure mode nobody would notice.
+     *
+     * `success` comes back as the STRING "false" here, not a boolean, so a
+     * truthiness check would read it as success. Compare against both forms.
+     */
+    const body: unknown = await response.json().catch(() => null)
+    const success = (body as { success?: unknown } | null)?.success
+    if (success === false || success === 'false') {
+      return { sent: false, reason: (body as { message?: string })?.message }
+    }
+    return { sent: true }
   } catch {
     return { sent: false }
   }
