@@ -111,21 +111,42 @@ function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void
   )
 }
 
+/**
+ * One received expression of interest.
+ *
+ * There is deliberately no approve button. The network does not admit members
+ * from this screen — someone reads the notification email, writes to the
+ * person, has a conversation, asks for their organisation's logo and letter,
+ * and only then sends the official Google Form. Filling in that form is what
+ * creates a profile. A publish button here would model a step nobody performs,
+ * and would let one click put someone on the public site ahead of the process
+ * that is supposed to vet them.
+ *
+ * Discarding is kept, because spam arrives and the list needs a way to stay
+ * readable. It removes a record; it does not deny anyone membership.
+ */
 function PendingCard({
   entry,
-  onResolve,
+  onDiscard,
 }: {
   entry: PendingMember
-  onResolve: (id: string, action: 'approve' | 'reject') => Promise<void>
+  onDiscard: (id: string) => Promise<void>
 }) {
-  const [busy, setBusy] = useState<'approve' | 'reject' | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  async function act(action: 'approve' | 'reject') {
-    setBusy(action)
+  async function discard() {
+    if (
+      !window.confirm(
+        `¿Descartar la solicitud de ${entry.fullName}? Se borra el registro; no afecta al sitio público.`,
+      )
+    ) {
+      return
+    }
+    setBusy(true)
     try {
-      await onResolve(entry.id, action)
+      await onDiscard(entry.id)
     } finally {
-      setBusy(null)
+      setBusy(false)
     }
   }
 
@@ -200,21 +221,19 @@ function PendingCard({
       </div>
 
       <div className="mt-4 flex gap-2">
-        <button
-          type="button"
-          disabled={busy !== null}
-          onClick={() => void act('approve')}
-          className="rounded-full bg-verde px-5 py-2 text-xs font-bold text-blanco transition-opacity hover:opacity-90 disabled:opacity-50"
+        <a
+          href={`mailto:${entry.email}?subject=${encodeURIComponent('Red Latinoamericana de Innovación Frugal')}`}
+          className="rounded-full bg-teal px-5 py-2 text-xs font-bold text-blanco transition-colors hover:bg-teal-deep"
         >
-          {busy === 'approve' ? 'Aprobando…' : '✓ Aprobar'}
-        </button>
+          ✉ Escribir a esta persona
+        </a>
         <button
           type="button"
-          disabled={busy !== null}
-          onClick={() => void act('reject')}
+          disabled={busy}
+          onClick={() => void discard()}
           className="rounded-full border border-carbon/20 px-5 py-2 text-xs font-bold text-pizarra transition-colors hover:border-teal-deep hover:text-teal-deep disabled:opacity-50"
         >
-          {busy === 'reject' ? 'Rechazando…' : '✕ Rechazar'}
+          {busy ? 'Descartando…' : 'Descartar'}
         </button>
       </div>
     </li>
@@ -280,13 +299,12 @@ export function AdminPage() {
     if (session) void refresh()
   }, [session, refresh])
 
-  async function resolve(id: string, action: 'approve' | 'reject') {
+  async function discard(id: string) {
     try {
-      if (action === 'approve') await adminApi.approve(id)
-      else await adminApi.reject(id)
+      await adminApi.reject(id)
       setPending((prev) => prev?.filter((entry) => entry.id !== id) ?? null)
     } catch {
-      setError('La acción falló — recarga e intenta de nuevo.')
+      setError('No se pudo descartar — recarga e intenta de nuevo.')
     }
   }
 
@@ -411,19 +429,24 @@ export function AdminPage() {
         {tab === 'solicitudes' && pending !== null && pending.length > 0 ? (
           <>
             <p className="mt-6 text-sm text-pizarra" role="status">
-              {pending.length} solicitud{pending.length === 1 ? '' : 'es'} pendiente
+              {pending.length} solicitud{pending.length === 1 ? '' : 'es'} recibida
               {pending.length === 1 ? '' : 's'}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-pizarra">
+              Cada persona de esta lista escribió al sitio para presentarse. El siguiente paso es
+              escribirle y conversar; el perfil público se crea después, con el formulario de
+              incorporación.
             </p>
             <ul className="mt-4 space-y-4">
               {pending.map((entry) => (
-                <PendingCard key={entry.id} entry={entry} onResolve={resolve} />
+                <PendingCard key={entry.id} entry={entry} onDiscard={discard} />
               ))}
             </ul>
           </>
         ) : null}
 
         <p className="mt-12 text-center text-xs text-pizarra/70">
-          Los miembros aprobados aparecen inmediatamente en el directorio público.{' '}
+          Los perfiles del directorio se crean con el formulario de incorporación, no desde aquí.{' '}
           <a href="/" className="font-semibold text-teal hover:underline">
             ← Volver al sitio
           </a>

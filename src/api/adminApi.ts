@@ -374,9 +374,17 @@ export const adminApi = {
   listPending: (): Promise<PendingMember[]> =>
     adminBackend() === 'firestore' ? firestoreAdmin.listPending() : httpAdmin.listPending(),
 
-  approve: (id: string): Promise<void> =>
-    adminBackend() === 'firestore' ? firestoreAdmin.approve(id) : httpAdmin.approve(id),
+  /*
+   * No `approve` on the public surface, deliberately.
+   *
+   * Nothing in the dashboard publishes a member. A profile is created by the
+   * incorporation form the network sends after it has spoken to someone, not by
+   * a click here — see PendingCard. The underlying firestoreAdmin.approve is
+   * left in place because the Google Form pipeline will write published records
+   * the same way, but it is not something the panel can invoke.
+   */
 
+  /** Discards a received request. Housekeeping for spam — not a membership decision. */
   reject: (id: string): Promise<void> =>
     adminBackend() === 'firestore' ? firestoreAdmin.reject(id) : httpAdmin.reject(id),
 }
