@@ -54,7 +54,7 @@ let testEnv: RulesTestEnvironment | undefined
 
 // Imported after the mock is registered so the adapter picks up the fake getDb.
 const { createFirestoreDataSource } = await import('../src/api/adapters/firestore')
-const { adminApi } = await import('../src/api/adminApi')
+const { adminApi, publishSubmission } = await import('../src/api/adminApi')
 const { makeSubmission } = await import('../src/test/fixtures')
 
 const config = {
@@ -169,7 +169,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
       asAdmin()
       const [entry] = await adminApi.listPending()
-      await adminApi.approve(entry.id)
+      await publishSubmission(entry.id)
 
       asAnon()
       const members = await source.getMembers()
@@ -198,7 +198,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
     it('approve publishes the member and clears the queue entry', async () => {
       const entry = await seedPending()
-      await adminApi.approve(entry.id)
+      await publishSubmission(entry.id)
 
       expect(await adminApi.listPending()).toHaveLength(0)
 
@@ -213,7 +213,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
     /** consentToPublish is an intake gate; it must not leak into the public record. */
     it('does not copy intake-only bookkeeping into the published record', async () => {
       const entry = await seedPending()
-      await adminApi.approve(entry.id)
+      await publishSubmission(entry.id)
 
       asAnon()
       const members = await createFirestoreDataSource(config).getMembers()
@@ -226,7 +226,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
     it('derives avatarHue deterministically on publish', async () => {
       const entry = await seedPending()
-      await adminApi.approve(entry.id)
+      await publishSubmission(entry.id)
 
       asAnon()
       const members = await createFirestoreDataSource(config).getMembers()
@@ -248,7 +248,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
     it('approving an unknown id fails instead of publishing an empty record', async () => {
       asAdmin()
-      await expect(adminApi.approve('does-not-exist')).rejects.toThrow('not-found')
+      await expect(publishSubmission('does-not-exist')).rejects.toThrow('not-found')
 
       asAnon()
       expect(await createFirestoreDataSource(config).getMembers()).toHaveLength(54)
@@ -266,7 +266,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       const entry = await seedPending()
       asAnon()
       await expect(adminApi.listPending()).rejects.toThrow()
-      await expect(adminApi.approve(entry.id)).rejects.toThrow()
+      await expect(publishSubmission(entry.id)).rejects.toThrow()
       await expect(adminApi.reject(entry.id)).rejects.toThrow()
     })
 

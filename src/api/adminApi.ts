@@ -356,6 +356,22 @@ export const contentAdmin = {
   },
 }
 
+/**
+ * Publishes a stored submission to the public directory.
+ *
+ * Deliberately NOT part of `adminApi`: nothing in the dashboard may call this.
+ * The network does not admit members from a screen — a profile is created once
+ * someone has been spoken to and has filled in the incorporation form, and that
+ * pipeline is what will call this. Exposing it on the panel's surface is how a
+ * publish button gets added back by accident.
+ *
+ * Named for what it does rather than for a decision it does not represent:
+ * this is not an approval, it is the last mechanical step of one.
+ */
+export function publishSubmission(id: string): Promise<void> {
+  return firestoreAdmin.approve(id)
+}
+
 /* ------------------------------------------------------------------- Public API */
 
 export const adminApi = {
@@ -373,16 +389,6 @@ export const adminApi = {
 
   listPending: (): Promise<PendingMember[]> =>
     adminBackend() === 'firestore' ? firestoreAdmin.listPending() : httpAdmin.listPending(),
-
-  /*
-   * No `approve` on the public surface, deliberately.
-   *
-   * Nothing in the dashboard publishes a member. A profile is created by the
-   * incorporation form the network sends after it has spoken to someone, not by
-   * a click here — see PendingCard. The underlying firestoreAdmin.approve is
-   * left in place because the Google Form pipeline will write published records
-   * the same way, but it is not something the panel can invoke.
-   */
 
   /** Discards a received request. Housekeeping for spam — not a membership decision. */
   reject: (id: string): Promise<void> =>
