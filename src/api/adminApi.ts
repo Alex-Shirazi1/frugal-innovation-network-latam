@@ -20,6 +20,8 @@ import { avatarHueFor, positionTitles } from '../domain/intake'
 import type { ApiResponse, Member, PendingMember, PositionType } from './types'
 import type { Initiative } from '../data/initiatives'
 import type { BibliographyEntry } from '../data/bibliography'
+import type { Resource } from '../data/resources'
+import type { Congress } from '../data/congress'
 import { bundledDataSource } from './adapters/bundled'
 
 export type AdminBackend = 'firestore' | 'http'
@@ -266,7 +268,7 @@ export const contentAdmin = {
    * never imported. Import is therefore a deliberate first step, and this is
    * how the panel knows whether it has happened.
    */
-  async count(kind: 'initiatives' | 'bibliography'): Promise<number> {
+  async count(kind: 'initiatives' | 'bibliography' | 'resources'): Promise<number> {
     const db = await getDb(requireConfig())
     const { collection, getCountFromServer } = await import('firebase/firestore')
     const snapshot = await getCountFromServer(collection(db, kind))
@@ -284,6 +286,26 @@ export const contentAdmin = {
     const db = await getDb(requireConfig())
     const { deleteDoc, doc } = await import('firebase/firestore')
     await deleteDoc(doc(db, 'initiatives', id))
+  },
+
+  async saveResource(resource: Resource): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { doc, setDoc } = await import('firebase/firestore')
+    const { id, ...fields } = resource
+    await setDoc(doc(db, 'resources', id), fields)
+  },
+
+  async deleteResource(id: string): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { deleteDoc, doc } = await import('firebase/firestore')
+    await deleteDoc(doc(db, 'resources', id))
+  },
+
+  /** The congress block is one document, so it is saved whole — no import step. */
+  async saveCongress(value: Congress): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { doc, setDoc } = await import('firebase/firestore')
+    await setDoc(doc(db, 'siteContent', 'congress'), value)
   },
 
   async saveBibliographyEntry(entry: BibliographyEntry): Promise<void> {
@@ -308,7 +330,7 @@ export const contentAdmin = {
    * is explicit rather than automatic: a silent first-write on page load would
    * be a surprising thing for opening a dashboard to do.
    */
-  async importSeed(kind: 'initiatives' | 'bibliography'): Promise<number> {
+  async importSeed(kind: 'initiatives' | 'bibliography' | 'resources'): Promise<number> {
     const db = await getDb(requireConfig())
     const { collection, doc, getDocs, writeBatch } = await import('firebase/firestore')
     const existing = await getDocs(collection(db, kind))
@@ -317,7 +339,9 @@ export const contentAdmin = {
     const records: Array<Record<string, unknown> & { id: string }> =
       kind === 'initiatives'
         ? (await bundledDataSource.getInitiatives()).map((i) => ({ ...i }))
-        : (await bundledDataSource.getBibliography()).map((b) => ({ ...b }))
+        : kind === 'resources'
+          ? (await bundledDataSource.getResources()).map((r) => ({ ...r }))
+          : (await bundledDataSource.getBibliography()).map((b) => ({ ...b }))
 
     // Batched so a half-imported collection cannot exist: it either all lands
     // or none of it does, and a partial import would look like deliberate

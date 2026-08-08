@@ -1,10 +1,8 @@
-import { useState } from 'react'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { SectionHeading } from '../ui/SectionHeading'
+import { localizeText } from '../../data/initiatives'
 
-/** The network's own microsite for the congress — the source for everything here. */
-const CONFERENCE_URL = 'https://redinnovacionfrugal.lat/congreso/index.php'
 
 function SpeakerGrid() {
   const { lang } = useI18n()
@@ -32,53 +30,6 @@ function SpeakerGrid() {
   )
 }
 
-function VideoWall() {
-  const { lang, t } = useI18n()
-  const { conference: { annualMeetingVideos } } = useApiData()
-  const [activeId, setActiveId] = useState<string | null>(null)
-  return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {annualMeetingVideos.map((video) => (
-        <li key={video.youtubeId} className="overflow-hidden rounded-2xl border border-carbon/10 bg-white/70">
-          <div className="relative aspect-video bg-carbon">
-            {activeId === video.youtubeId ? (
-              <iframe
-                className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1`}
-                title={video.title[lang]}
-                allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setActiveId(video.youtubeId)}
-                className="group absolute inset-0 flex w-full items-center justify-center"
-                aria-label={`${t.conference.watchVideo}: ${video.title[lang]}`}
-              >
-                <img
-                  src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
-                  alt=""
-                  loading="lazy"
-                  width="480"
-                  height="360"
-                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity group-hover:opacity-90"
-                />
-                <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-teal text-blanco shadow-lg transition-transform group-hover:scale-110">
-                  <svg width="18" height="20" viewBox="0 0 18 20" aria-hidden="true">
-                    <path d="M2 1.5v17l14-8.5z" fill="currentColor" />
-                  </svg>
-                </span>
-              </button>
-            )}
-          </div>
-          <h4 className="px-4 py-3 text-sm font-semibold leading-snug">{video.title[lang]}</h4>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 /**
  * The congress, limited to what the network publishes about it.
  *
@@ -96,8 +47,8 @@ function VideoWall() {
  * the microsite, which is linked so a reader can check them.
  */
 export function ConferenceArchive() {
-  const { t } = useI18n()
-  const { conference: { speakers } } = useApiData()
+  const { t, lang } = useI18n()
+  const { conference: { speakers }, congress } = useApiData()
 
   return (
     <section id="congreso" aria-labelledby="congreso-heading" className="py-(--spacing-section)">
@@ -106,41 +57,31 @@ export function ConferenceArchive() {
           <div className="border-b border-carbon/10 bg-white/50 px-5 py-8 md:px-10 md:py-10">
             <SectionHeading
               id="congreso-heading"
-              kicker={t.conference.kicker}
-              title={t.conference.title}
-              subtitle={t.conference.subtitle}
+              kicker={localizeText(congress.kicker, lang)}
+              title={localizeText(congress.title, lang)}
+              subtitle={localizeText(congress.subtitle, lang)}
             />
 
-            <p className="text-sm font-semibold text-teal">{t.conference.details}</p>
+            <p className="text-sm font-semibold text-teal">{localizeText(congress.details, lang)}</p>
 
             <a
-              href={CONFERENCE_URL}
+              href={congress.siteUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-block rounded-full border-2 border-carbon/15 px-5 py-2.5 text-sm font-bold text-carbon transition-colors hover:border-teal hover:text-teal"
             >
-              {t.conference.siteCta} ↗
+              {localizeText(congress.siteCta, lang)} ↗
             </a>
           </div>
 
-          <div className="px-5 py-8 md:px-10 md:py-10">
-            {speakers.length > 0 ? (
-              <>
-                <h3 className="mb-4 font-display text-lg font-semibold text-carbon">
-                  {t.conference.speakersTab}
-                </h3>
-                <SpeakerGrid />
-              </>
-            ) : null}
-
-            <div className={speakers.length > 0 ? 'mt-10' : ''}>
-              <h3 className="font-display text-lg font-semibold text-carbon">
-                {t.conference.videosTitle}
+          {speakers.length > 0 ? (
+            <div className="px-5 py-8 md:px-10 md:py-10">
+              <h3 className="mb-4 font-display text-lg font-semibold text-carbon">
+                {t.conference.speakersTab}
               </h3>
-              <p className="mt-1 mb-4 text-sm text-pizarra">{t.conference.videosNote}</p>
-              <VideoWall />
+              <SpeakerGrid />
             </div>
-          </div>
+          ) : null}
         </article>
       </div>
     </section>

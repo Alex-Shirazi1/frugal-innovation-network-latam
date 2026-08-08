@@ -10,8 +10,7 @@ describe('initiatives seed', () => {
    * losing or truncating one would be a regression on the live site, not just
    * a broken fixture.
    */
-  it('carries the six published initiatives', () => {
-    expect(initiatives).toHaveLength(6)
+  it('carries the published initiatives, including the annual meeting', () => {
     expect(initiatives.map((i) => i.id)).toEqual([
       'encuentros',
       'podcast',
@@ -19,7 +18,21 @@ describe('initiatives seed', () => {
       'mooc',
       'investigacion',
       'herramientas',
+      'encuentro-anual',
     ])
+  })
+
+  /**
+   * The 2021 recordings used to be embedded inside the congress card, which
+   * read as if they were congress sessions — they are the virtual annual
+   * meeting, a different event. Allan's call was that a link on a card is
+   * enough, so they live here now and the congress card carries only the
+   * congress.
+   */
+  it('links the annual meeting to its recording', () => {
+    const annual = initiatives.find((i) => i.id === 'encuentro-anual')
+    expect(annual?.url).toContain('youtube.com')
+    expect(annual?.text.es).toContain('2021')
   })
 
   it('gives every initiative all three translations, since these were already translated', () => {

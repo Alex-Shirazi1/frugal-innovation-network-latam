@@ -217,6 +217,49 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    function localizedText(value) {
+      return value is map
+        && value.keys().hasOnly(['es', 'en', 'pt'])
+        && requiredText(value.es, 500);
+    }
+
+    function validResource(data) {
+      return data.keys().hasOnly(['title', 'language', 'author', 'year', 'type', 'file', 'summary'])
+        && data.keys().hasAll(['title', 'language', 'type', 'file'])
+        && localizedText(data.title)
+        && (!('summary' in data.keys()) || localizedText(data.summary))
+        && data.language in ['ES', 'EN', 'PT']
+        && data.type in ['PDF', 'Guía', 'Artículo', 'Bibliografía']
+        && (!('author' in data.keys()) || textWithin(data.author, 300))
+        && (!('year' in data.keys()) || data.year is int)
+        && requiredText(data.file, 500);
+    }
+
+    function validCongress(data) {
+      return data.keys().hasOnly(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+        && data.keys().hasAll(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+        && editableText(data.kicker)
+        && editableText(data.title)
+        && editableText(data.subtitle)
+        && editableText(data.details)
+        && editableText(data.siteCta)
+        && textWithin(data.siteUrl, 500)
+        && data.siteUrl.matches('https?://.*');
+    }
+
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validResource(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // One-off editable blocks. Only the congress document is defined; anything
+    // else in this collection is denied rather than accepted with no shape.
+    match /siteContent/congress {
+      allow read: if true;
+      allow write: if isAdmin() && validCongress(request.resource.data);
+    }
+
     match /bibliography/{entryId} {
       allow read: if true;
       allow create, update: if isAdmin() && validBibliographyEntry(request.resource.data);

@@ -63,7 +63,19 @@ function DocumentCover({ resource }: { resource: Resource }) {
   )
 }
 
-type FileState = 'checking' | 'ready' | 'missing'
+type FileState = 'checking' | 'ready' | 'missing' | 'external'
+
+/**
+ * Documents added from the admin panel point at the network's Google Drive
+ * rather than a path under public/ — Cloud Storage left Firebase's free plan in
+ * February 2026, so there is nowhere to upload to. Drive will not answer a
+ * cross-origin HEAD and will not render inside an <object>, so these are not
+ * probed and not embedded; they are offered as a link instead. Treating them as
+ * "missing" would tell a reader the document does not exist when it does.
+ */
+export function isExternalDocument(file: string): boolean {
+  return /^https?:\/\//.test(file)
+}
 
 /**
  * Reports whether `file` is a real, servable PDF.
@@ -77,6 +89,10 @@ function usePdfAvailability(file: string): FileState {
 
   useEffect(() => {
     let cancelled = false
+    if (isExternalDocument(file)) {
+      setFileState('external')
+      return
+    }
     setFileState('checking')
     fetch(file, { method: 'HEAD' })
       .then((response) => {
@@ -170,6 +186,16 @@ function PreviewModal({ resource, onClose }: { resource: Resource; onClose: () =
             <DocumentCover resource={resource} />
             {fileState === 'missing' ? (
               <p className="mt-4 text-center text-xs text-pizarra">{t.library.previewMissing}</p>
+            ) : null}
+            {fileState === 'external' ? (
+              <a
+                href={resource.file}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 block text-center text-xs font-semibold text-teal hover:underline"
+              >
+                ↗ {t.library.openInNewTab}
+              </a>
             ) : null}
           </div>
         )}

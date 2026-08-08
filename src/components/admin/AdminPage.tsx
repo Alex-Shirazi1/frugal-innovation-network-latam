@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { adminApi, type AdminSession } from '../../api/adminApi'
 import { InitiativesEditor } from './InitiativesEditor'
 import { BibliographyEditor } from './BibliographyEditor'
+import { ResourcesEditor } from './ResourcesEditor'
+import { CongressEditor } from './CongressEditor'
 import type { PendingMember } from '../../api/types'
 import {
   generalAreas,
@@ -227,7 +229,9 @@ function PendingCard({
 const TABS = [
   { id: 'solicitudes', label: 'Solicitudes' },
   { id: 'iniciativas', label: 'Iniciativas' },
+  { id: 'documentos', label: 'Documentos' },
   { id: 'bibliografia', label: 'Bibliografía' },
+  { id: 'congreso', label: 'Congreso' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -364,6 +368,18 @@ export function AdminPage() {
         {tab === 'iniciativas' && session.backend === 'firestore' ? (
           <div className="mt-8">
             <InitiativesEditor />
+          </div>
+        ) : null}
+
+        {tab === 'documentos' && session.backend === 'firestore' ? (
+          <div className="mt-8">
+            <ResourcesEditor />
+          </div>
+        ) : null}
+
+        {tab === 'congreso' && session.backend === 'firestore' ? (
+          <div className="mt-8">
+            <CongressEditor />
           </div>
         ) : null}
 

@@ -12,6 +12,7 @@ import { institutions } from '../../data/institutions'
 import { resources } from '../../data/resources'
 import { initiatives } from '../../data/initiatives'
 import { bibliography } from '../../data/bibliography'
+import { congress } from '../../data/congress'
 import { annualMeetingVideos, speakers } from '../../data/conference'
 import {
   countries,
@@ -47,6 +48,7 @@ export const bundledDataSource: RelifDataSource = {
   getInstitutions: async () => institutions,
   getInitiatives: async () => initiatives,
   getBibliography: async () => bibliography,
+  getCongress: async () => congress,
   getMembers: async () => mockMembers,
   getResources: async () => resources,
   getConference: async () => ({ speakers, annualMeetingVideos }),

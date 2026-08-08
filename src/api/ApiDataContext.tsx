@@ -22,6 +22,7 @@ import type {
 import { mockMembers } from '../data/members'
 import { initiatives as bundledInitiatives, type Initiative } from '../data/initiatives'
 import { bibliography as bundledBibliography, type BibliographyEntry } from '../data/bibliography'
+import { congress as bundledCongress, type Congress } from '../data/congress'
 import { institutions as bundledInstitutions } from '../data/institutions'
 import { resources as bundledResources } from '../data/resources'
 import { annualMeetingVideos, speakers } from '../data/conference'
@@ -41,6 +42,7 @@ interface ApiDataValue {
   members: Member[]
   initiatives: Initiative[]
   bibliography: BibliographyEntry[]
+  congress: Congress
   resources: Resource[]
   conference: ConferenceData
   options: OnboardingOptions
@@ -81,6 +83,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
   const [members, setMembers] = useState<Member[]>(mockMembers)
   const [initiatives, setInitiatives] = useState<Initiative[]>(bundledInitiatives)
   const [bibliography, setBibliography] = useState<BibliographyEntry[]>(bundledBibliography)
+  const [congress, setCongress] = useState<Congress>(bundledCongress)
   const [resources, setResources] = useState<Resource[]>(bundledResources)
   const [conference, setConference] = useState<ConferenceData>({ speakers, annualMeetingVideos })
   const [options, setOptions] = useState<OnboardingOptions>({
@@ -112,6 +115,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
         hydrate(source.getInstitutions(), setInstitutions),
         hydrate(source.getInitiatives(), setInitiatives),
         hydrate(source.getBibliography(), setBibliography),
+        hydrate(source.getCongress(), setCongress),
         hydrate(source.getMembers(), setMembers),
         hydrate(source.getResources(), setResources),
         hydrate(source.getConference(), setConference),
@@ -135,6 +139,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
       members,
       initiatives,
       bibliography,
+      congress,
       resources,
       conference,
       options,
@@ -172,7 +177,17 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
         return institutions.find((i) => i.id === affiliationId)?.name ?? null
       },
     }
-  }, [dataSource, institutions, members, initiatives, bibliography, resources, conference, options])
+  }, [
+    dataSource,
+    institutions,
+    members,
+    initiatives,
+    bibliography,
+    congress,
+    resources,
+    conference,
+    options,
+  ])
 
   return <ApiDataContext.Provider value={value}>{children}</ApiDataContext.Provider>
 }

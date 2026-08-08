@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { contentAdmin } from '../../api/adminApi'
 
-export type ContentKind = 'initiatives' | 'bibliography'
+export type ContentKind = 'initiatives' | 'bibliography' | 'resources'
 
 export const editorInputClass =
   'w-full rounded-xl border border-carbon/15 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-teal'

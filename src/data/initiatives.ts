@@ -152,4 +152,24 @@ export const initiatives: Initiative[] = [
     url: null,
     cta: null,
   },
+  {
+    id: "encuentro-anual",
+    order: 6,
+    title: {
+      es: "Encuentro Anual RELIF",
+      en: "RELIF Annual Meeting",
+      pt: "Encontro Anual RELIF"
+    },
+    text: {
+      es: "Grabaciones del encuentro virtual anual de la red, 18 y 19 de noviembre de 2021.",
+      en: "Recordings of the network\u2019s virtual annual meeting, 18\u201319 November 2021.",
+      pt: "Grava\u00e7\u00f5es do encontro virtual anual da rede, 18 e 19 de novembro de 2021."
+    },
+    url: "https://www.youtube.com/watch?v=zcUO-IOQDz4",
+    cta: {
+      es: "Ver las grabaciones",
+      en: "Watch the recordings",
+      pt: "Ver as grava\u00e7\u00f5es"
+    },
+  },
 ]
