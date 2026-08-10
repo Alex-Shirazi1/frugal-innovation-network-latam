@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentEditorShell } from './ContentEditorShell'
+import { I18nProvider } from '../../i18n/I18nContext'
 
 const count = vi.fn()
 const importSeed = vi.fn()
@@ -13,22 +14,31 @@ vi.mock('../../api/adminApi', () => ({
   },
 }))
 
+/**
+ * The shell reads its copy from the dictionary, so it needs the provider. The
+ * assertions below stay in Spanish because that is the default language, which
+ * is itself worth pinning: the panel must not come up in English for the people
+ * who actually run the network.
+ */
 function renderShell() {
   return render(
-    <ContentEditorShell
-      kind="initiatives"
-      title="Iniciativas"
-      seedCount={6}
-      importDescription="Se pueden administrar desde aquí."
-    >
-      {() => <p>EDITOR</p>}
-    </ContentEditorShell>,
+    <I18nProvider>
+      <ContentEditorShell
+        kind="initiatives"
+        title="Iniciativas"
+        seedCount={6}
+        importDescription="Se pueden administrar desde aquí."
+      >
+        {() => <p>EDITOR</p>}
+      </ContentEditorShell>
+    </I18nProvider>,
   )
 }
 
 beforeEach(() => {
   count.mockReset()
   importSeed.mockReset()
+  window.localStorage.clear()
 })
 
 describe('ContentEditorShell', () => {
@@ -100,5 +110,32 @@ describe('ContentEditorShell', () => {
 
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
     expect(screen.queryByText('EDITOR')).not.toBeInTheDocument()
+  })
+
+  /**
+   * The gate was hardcoded Spanish long after the rest of the panel could be
+   * switched, so choosing English left the one screen that explains what Import
+   * does unreadable to whoever chose it. Asserting on the stored preference is
+   * what stops a future editor from being added the same way.
+   */
+  it('renders the import gate in the chosen language, not always Spanish', async () => {
+    window.localStorage.setItem('relif-lang', 'en')
+    count.mockResolvedValue(0)
+    renderShell()
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Import 6 items' })).toBeInTheDocument(),
+    )
+    expect(screen.getByText(/The public site does not change/)).toBeInTheDocument()
+    expect(screen.queryByText(/El sitio público no cambia/)).not.toBeInTheDocument()
+  })
+
+  it('falls back to Spanish when no language has been chosen', async () => {
+    count.mockResolvedValue(0)
+    renderShell()
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Importar 6 elementos' })).toBeInTheDocument(),
+    )
   })
 })

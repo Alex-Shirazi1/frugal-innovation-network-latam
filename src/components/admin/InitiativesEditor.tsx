@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { contentAdmin } from '../../api/adminApi'
 import { createDataSource } from '../../api'
-import { initiatives as seed, type Initiative } from '../../data/initiatives'
+import { initiatives as seed, localizeText, type Initiative } from '../../data/initiatives'
+import { useI18n } from '../../i18n/I18nContext'
+import type { ContentLang, LocalisedText } from '../../lib/translate'
+import { CompleteLanguagesButton, MachineTranslatedNote } from './TranslateControls'
 import {
   ContentEditorShell,
   EditorField,
   editorInputClass,
+  fill,
+  rowActionClass,
+  rowDestructiveActionClass,
 } from './ContentEditorShell'
 
 /** A blank card. `order` is filled in from the current list on save. */
@@ -52,13 +58,46 @@ interface FormProps {
 }
 
 function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: FormProps) {
+  const { t } = useI18n()
   const [draft, setDraft] = useState<Initiative>(initial)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<'required' | 'link' | 'save' | null>(null)
   const isNew = initial.id === ''
+  const e = t.admin.editor
+  const copy = t.admin.initiatives
+
+  /**
+   * Which fields a machine wrote, so the note can appear under exactly those.
+   * Component state, not stored: it is a prompt to read the text before saving,
+   * not a property of the record.
+   */
+  const [machine, setMachine] = useState<Record<'title' | 'text', Set<ContentLang>>>({
+    title: new Set(),
+    text: new Set(),
+  })
 
   function set<K extends keyof Initiative>(key: K, value: Initiative[K]) {
     setDraft((prev) => ({ ...prev, [key]: value }))
+  }
+
+  /** Applies a translation result to one field group and flags what it filled. */
+  function applyTranslation(field: 'title' | 'text', values: LocalisedText) {
+    setDraft((prev) => ({ ...prev, [field]: { ...prev[field], ...values } }))
+    setMachine((prev) => ({
+      ...prev,
+      [field]: new Set([...prev[field], ...(Object.keys(values) as ContentLang[])]),
+    }))
+  }
+
+  /** Typing over a machine translation makes it the author's text again. */
+  function setTranslated(field: 'title' | 'text', lang: ContentLang, value: string) {
+    set(field, { ...draft[field], [lang]: value })
+    setMachine((prev) => {
+      if (!prev[field].has(lang)) return prev
+      const next = new Set(prev[field])
+      next.delete(lang)
+      return { ...prev, [field]: next }
+    })
   }
 
   async function save() {
@@ -67,12 +106,12 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
     // Spanish is the only required language — see EditableText. Without it there
     // is nothing to fall back to and the card renders blank everywhere.
     if (!titleEs || !textEs) {
-      setError('El título y la descripción en español son obligatorios.')
+      setError('required')
       return
     }
     const url = draft.url?.trim() || null
     if (url && !/^https?:\/\/.+/.test(url)) {
-      setError('El enlace debe empezar con https://')
+      setError('link')
       return
     }
 
@@ -91,7 +130,7 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
       })
       onSaved()
     } catch {
-      setError('No se pudo guardar. Revisa tu conexión e intenta de nuevo.')
+      setError('save')
     } finally {
       setSaving(false)
     }
@@ -100,75 +139,91 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
   return (
     <div className="rounded-2xl border border-teal/40 bg-teal-tint/40 p-5">
       <h4 className="mb-3 font-display text-base font-semibold">
-        {isNew ? 'Nueva iniciativa' : `Editando: ${initial.title.es}`}
+        {isNew ? copy.newHeading : fill(copy.editingHeading, { name: initial.title.es })}
       </h4>
 
       <div className="grid gap-3">
-        <EditorField label="Título (español) *">
+        <EditorField label={`${copy.titleLabel} (${e.inSpanish}) *`}>
           <input
             className={editorInputClass}
             value={draft.title.es}
-            onChange={(e) => set('title', { ...draft.title, es: e.target.value })}
+            onChange={(event) => setTranslated('title', 'es', event.target.value)}
           />
+          {machine.title.has('es') ? <MachineTranslatedNote /> : null}
         </EditorField>
+        <CompleteLanguagesButton
+          value={draft.title}
+          onFilled={(values) => applyTranslation('title', values)}
+        />
         <div className="grid gap-3 sm:grid-cols-2">
-          <EditorField label="Título (inglés)" hint="Opcional — si falta se usa el español">
+          <EditorField label={`${copy.titleLabel} (${e.inEnglish})`} hint={e.optionalFallsBack}>
             <input
               className={editorInputClass}
               value={draft.title.en ?? ''}
-              onChange={(e) => set('title', { ...draft.title, en: e.target.value })}
+              onChange={(event) => setTranslated('title', 'en', event.target.value)}
             />
+            {machine.title.has('en') ? <MachineTranslatedNote /> : null}
           </EditorField>
-          <EditorField label="Título (portugués)" hint="Opcional">
+          <EditorField label={`${copy.titleLabel} (${e.inPortuguese})`} hint={e.optional}>
             <input
               className={editorInputClass}
               value={draft.title.pt ?? ''}
-              onChange={(e) => set('title', { ...draft.title, pt: e.target.value })}
+              onChange={(event) => setTranslated('title', 'pt', event.target.value)}
             />
+            {machine.title.has('pt') ? <MachineTranslatedNote /> : null}
           </EditorField>
         </div>
 
-        <EditorField label="Descripción (español) *">
+        <EditorField label={`${copy.descriptionLabel} (${e.inSpanish}) *`}>
           <textarea
             rows={2}
             className={editorInputClass}
             value={draft.text.es}
-            onChange={(e) => set('text', { ...draft.text, es: e.target.value })}
+            onChange={(event) => setTranslated('text', 'es', event.target.value)}
           />
+          {machine.text.has('es') ? <MachineTranslatedNote /> : null}
         </EditorField>
+        <CompleteLanguagesButton
+          value={draft.text}
+          onFilled={(values) => applyTranslation('text', values)}
+        />
         <div className="grid gap-3 sm:grid-cols-2">
-          <EditorField label="Descripción (inglés)" hint="Opcional">
+          <EditorField label={`${copy.descriptionLabel} (${e.inEnglish})`} hint={e.optional}>
             <textarea
               rows={2}
               className={editorInputClass}
               value={draft.text.en ?? ''}
-              onChange={(e) => set('text', { ...draft.text, en: e.target.value })}
+              onChange={(event) => setTranslated('text', 'en', event.target.value)}
             />
+            {machine.text.has('en') ? <MachineTranslatedNote /> : null}
           </EditorField>
-          <EditorField label="Descripción (portugués)" hint="Opcional">
+          <EditorField label={`${copy.descriptionLabel} (${e.inPortuguese})`} hint={e.optional}>
             <textarea
               rows={2}
               className={editorInputClass}
               value={draft.text.pt ?? ''}
-              onChange={(e) => set('text', { ...draft.text, pt: e.target.value })}
+              onChange={(event) => setTranslated('text', 'pt', event.target.value)}
             />
+            {machine.text.has('pt') ? <MachineTranslatedNote /> : null}
           </EditorField>
         </div>
 
-        <EditorField label="Enlace" hint="Opcional. Debe empezar con https://">
+        <EditorField label={copy.linkLabel} hint={copy.linkHint}>
           <input
             className={editorInputClass}
             placeholder="https://…"
             value={draft.url ?? ''}
-            onChange={(e) => set('url', e.target.value || null)}
+            onChange={(event) => set('url', event.target.value || null)}
           />
         </EditorField>
         {draft.url ? (
-          <EditorField label="Texto del enlace (español)" hint="Si se deja vacío se usa el título">
+          <EditorField label={copy.ctaLabel} hint={copy.ctaHint}>
             <input
               className={editorInputClass}
               value={draft.cta?.es ?? ''}
-              onChange={(e) => set('cta', { ...(draft.cta ?? { es: '' }), es: e.target.value })}
+              onChange={(event) =>
+                set('cta', { ...(draft.cta ?? { es: '' }), es: event.target.value })
+              }
             />
           </EditorField>
         ) : null}
@@ -176,7 +231,11 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
 
       {error ? (
         <p role="alert" className="mt-3 text-xs font-medium text-rojo">
-          {error}
+          {error === 'required'
+            ? copy.requiredSpanish
+            : error === 'link'
+              ? copy.linkInvalid
+              : e.saveFailed}
         </p>
       ) : null}
 
@@ -187,14 +246,14 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
           disabled={saving}
           className="rounded-full bg-teal px-5 py-2 text-xs font-semibold text-blanco hover:bg-teal-deep disabled:opacity-60"
         >
-          {saving ? 'Guardando…' : 'Guardar'}
+          {saving ? e.saving : e.save}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-full border border-carbon/15 px-5 py-2 text-xs font-semibold text-pizarra hover:border-carbon/35"
         >
-          Cancelar
+          {e.cancel}
         </button>
       </div>
     </div>
@@ -211,9 +270,12 @@ function trimText<T extends { es: string; en?: string; pt?: string }>(value: T):
 }
 
 function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => void }) {
+  const { lang, t } = useI18n()
   const [items, setItems] = useState<Initiative[] | null>(null)
   const [editing, setEditing] = useState<Initiative | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<'load' | 'delete' | null>(null)
+  const e = t.admin.editor
+  const copy = t.admin.initiatives
 
   useEffect(() => {
     let cancelled = false
@@ -223,7 +285,7 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
         if (!cancelled) setItems(loaded)
       })
       .catch(() => {
-        if (!cancelled) setError('No se pudieron cargar las iniciativas.')
+        if (!cancelled) setError('load')
       })
     return () => {
       cancelled = true
@@ -231,23 +293,23 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
   }, [reloadKey])
 
   async function remove(item: Initiative) {
-    if (!window.confirm(`¿Eliminar "${item.title.es}"? Desaparecerá del sitio público.`)) return
+    if (!window.confirm(fill(e.deleteConfirm, { name: localizeText(item.title, lang) }))) return
     try {
       await contentAdmin.deleteInitiative(item.id)
       onChanged()
     } catch {
-      setError('No se pudo eliminar.')
+      setError('delete')
     }
   }
 
   if (error) {
     return (
       <p role="alert" className="text-sm text-rojo">
-        {error}
+        {error === 'load' ? copy.loadFailed : e.deleteFailed}
       </p>
     )
   }
-  if (!items) return <p className="text-sm text-pizarra">Cargando…</p>
+  if (!items) return <p className="text-sm text-pizarra">{e.loading}</p>
 
   const ids = items.map((i) => i.id)
   const nextOrder = items.reduce((max, i) => Math.max(max, i.order), -1) + 1
@@ -272,7 +334,7 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
           onClick={() => setEditing(emptyInitiative())}
           className="rounded-full bg-carbon px-5 py-2 text-xs font-semibold text-blanco hover:bg-carbon/85"
         >
-          + Añadir iniciativa
+          {copy.add}
         </button>
       )}
 
@@ -282,10 +344,19 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
             key={item.id}
             className="rounded-2xl border border-carbon/10 bg-white/80 p-4"
           >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h4 className="font-semibold">{item.title.es}</h4>
-                <p className="mt-0.5 text-xs text-pizarra">{item.text.es}</p>
+            {/* Not flex-wrap: a wrapping row lets the whole button group drop
+                to the next line as soon as the text is long, so rows with a
+                long URL looked different from rows without one. Wrapping is
+                decided by the breakpoint instead — stacked below sm, inline
+                above it — so every row in the list agrees. `min-w-0 flex-1`
+                is what lets the text shrink and truncate rather than shove. */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                {/* Shows the chosen language, falling back to Spanish — the
+                    list used to read `.es` regardless, so an English reviewer
+                    could not tell which card they were about to edit. */}
+                <h4 className="font-semibold">{localizeText(item.title, lang)}</h4>
+                <p className="mt-0.5 text-xs text-pizarra">{localizeText(item.text, lang)}</p>
                 {item.url ? (
                   <a
                     href={item.url}
@@ -300,20 +371,20 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
                   {item.title.en ? 'EN ✓' : 'EN —'} · {item.title.pt ? 'PT ✓' : 'PT —'}
                 </p>
               </div>
-              <div className="flex shrink-0 gap-2">
+              <div className="flex shrink-0 gap-2 self-start">
                 <button
                   type="button"
                   onClick={() => setEditing(item)}
-                  className="rounded-full border border-carbon/15 px-3.5 py-1.5 text-xs font-semibold text-pizarra hover:border-teal hover:text-teal"
+                  className={rowActionClass}
                 >
-                  Editar
+                  {e.edit}
                 </button>
                 <button
                   type="button"
                   onClick={() => void remove(item)}
-                  className="rounded-full border border-rojo/30 px-3.5 py-1.5 text-xs font-semibold text-rojo hover:bg-rojo/5"
+                  className={rowDestructiveActionClass}
                 >
-                  Eliminar
+                  {e.remove}
                 </button>
               </div>
             </div>
@@ -325,12 +396,13 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
 }
 
 export function InitiativesEditor() {
+  const { t } = useI18n()
   return (
     <ContentEditorShell
       kind="initiatives"
-      title="Iniciativas"
+      title={t.admin.initiatives.sectionName}
       seedCount={seed.length}
-      importDescription="Las tarjetas de Iniciativas se pueden administrar desde aquí: añadir, editar y eliminar, con título, descripción corta y enlace."
+      importDescription={t.admin.initiatives.importDescription}
     >
       {({ reloadKey, onChanged }) => <List reloadKey={reloadKey} onChanged={onChanged} />}
     </ContentEditorShell>

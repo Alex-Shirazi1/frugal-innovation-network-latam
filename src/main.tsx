@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles/global.css'
 import App from './App.tsx'
 import { AnalyticsProvider } from './lib/analytics.tsx'
+import { I18nProvider } from './i18n/I18nContext.tsx'
 
 // Moderation UI stays out of the public bundle — only loads on /admin.
 const AdminPage = lazy(() =>
@@ -27,9 +28,15 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AnalyticsProvider>
       {isAdminRoute() ? (
-        <Suspense fallback={null}>
-          <AdminPage />
-        </Suspense>
+        // App mounts its own I18nProvider, so the two routes each get one
+        // rather than hoisting it above a branch only one side of which is
+        // ever rendered. Both read the same `relif-lang` key, so a language
+        // chosen on the site is the language the panel opens in.
+        <I18nProvider>
+          <Suspense fallback={null}>
+            <AdminPage />
+          </Suspense>
+        </I18nProvider>
       ) : (
         <App />
       )}

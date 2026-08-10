@@ -15,6 +15,8 @@
     "test:watch": "vitest",
     "rules": "tsx server/scripts/generate-firestore-rules.ts",
     "test:rules": "firebase emulators:exec --only firestore,auth --project relif-rules-test \"vitest run server/firestore-rules.test.ts server/firestore-adapter.test.ts\"",
+    "emulators": "firebase emulators:start --only firestore,auth --project raif-af800",
+    "seed:emulator": "tsx server/scripts/seed-emulator.ts",
     "grant-admin": "tsx server/scripts/grant-admin.ts",
     "relock": "./scripts/relock.sh"
   },

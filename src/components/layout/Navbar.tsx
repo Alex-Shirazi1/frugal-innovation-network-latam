@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useI18n, type Lang } from '../../i18n/I18nContext'
+import { useI18n } from '../../i18n/I18nContext'
+import { LanguageToggle } from '../ui/LanguageToggle'
 
 const sections = [
   { href: '#origen', key: 'origin' },
@@ -11,34 +12,6 @@ const sections = [
   { href: '#recursos', key: 'library' },
   { href: '#contacto', key: 'contact' },
 ] as const
-
-function LanguageToggle() {
-  const { lang, setLang, t } = useI18n()
-  const options: Lang[] = ['es', 'en', 'pt']
-  return (
-    <div
-      role="group"
-      aria-label={t.common.languageLabel}
-      className="flex items-center rounded-full border border-carbon/15 bg-blanco/70 p-0.5 text-xs font-semibold"
-    >
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          onClick={() => setLang(option)}
-          aria-pressed={lang === option}
-          className={`rounded-full px-2 py-1 uppercase tracking-wide transition-colors sm:px-2.5 ${
-            lang === option
-              ? 'bg-carbon text-blanco'
-              : 'text-pizarra hover:text-carbon'
-          }`}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  )
-}
 
 export function Navbar() {
   const { t } = useI18n()
@@ -75,6 +48,14 @@ export function Navbar() {
           />
         </a>
 
+        {/*
+          The row overflowed its own max-w-7xl container by ~140px and clipped
+          the join button, at every width wide enough to show it. The fix was
+          the labels, not the breakpoint: these used to repeat each section's
+          full heading, and eight of those need more bar than the container has.
+          Terse labels bring Spanish — the longest language — to ~650px against
+          ~800px available, so xl is honest again. See `nav` in translations.ts.
+        */}
         <ul className="hidden xl:flex items-center gap-5 text-sm font-medium text-pizarra">
           {sections.map((section) => (
             <li key={section.href}>

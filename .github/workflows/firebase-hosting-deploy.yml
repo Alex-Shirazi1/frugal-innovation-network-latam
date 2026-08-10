@@ -58,6 +58,12 @@ jobs:
           # secret rather than a committed constant so the destination can be
           # repointed without a code change. Unset means no notification is sent.
           VITE_NOTIFY_TARGET: ${{ secrets.VITE_NOTIFY_TARGET }}
+          # Contact address for MyMemory's `de=` parameter, which raises the
+          # translation quota from 5,000 to 50,000 chars/day. A secret rather
+          # than a committed constant because this repository is public and the
+          # address should stay rotatable — it is inlined into the bundle and so
+          # publicly readable either way. Unset means the anonymous quota.
+          VITE_TRANSLATE_CONTACT: ${{ secrets.VITE_TRANSLATE_CONTACT }}
 
       # firestore.rules is generated from src/data/onboardingOptions.ts, so it can
       # only be trusted if it matches that data (checked by the drift test in

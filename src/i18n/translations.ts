@@ -1,10 +1,20 @@
 export const es = {
+  /**
+   * Navigation labels, deliberately shorter than the headings they point at.
+   *
+   * These used to repeat each section's full title — "Origen de la Red", "En
+   * Dónde Estamos", "Mundos de Transformación" — which made eight links 915px
+   * wide against 803px of bar, so the row overflowed and clipped the join
+   * button at every desktop width. Terse labels are how a nav normally reads
+   * (and how Apple fits eight items); the sections keep their full titles,
+   * which live under their own keys below.
+   */
   nav: {
-    origin: 'Origen de la Red',
-    conference: 'Mundos de Transformación',
+    origin: 'Origen',
+    conference: 'Congreso',
     frugal: 'Innovación Frugal',
     initiatives: 'Iniciativas',
-    map: 'En Dónde Estamos',
+    map: 'Mapa',
     members: 'Miembros',
     library: 'Recursos',
     about: 'Acerca de',
@@ -273,6 +283,146 @@ export const es = {
   footer: {
     rights: 'Hecho con frugalidad en América Latina.',
   },
+  /**
+   * The panel at /admin, where the network maintains its own three sections.
+   *
+   * Spanish stays the default: the people who actually run the network read it.
+   * The toggle exists because the panel is also maintained by people who do
+   * not, and a back office nobody on the team can read is a back office that
+   * gets worked around.
+   *
+   * Only the shell is here — sign-in, the header, the tabs. The three content
+   * editors are still Spanish-only.
+   */
+  admin: {
+    signInTitle: 'Panel de administración',
+    signInLede: 'Acceso restringido a moderadores autorizados de la red.',
+    emailLabel: 'Correo electrónico',
+    passwordLabel: 'Contraseña',
+    signIn: 'Entrar',
+    checking: 'Verificando…',
+    restoringSession: 'Verificando sesión…',
+    signInDenied: 'Esta cuenta no tiene permisos de moderación.',
+    signInFailed: 'No se pudo iniciar sesión. Revisa el correo y la contraseña.',
+    kicker: 'RELIF · Administración',
+    title: 'Administración del sitio',
+    backToSite: 'Volver al sitio',
+    signOut: 'Salir',
+    sectionsLabel: 'Secciones',
+    tabs: {
+      initiatives: 'Iniciativas',
+      bibliography: 'Bibliografía',
+      congress: 'Congreso',
+    },
+    footerNote:
+      'Los perfiles del directorio no se administran aquí. Se crean con el formulario de incorporación que la red envía después de conversar con la persona.',
+    contentNeedsFirebase:
+      'La edición de contenido requiere el backend de Firebase. Este panel está conectado al servidor local de desarrollo, que no tiene ruta de escritura para el contenido del sitio.',
+
+    /** Shared by all three editors — buttons, field suffixes, the import gate. */
+    editor: {
+      edit: 'Editar',
+      remove: 'Eliminar',
+      save: 'Guardar',
+      saving: 'Guardando…',
+      cancel: 'Cancelar',
+      loading: 'Cargando…',
+      saveFailed: 'No se pudo guardar. Revisa tu conexión e intenta de nuevo.',
+      deleteFailed: 'No se pudo eliminar.',
+      deleteConfirm: '¿Eliminar «{name}»? Desaparecerá del sitio público.',
+      // Appended to a field label, e.g. "Título (español) *".
+      inSpanish: 'español',
+      inEnglish: 'inglés',
+      inPortuguese: 'portugués',
+      english: 'Inglés',
+      portuguese: 'Portugués',
+      optional: 'Opcional',
+      optionalFallsBack: 'Opcional — si falta se usa el español',
+      importHeading: '{section}: aún no se administra aquí',
+      importCountNote:
+        'El sitio muestra ahora {count} elementos incluidos en el código. Al importarlos se copian a la base de datos y quedan editables. El sitio público no cambia.',
+      importAction: 'Importar {count} elementos',
+      importing: 'Importando…',
+      importFailed: 'No se pudo importar el contenido inicial.',
+      alreadyPopulated: 'La colección ya tiene contenido; recarga la página.',
+      countFailed: 'No se pudo leer la colección de {section}.',
+      loadingSection: 'Cargando {section}…',
+
+      /* Machine translation. Suggestions only — nothing is published until the
+         person saves, which is why the copy says "revísala" rather than
+         announcing the field as done. */
+      completeLanguages: 'Completar los idiomas que faltan',
+      translating: 'Traduciendo…',
+      translateNeedsText: 'Escribe en un idioma primero.',
+      machineTranslated: 'Traducción automática — revísala antes de guardar',
+      translateFailed: 'No se pudo traducir. Escribe el texto a mano.',
+      translateQuota:
+        'Se agotó la cuota gratuita de traducción de hoy. Escribe el texto a mano.',
+      translateTooLong: 'El texto es demasiado largo para traducirlo automáticamente.',
+    },
+
+    initiatives: {
+      sectionName: 'Iniciativas',
+      importDescription:
+        'Las tarjetas de Iniciativas se pueden administrar desde aquí: añadir, editar y eliminar, con título, descripción corta y enlace.',
+      add: '+ Añadir iniciativa',
+      newHeading: 'Nueva iniciativa',
+      editingHeading: 'Editando: {name}',
+      titleLabel: 'Título',
+      descriptionLabel: 'Descripción',
+      linkLabel: 'Enlace',
+      linkHint: 'Opcional. Debe empezar con https://',
+      ctaLabel: 'Texto del enlace (español)',
+      ctaHint: 'Si se deja vacío se usa el título',
+      requiredSpanish: 'El título y la descripción en español son obligatorios.',
+      linkInvalid: 'El enlace debe empezar con https://',
+      loadFailed: 'No se pudieron cargar las iniciativas.',
+    },
+
+    bibliography: {
+      sectionName: 'Bibliografía',
+      importDescription:
+        'La bibliografía se puede administrar desde aquí: añadir, editar y eliminar entradas del listado académico.',
+      add: '+ Añadir entrada',
+      newHeading: 'Nueva entrada',
+      editingHeading: 'Editando: {name}',
+      numberLabel: 'Número',
+      titleLabel: 'Título',
+      authorsLabel: 'Autoría',
+      yearLabel: 'Año',
+      yearHint: 'Vacío si el documento no lo indica',
+      languageLabel: 'Idioma',
+      fileLabel: 'Archivo',
+      fileHint:
+        'Ruta dentro del sitio, p. ej. /docs/biblio/001.pdf. La subida de archivos aún no está disponible.',
+      searchPlaceholder: 'Buscar por número, título o autoría…',
+      searchLabel: 'Buscar en la bibliografía',
+      countShown: '{shown} de {total} entradas',
+      requiredFields: 'Número, título y archivo son obligatorios.',
+      filePathOnly: 'El archivo debe ser una ruta dentro del sitio, no una URL completa.',
+      duplicateNumber: 'Ya existe una entrada con el número {number}.',
+      noYear: 's. f.',
+      loadFailed: 'No se pudo cargar la bibliografía.',
+    },
+
+    congress: {
+      intro:
+        'Esta tarjeta se actualiza cada año. El español es obligatorio; si falta inglés o portugués se muestra el español.',
+      kickerLabel: 'Antetítulo',
+      kickerHint: 'La línea pequeña sobre el título',
+      titleLabel: 'Título',
+      subtitleLabel: 'Descripción',
+      detailsLabel: 'Fechas y lugar',
+      detailsHint: 'Una sola línea, p. ej. 27–29 de mayo de 2026 · Bogotá, Colombia',
+      siteCtaLabel: 'Texto del botón',
+      siteUrlLabel: 'Enlace del sitio del congreso',
+      missingField: 'Falta «{field}» en español.',
+      urlInvalid: 'El enlace del congreso debe empezar con https://',
+      saveChanges: 'Guardar cambios',
+      savedNote: 'Guardado. El sitio público ya muestra estos cambios.',
+      loadFailed: 'No se pudo cargar la información del congreso.',
+    },
+  },
   common: {
     languageLabel: 'Idioma',
   },
@@ -288,11 +438,11 @@ export type Dictionary = DeepStringify<typeof es>
 
 export const en: Dictionary = {
   nav: {
-    origin: 'Origin of the Network',
-    conference: 'Worlds of Transformation',
+    origin: 'Origin',
+    conference: 'Congress',
     frugal: 'Frugal Innovation',
     initiatives: 'Initiatives',
-    map: 'Where We Are',
+    map: 'Map',
     members: 'Members',
     library: 'Resources',
     about: 'About',
@@ -561,6 +711,128 @@ export const en: Dictionary = {
   footer: {
     rights: 'Made frugally in Latin America.',
   },
+  admin: {
+    signInTitle: 'Administration panel',
+    signInLede: 'Restricted to authorised network moderators.',
+    emailLabel: 'Email address',
+    passwordLabel: 'Password',
+    signIn: 'Sign in',
+    checking: 'Checking…',
+    restoringSession: 'Checking session…',
+    signInDenied: 'This account does not have moderation permissions.',
+    signInFailed: 'Could not sign in. Check the email address and password.',
+    kicker: 'RELIF · Administration',
+    title: 'Site administration',
+    backToSite: 'Back to the site',
+    signOut: 'Sign out',
+    sectionsLabel: 'Sections',
+    tabs: {
+      initiatives: 'Initiatives',
+      bibliography: 'Bibliography',
+      congress: 'Congress',
+    },
+    footerNote:
+      'Directory profiles are not managed here. They are created with the incorporation form the network sends after talking to the person.',
+    contentNeedsFirebase:
+      'Content editing requires the Firebase backend. This panel is connected to the local development server, which has no write path for site content.',
+
+    editor: {
+      edit: 'Edit',
+      remove: 'Delete',
+      save: 'Save',
+      saving: 'Saving…',
+      cancel: 'Cancel',
+      loading: 'Loading…',
+      saveFailed: 'Could not save. Check your connection and try again.',
+      deleteFailed: 'Could not delete.',
+      deleteConfirm: 'Delete “{name}”? It will disappear from the public site.',
+      inSpanish: 'Spanish',
+      inEnglish: 'English',
+      inPortuguese: 'Portuguese',
+      english: 'English',
+      portuguese: 'Portuguese',
+      optional: 'Optional',
+      optionalFallsBack: 'Optional — Spanish is used when this is empty',
+      importHeading: '{section}: not managed here yet',
+      importCountNote:
+        'The site is currently showing {count} items built into the code. Importing copies them into the database and makes them editable. The public site does not change.',
+      importAction: 'Import {count} items',
+      importing: 'Importing…',
+      importFailed: 'Could not import the initial content.',
+      alreadyPopulated: 'The collection already has content; reload the page.',
+      countFailed: 'Could not read the {section} collection.',
+      loadingSection: 'Loading {section}…',
+      completeLanguages: 'Fill in the missing languages',
+      translating: 'Translating…',
+      translateNeedsText: 'Write in one language first.',
+      machineTranslated: 'Machine translation — review it before saving',
+      translateFailed: 'Could not translate. Type the text by hand.',
+      translateQuota: "Today's free translation quota is used up. Type the text by hand.",
+      translateTooLong: 'The text is too long to translate automatically.',
+    },
+
+    initiatives: {
+      sectionName: 'Initiatives',
+      importDescription:
+        'The Initiatives cards can be managed from here: add, edit and delete, with a title, a short description and a link.',
+      add: '+ Add initiative',
+      newHeading: 'New initiative',
+      editingHeading: 'Editing: {name}',
+      titleLabel: 'Title',
+      descriptionLabel: 'Description',
+      linkLabel: 'Link',
+      linkHint: 'Optional. Must start with https://',
+      ctaLabel: 'Link text (Spanish)',
+      ctaHint: 'The title is used when this is empty',
+      requiredSpanish: 'The Spanish title and description are required.',
+      linkInvalid: 'The link must start with https://',
+      loadFailed: 'Could not load the initiatives.',
+    },
+
+    bibliography: {
+      sectionName: 'Bibliography',
+      importDescription:
+        'The bibliography can be managed from here: add, edit and delete entries in the academic list.',
+      add: '+ Add entry',
+      newHeading: 'New entry',
+      editingHeading: 'Editing: {name}',
+      numberLabel: 'Number',
+      titleLabel: 'Title',
+      authorsLabel: 'Authors',
+      yearLabel: 'Year',
+      yearHint: 'Leave empty if the document does not state one',
+      languageLabel: 'Language',
+      fileLabel: 'File',
+      fileHint:
+        'A path inside the site, e.g. /docs/biblio/001.pdf. File upload is not available yet.',
+      searchPlaceholder: 'Search by number, title or author…',
+      searchLabel: 'Search the bibliography',
+      countShown: '{shown} of {total} entries',
+      requiredFields: 'Number, title and file are required.',
+      filePathOnly: 'The file must be a path inside the site, not a full URL.',
+      duplicateNumber: 'An entry with number {number} already exists.',
+      noYear: 'n.d.',
+      loadFailed: 'Could not load the bibliography.',
+    },
+
+    congress: {
+      intro:
+        'This card is updated once a year. Spanish is required; when English or Portuguese is missing, Spanish is shown.',
+      kickerLabel: 'Kicker',
+      kickerHint: 'The small line above the title',
+      titleLabel: 'Title',
+      subtitleLabel: 'Description',
+      detailsLabel: 'Dates and place',
+      detailsHint: 'A single line, e.g. 27–29 May 2026 · Bogotá, Colombia',
+      siteCtaLabel: 'Button text',
+      siteUrlLabel: 'Congress website link',
+      missingField: '“{field}” is missing in Spanish.',
+      urlInvalid: 'The congress link must start with https://',
+      saveChanges: 'Save changes',
+      savedNote: 'Saved. The public site is already showing these changes.',
+      loadFailed: 'Could not load the congress information.',
+    },
+  },
   common: {
     languageLabel: 'Language',
   },
@@ -568,11 +840,11 @@ export const en: Dictionary = {
 
 export const pt: Dictionary = {
   nav: {
-    origin: 'Origem da Rede',
-    conference: 'Mundos de Transformação',
+    origin: 'Origem',
+    conference: 'Congresso',
     frugal: 'Inovação Frugal',
     initiatives: 'Iniciativas',
-    map: 'Onde Estamos',
+    map: 'Mapa',
     members: 'Membros',
     library: 'Recursos',
     about: 'Sobre',
@@ -840,6 +1112,128 @@ export const pt: Dictionary = {
   },
   footer: {
     rights: 'Feito com frugalidade na América Latina.',
+  },
+  admin: {
+    signInTitle: 'Painel de administração',
+    signInLede: 'Acesso restrito a moderadores autorizados da rede.',
+    emailLabel: 'Endereço de e-mail',
+    passwordLabel: 'Senha',
+    signIn: 'Entrar',
+    checking: 'Verificando…',
+    restoringSession: 'Verificando sessão…',
+    signInDenied: 'Esta conta não tem permissões de moderação.',
+    signInFailed: 'Não foi possível entrar. Verifique o e-mail e a senha.',
+    kicker: 'RELIF · Administração',
+    title: 'Administração do site',
+    backToSite: 'Voltar ao site',
+    signOut: 'Sair',
+    sectionsLabel: 'Seções',
+    tabs: {
+      initiatives: 'Iniciativas',
+      bibliography: 'Bibliografia',
+      congress: 'Congresso',
+    },
+    footerNote:
+      'Os perfis do diretório não são administrados aqui. São criados com o formulário de incorporação que a rede envia depois de conversar com a pessoa.',
+    contentNeedsFirebase:
+      'A edição de conteúdo requer o backend do Firebase. Este painel está conectado ao servidor local de desenvolvimento, que não tem rota de escrita para o conteúdo do site.',
+
+    editor: {
+      edit: 'Editar',
+      remove: 'Excluir',
+      save: 'Salvar',
+      saving: 'Salvando…',
+      cancel: 'Cancelar',
+      loading: 'Carregando…',
+      saveFailed: 'Não foi possível salvar. Verifique sua conexão e tente de novo.',
+      deleteFailed: 'Não foi possível excluir.',
+      deleteConfirm: 'Excluir «{name}»? Vai desaparecer do site público.',
+      inSpanish: 'espanhol',
+      inEnglish: 'inglês',
+      inPortuguese: 'português',
+      english: 'Inglês',
+      portuguese: 'Português',
+      optional: 'Opcional',
+      optionalFallsBack: 'Opcional — se faltar, usa-se o espanhol',
+      importHeading: '{section}: ainda não é administrado aqui',
+      importCountNote:
+        'O site mostra agora {count} elementos incluídos no código. Ao importá-los, são copiados para a base de dados e ficam editáveis. O site público não muda.',
+      importAction: 'Importar {count} elementos',
+      importing: 'Importando…',
+      importFailed: 'Não foi possível importar o conteúdo inicial.',
+      alreadyPopulated: 'A coleção já tem conteúdo; recarregue a página.',
+      countFailed: 'Não foi possível ler a coleção de {section}.',
+      loadingSection: 'Carregando {section}…',
+      completeLanguages: 'Completar os idiomas que faltam',
+      translating: 'Traduzindo…',
+      translateNeedsText: 'Escreva em um idioma primeiro.',
+      machineTranslated: 'Tradução automática — revise antes de salvar',
+      translateFailed: 'Não foi possível traduzir. Escreva o texto à mão.',
+      translateQuota: 'A cota gratuita de tradução de hoje acabou. Escreva o texto à mão.',
+      translateTooLong: 'O texto é longo demais para traduzir automaticamente.',
+    },
+
+    initiatives: {
+      sectionName: 'Iniciativas',
+      importDescription:
+        'Os cartões de Iniciativas podem ser administrados aqui: adicionar, editar e excluir, com título, descrição curta e link.',
+      add: '+ Adicionar iniciativa',
+      newHeading: 'Nova iniciativa',
+      editingHeading: 'Editando: {name}',
+      titleLabel: 'Título',
+      descriptionLabel: 'Descrição',
+      linkLabel: 'Link',
+      linkHint: 'Opcional. Deve começar com https://',
+      ctaLabel: 'Texto do link (espanhol)',
+      ctaHint: 'Se ficar vazio, usa-se o título',
+      requiredSpanish: 'O título e a descrição em espanhol são obrigatórios.',
+      linkInvalid: 'O link deve começar com https://',
+      loadFailed: 'Não foi possível carregar as iniciativas.',
+    },
+
+    bibliography: {
+      sectionName: 'Bibliografia',
+      importDescription:
+        'A bibliografia pode ser administrada aqui: adicionar, editar e excluir entradas da lista acadêmica.',
+      add: '+ Adicionar entrada',
+      newHeading: 'Nova entrada',
+      editingHeading: 'Editando: {name}',
+      numberLabel: 'Número',
+      titleLabel: 'Título',
+      authorsLabel: 'Autoria',
+      yearLabel: 'Ano',
+      yearHint: 'Vazio se o documento não indicar',
+      languageLabel: 'Idioma',
+      fileLabel: 'Arquivo',
+      fileHint:
+        'Caminho dentro do site, p. ex. /docs/biblio/001.pdf. O envio de arquivos ainda não está disponível.',
+      searchPlaceholder: 'Buscar por número, título ou autoria…',
+      searchLabel: 'Buscar na bibliografia',
+      countShown: '{shown} de {total} entradas',
+      requiredFields: 'Número, título e arquivo são obrigatórios.',
+      filePathOnly: 'O arquivo deve ser um caminho dentro do site, não uma URL completa.',
+      duplicateNumber: 'Já existe uma entrada com o número {number}.',
+      noYear: 's. d.',
+      loadFailed: 'Não foi possível carregar a bibliografia.',
+    },
+
+    congress: {
+      intro:
+        'Este cartão é atualizado a cada ano. O espanhol é obrigatório; se faltar inglês ou português, mostra-se o espanhol.',
+      kickerLabel: 'Antetítulo',
+      kickerHint: 'A linha pequena acima do título',
+      titleLabel: 'Título',
+      subtitleLabel: 'Descrição',
+      detailsLabel: 'Datas e lugar',
+      detailsHint: 'Uma só linha, p. ex. 27–29 de maio de 2026 · Bogotá, Colômbia',
+      siteCtaLabel: 'Texto do botão',
+      siteUrlLabel: 'Link do site do congresso',
+      missingField: 'Falta «{field}» em espanhol.',
+      urlInvalid: 'O link do congresso deve começar com https://',
+      saveChanges: 'Salvar alterações',
+      savedNote: 'Salvo. O site público já mostra estas alterações.',
+      loadFailed: 'Não foi possível carregar as informações do congresso.',
+    },
   },
   common: {
     languageLabel: 'Idioma',

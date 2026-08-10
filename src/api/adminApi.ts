@@ -3,9 +3,11 @@
  *
  * Two backends behind one interface:
  *
- *  - Firestore (hosted): Google sign-in plus an `admin` custom claim, enforced
- *    by firestore.rules. A static site cannot hold a secret, so the shared-key
- *    scheme below is NOT usable in production.
+ *  - Firestore (hosted): Firebase Auth email and password, plus an `admin`
+ *    custom claim, enforced by firestore.rules. A static site cannot hold a
+ *    secret, so the shared-key scheme below is NOT usable in production — but
+ *    it does not need to be, because Firebase Auth holds the password hash and
+ *    checks it for us.
  *  - Express (local dev): the x-admin-key header, which is fine for a process
  *    on localhost reading a secret from the environment.
  *
@@ -20,7 +22,6 @@ import { avatarHueFor, positionTitles } from '../domain/intake'
 import type { ApiResponse, Member, PendingMember, PositionType } from './types'
 import type { Initiative } from '../data/initiatives'
 import type { BibliographyEntry } from '../data/bibliography'
-import type { Resource } from '../data/resources'
 import type { Congress } from '../data/congress'
 import { bundledDataSource } from './adapters/bundled'
 
@@ -34,6 +35,17 @@ export interface AdminSession {
   backend: AdminBackend
   /** Display label for whoever is signed in (email, or "local admin"). */
   label: string
+}
+
+/**
+ * What the sign-in form collects. One shape for both backends so the gate is a
+ * single form rather than one per deployment target — Firestore checks the pair
+ * against Firebase Auth, the Express prototype checks the password against its
+ * ADMIN_KEY and keeps the address only as a label.
+ */
+export interface AdminCredentials {
+  email: string
+  password: string
 }
 
 /* ------------------------------------------------------------------ Firestore */
@@ -96,12 +108,25 @@ function requireConfig() {
 }
 
 const firestoreAdmin = {
-  /** Google sign-in, then verify the claim actually grants moderation. */
-  async signIn(): Promise<AdminSession> {
+  /**
+   * Email and password, then verify the claim actually grants moderation.
+   *
+   * The password is never a value this codebase holds. Firebase Auth stores it
+   * hashed and checks it server-side, which is what lets a static site have a
+   * password gate at all — there is no secret in the bundle to leak, and the
+   * account can be rotated or disabled from the Firebase console without a
+   * redeploy.
+   *
+   * Signing in successfully is still not enough: the claim is the authorisation,
+   * and it is what firestore.rules checks. A signed-in account without it is
+   * signed straight back out, so a stray session cannot linger with a token the
+   * rules will reject anyway.
+   */
+  async signIn(email: string, password: string): Promise<AdminSession> {
     const config = requireConfig()
     const auth = await getAuthClient(config)
-    const { GoogleAuthProvider, signInWithPopup, signOut } = await import('firebase/auth')
-    const credential = await signInWithPopup(auth, new GoogleAuthProvider())
+    const { signInWithEmailAndPassword, signOut } = await import('firebase/auth')
+    const credential = await signInWithEmailAndPassword(auth, email, password)
 
     // force-refresh so a freshly granted claim is picked up without re-login.
     const token = await credential.user.getIdTokenResult(true)
@@ -198,10 +223,11 @@ async function keyedRequest<T>(path: string, adminKey: string, init?: RequestIni
 }
 
 const httpAdmin = {
-  async signIn(adminKey: string): Promise<AdminSession> {
-    await keyedRequest('/admin/login', adminKey, { method: 'POST' })
-    sessionStorage.setItem(KEY_STORAGE, adminKey)
-    return { backend: 'http', label: 'local admin' }
+  /** The password doubles as ADMIN_KEY here; the address is only a label. */
+  async signIn({ email, password }: AdminCredentials): Promise<AdminSession> {
+    await keyedRequest('/admin/login', password, { method: 'POST' })
+    sessionStorage.setItem(KEY_STORAGE, password)
+    return { backend: 'http', label: email || 'local admin' }
   },
 
   async restore(): Promise<AdminSession | null> {
@@ -248,8 +274,19 @@ const httpAdmin = {
 /* --------------------------------------------------- Editable site content */
 
 /**
- * Iniciativas and the bibliography, the two sections Allan asked to be able to
- * maintain himself.
+ * The collections that hold a list and therefore need the import step. The
+ * congress is a single document, so it is not one of these.
+ */
+export type ContentCollection = 'initiatives' | 'bibliography'
+
+/**
+ * The three sections the network maintains itself: Iniciativas, the
+ * bibliography, and the congress card.
+ *
+ * The Resources table (the handful of RELIF PDFs above the bibliography) was
+ * editable here too and is not any more — it was never one of the three that
+ * were asked for, and an editor nobody was going to open is still a write path
+ * that has to be kept correct.
  *
  * Firestore only — there is no Express equivalent, deliberately. The instructor
  * requires Firebase as the backend, `firestore.rules` is what actually enforces
@@ -268,7 +305,7 @@ export const contentAdmin = {
    * never imported. Import is therefore a deliberate first step, and this is
    * how the panel knows whether it has happened.
    */
-  async count(kind: 'initiatives' | 'bibliography' | 'resources'): Promise<number> {
+  async count(kind: ContentCollection): Promise<number> {
     const db = await getDb(requireConfig())
     const { collection, getCountFromServer } = await import('firebase/firestore')
     const snapshot = await getCountFromServer(collection(db, kind))
@@ -286,19 +323,6 @@ export const contentAdmin = {
     const db = await getDb(requireConfig())
     const { deleteDoc, doc } = await import('firebase/firestore')
     await deleteDoc(doc(db, 'initiatives', id))
-  },
-
-  async saveResource(resource: Resource): Promise<void> {
-    const db = await getDb(requireConfig())
-    const { doc, setDoc } = await import('firebase/firestore')
-    const { id, ...fields } = resource
-    await setDoc(doc(db, 'resources', id), fields)
-  },
-
-  async deleteResource(id: string): Promise<void> {
-    const db = await getDb(requireConfig())
-    const { deleteDoc, doc } = await import('firebase/firestore')
-    await deleteDoc(doc(db, 'resources', id))
   },
 
   /** The congress block is one document, so it is saved whole — no import step. */
@@ -330,7 +354,7 @@ export const contentAdmin = {
    * is explicit rather than automatic: a silent first-write on page load would
    * be a surprising thing for opening a dashboard to do.
    */
-  async importSeed(kind: 'initiatives' | 'bibliography' | 'resources'): Promise<number> {
+  async importSeed(kind: ContentCollection): Promise<number> {
     const db = await getDb(requireConfig())
     const { collection, doc, getDocs, writeBatch } = await import('firebase/firestore')
     const existing = await getDocs(collection(db, kind))
@@ -339,9 +363,7 @@ export const contentAdmin = {
     const records: Array<Record<string, unknown> & { id: string }> =
       kind === 'initiatives'
         ? (await bundledDataSource.getInitiatives()).map((i) => ({ ...i }))
-        : kind === 'resources'
-          ? (await bundledDataSource.getResources()).map((r) => ({ ...r }))
-          : (await bundledDataSource.getBibliography()).map((b) => ({ ...b }))
+        : (await bundledDataSource.getBibliography()).map((b) => ({ ...b }))
 
     // Batched so a half-imported collection cannot exist: it either all lands
     // or none of it does, and a partial import would look like deliberate
@@ -377,9 +399,10 @@ export function publishSubmission(id: string): Promise<void> {
 export const adminApi = {
   backend: adminBackend,
 
-  /** `secret` is only meaningful for the local Express backend. */
-  signIn: (secret?: string): Promise<AdminSession> =>
-    adminBackend() === 'firestore' ? firestoreAdmin.signIn() : httpAdmin.signIn(secret ?? ''),
+  signIn: (credentials: AdminCredentials): Promise<AdminSession> =>
+    adminBackend() === 'firestore'
+      ? firestoreAdmin.signIn(credentials.email, credentials.password)
+      : httpAdmin.signIn(credentials),
 
   restore: (): Promise<AdminSession | null> =>
     adminBackend() === 'firestore' ? firestoreAdmin.restore() : httpAdmin.restore(),

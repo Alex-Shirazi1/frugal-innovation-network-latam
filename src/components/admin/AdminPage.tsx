@@ -1,110 +1,93 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { adminApi, type AdminSession } from '../../api/adminApi'
+import { AdminHeader } from './AdminHeader'
 import { InitiativesEditor } from './InitiativesEditor'
 import { BibliographyEditor } from './BibliographyEditor'
-import { ResourcesEditor } from './ResourcesEditor'
 import { CongressEditor } from './CongressEditor'
-import type { PendingMember } from '../../api/types'
-import {
-  generalAreas,
-  languageOptions,
-  placeLabel,
-  researchInterests,
-} from '../../data/onboardingOptions'
-import { institutions } from '../../data/institutions'
+import { useI18n } from '../../i18n/I18nContext'
 
 const inputClass =
   'w-full rounded-xl border border-carbon/15 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-teal'
 
-function labelFrom(list: { id: string; es: string }[], id: string): string {
-  return list.find((entry) => entry.id === id)?.es ?? id
-}
-
-function institutionLabel(id: string | null): string {
-  if (!id) return 'Miembro independiente'
-  return institutions.find((i) => i.id === id)?.name ?? id
-}
-
 /**
- * Sign-in gate. On the hosted deployment this is Google sign-in gated by an
- * `admin` custom claim; a static site cannot hold a shared secret, so the key
- * form only appears when running against the local Express backend.
+ * Sign-in gate: one address and one password, for both backends.
+ *
+ * There is deliberately no "sign in with Google" here. The network has a single
+ * shared mailbox rather than a set of named moderators, so identity through a
+ * personal Google account modelled a distinction that does not exist — and it
+ * meant whoever held the panel had to have a Google account at all. Firebase
+ * Auth's email/password provider keeps the same security boundary: the password
+ * is hashed on Firebase's side and never enters this bundle, and the `admin`
+ * custom claim that firestore.rules actually checks is still what authorises.
  */
 function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void }) {
-  const backend = adminApi.backend()
-  const [key, setKey] = useState('')
+  const { t } = useI18n()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [status, setStatus] = useState<'idle' | 'checking' | 'failed' | 'denied'>('idle')
 
-  async function attempt(secret?: string) {
+  async function attempt() {
     setStatus('checking')
     try {
-      onSignedIn(await adminApi.signIn(secret))
+      onSignedIn(await adminApi.signIn({ email, password }))
     } catch (error: unknown) {
       setStatus(error instanceof Error && error.message === 'unauthorized' ? 'denied' : 'failed')
     }
   }
 
   return (
-    <div className="mx-auto max-w-sm pt-32 px-4">
-      <h1 className="font-display text-2xl font-semibold text-carbon">Panel de administración</h1>
+    <div className="mx-auto max-w-sm px-4 pt-24">
+      <h1 className="font-display text-2xl font-semibold text-carbon">{t.admin.signInTitle}</h1>
+      <p className="mt-2 text-sm text-pizarra">{t.admin.signInLede}</p>
 
-      {backend === 'firestore' ? (
-        <>
-          <p className="mt-2 text-sm text-pizarra">
-            Acceso restringido a moderadores autorizados de la red.
-          </p>
-          <button
-            type="button"
-            onClick={() => void attempt()}
-            disabled={status === 'checking'}
-            className="mt-6 w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
-          >
-            {status === 'checking' ? 'Verificando…' : 'Entrar con Google'}
-          </button>
-        </>
-      ) : (
-        <>
-          <p className="mt-2 text-sm text-pizarra">
-            Backend local — ingresa la clave de administración.
-          </p>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (key) void attempt(key)
-            }}
-            className="mt-6 space-y-4"
-          >
-            <input
-              type="password"
-              className={inputClass}
-              value={key}
-              onChange={(event) => {
-                setKey(event.target.value)
-                setStatus('idle')
-              }}
-              placeholder="Clave de administración"
-              autoComplete="current-password"
-              aria-label="Clave de administración"
-            />
-            <button
-              type="submit"
-              disabled={status === 'checking' || !key}
-              className="w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
-            >
-              {status === 'checking' ? 'Verificando…' : 'Entrar'}
-            </button>
-          </form>
-        </>
-      )}
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          if (email && password) void attempt()
+        }}
+        className="mt-6 space-y-3"
+      >
+        <input
+          type="email"
+          className={inputClass}
+          value={email}
+          onChange={(event) => {
+            setEmail(event.target.value)
+            setStatus('idle')
+          }}
+          placeholder={t.admin.emailLabel}
+          autoComplete="username"
+          aria-label={t.admin.emailLabel}
+        />
+        <input
+          type="password"
+          className={inputClass}
+          value={password}
+          onChange={(event) => {
+            setPassword(event.target.value)
+            setStatus('idle')
+          }}
+          placeholder={t.admin.passwordLabel}
+          autoComplete="current-password"
+          aria-label={t.admin.passwordLabel}
+        />
+        <button
+          type="submit"
+          disabled={status === 'checking' || !email || !password}
+          className="w-full rounded-full bg-teal px-6 py-3 text-sm font-bold text-blanco transition-colors hover:bg-teal-deep disabled:opacity-50"
+        >
+          {status === 'checking' ? t.admin.checking : t.admin.signIn}
+        </button>
+      </form>
 
       {status === 'denied' ? (
         <p role="alert" className="mt-4 text-xs font-medium text-teal-deep">
-          Esta cuenta no tiene permisos de moderación.
+          {t.admin.signInDenied}
         </p>
       ) : null}
       {status === 'failed' ? (
         <p role="alert" className="mt-4 text-xs font-medium text-teal-deep">
-          No se pudo iniciar sesión. Revisa la configuración o intenta de nuevo.
+          {t.admin.signInFailed}
         </p>
       ) : null}
     </div>
@@ -112,169 +95,35 @@ function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void
 }
 
 /**
- * One received expression of interest.
+ * The three sections the network maintains itself.
  *
- * There is deliberately no approve button. The network does not admit members
- * from this screen — someone reads the notification email, writes to the
- * person, has a conversation, asks for their organisation's logo and letter,
- * and only then sends the official Google Form. Filling in that form is what
- * creates a profile. A publish button here would model a step nobody performs,
- * and would let one click put someone on the public site ahead of the process
- * that is supposed to vet them.
+ * There is deliberately no membership queue here. Joining is a conversation,
+ * not a screen: the public form's whole job is to put an email in the network's
+ * inbox, after which someone writes back, has a call, and — if it is a fit —
+ * sends the private Google Form. Filling that in is what creates a profile, and
+ * the profile is published only if the person asked for it to be. None of those
+ * steps happen in a dashboard, so a dashboard for them modelled work nobody
+ * does.
  *
- * Discarding is kept, because spam arrives and the list needs a way to stay
- * readable. It removes a record; it does not deny anyone membership.
- */
-function PendingCard({
-  entry,
-  onDiscard,
-}: {
-  entry: PendingMember
-  onDiscard: (id: string) => Promise<void>
-}) {
-  const [busy, setBusy] = useState(false)
-
-  async function discard() {
-    if (
-      !window.confirm(
-        `¿Descartar la solicitud de ${entry.fullName}? Se borra el registro; no afecta al sitio público.`,
-      )
-    ) {
-      return
-    }
-    setBusy(true)
-    try {
-      await onDiscard(entry.id)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <li className="rounded-2xl border border-carbon/10 bg-white/80 p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="font-semibold">{entry.fullName}</h3>
-          <p className="text-xs text-pizarra">{entry.title.es}</p>
-          {entry.jobPositionName ? (
-            <p className="text-xs font-medium text-carbon">{entry.jobPositionName}</p>
-          ) : null}
-          {/* The queue's whole purpose is to start a conversation, so the
-              address is a link rather than text to copy out by hand. */}
-          {entry.email ? (
-            <a
-              href={`mailto:${entry.email}`}
-              className="mt-1 block text-xs font-medium text-teal hover:underline"
-            >
-              {entry.email}
-            </a>
-          ) : null}
-          <p className="mt-1 text-xs text-pizarra">
-            {institutionLabel(entry.affiliationId)} · {placeLabel(entry.region, 'es')},{' '}
-            {placeLabel(entry.country, 'es')}
-          </p>
-        </div>
-        <time className="text-[11px] text-pizarra" dateTime={entry.createdAt}>
-          {new Date(entry.createdAt).toLocaleString('es-MX')}
-        </time>
-      </div>
-
-      {entry.biography ? (
-        <p className="mt-3 text-xs leading-relaxed text-pizarra">{entry.biography}</p>
-      ) : null}
-
-      <ul className="mt-3 flex flex-wrap gap-1.5">
-        {entry.interestIds.map((id) => (
-          <li
-            key={id}
-            className="rounded-full bg-verde/12 px-2.5 py-1 text-[11px] font-medium text-[#5d8523]"
-          >
-            {labelFrom(researchInterests, id)}
-          </li>
-        ))}
-        {entry.generalAreaIds.map((id) => (
-          <li
-            key={id}
-            className="rounded-full bg-teal/10 px-2.5 py-1 text-[11px] font-medium text-teal-deep"
-          >
-            {labelFrom(generalAreas, id)}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-3 flex flex-wrap items-center gap-4 text-xs">
-        {entry.languages.length > 0 ? (
-          <span className="text-pizarra">
-            Idiomas: {entry.languages.map((id) => labelFrom(languageOptions, id)).join(' · ')}
-          </span>
-        ) : null}
-        {entry.socialUrl ? (
-          <a
-            href={entry.socialUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="font-semibold text-teal hover:underline"
-          >
-            ↗ {entry.socialUrl.replace(/^https?:\/\//, '')}
-          </a>
-        ) : null}
-      </div>
-
-      <div className="mt-4 flex gap-2">
-        <a
-          href={`mailto:${entry.email}?subject=${encodeURIComponent('Red Latinoamericana de Innovación Frugal')}`}
-          className="rounded-full bg-teal px-5 py-2 text-xs font-bold text-blanco transition-colors hover:bg-teal-deep"
-        >
-          ✉ Escribir a esta persona
-        </a>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => void discard()}
-          className="rounded-full border border-carbon/20 px-5 py-2 text-xs font-bold text-pizarra transition-colors hover:border-teal-deep hover:text-teal-deep disabled:opacity-50"
-        >
-          {busy ? 'Descartando…' : 'Descartar'}
-        </button>
-      </div>
-    </li>
-  )
-}
-
-/**
- * The panel's three jobs. Membership was the original one; the other two are
- * the sections Allan asked to maintain himself, and they only exist on the
- * Firestore backend — the Express prototype has no write path for content.
+ * Submissions are still stored and still readable by an admin (`listPending` in
+ * adminApi, exercised by the adapter tests) — they simply have no screen. That
+ * is the recovery path if a notification email is ever missed.
+ *
+ * `labelKey` rather than a label: the ids are stable state, the words are not.
  */
 const TABS = [
-  { id: 'solicitudes', label: 'Solicitudes' },
-  { id: 'iniciativas', label: 'Iniciativas' },
-  { id: 'documentos', label: 'Documentos' },
-  { id: 'bibliografia', label: 'Bibliografía' },
-  { id: 'congreso', label: 'Congreso' },
+  { id: 'iniciativas', labelKey: 'initiatives' },
+  { id: 'bibliografia', labelKey: 'bibliography' },
+  { id: 'congreso', labelKey: 'congress' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
 
 export function AdminPage() {
-  const [tab, setTab] = useState<TabId>('solicitudes')
+  const { t } = useI18n()
+  const [tab, setTab] = useState<TabId>('iniciativas')
   const [session, setSession] = useState<AdminSession | null>(null)
   const [restoring, setRestoring] = useState(true)
-  const [pending, setPending] = useState<PendingMember[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  const refresh = useCallback(async () => {
-    try {
-      setPending(await adminApi.listPending())
-      setError(null)
-    } catch (err: unknown) {
-      if (err instanceof Error && err.message === 'unauthorized') {
-        await adminApi.signOut()
-        setSession(null)
-      } else {
-        setError('No se pudo cargar la cola de solicitudes. Intenta de nuevo.')
-      }
-    }
-  }, [])
 
   // Restore an existing session (Firebase auth state, or the dev key) on load.
   useEffect(() => {
@@ -295,23 +144,11 @@ export function AdminPage() {
     }
   }, [])
 
-  useEffect(() => {
-    if (session) void refresh()
-  }, [session, refresh])
-
-  async function discard(id: string) {
-    try {
-      await adminApi.reject(id)
-      setPending((prev) => prev?.filter((entry) => entry.id !== id) ?? null)
-    } catch {
-      setError('No se pudo descartar — recarga e intenta de nuevo.')
-    }
-  }
-
   if (restoring) {
     return (
       <main className="min-h-screen bg-niebla/60">
-        <p className="pt-32 text-center text-sm text-pizarra">Verificando sesión…</p>
+        <AdminHeader />
+        <p className="pt-24 text-center text-sm text-pizarra">{t.admin.restoringSession}</p>
       </main>
     )
   }
@@ -319,6 +156,7 @@ export function AdminPage() {
   if (!session) {
     return (
       <main className="min-h-screen bg-niebla/60">
+        <AdminHeader />
         <LoginGate onSignedIn={setSession} />
       </main>
     )
@@ -326,38 +164,34 @@ export function AdminPage() {
 
   return (
     <main className="min-h-screen bg-niebla/60 pb-20">
-      <div className="mx-auto max-w-3xl px-4 pt-16">
+      <AdminHeader />
+      <div className="mx-auto max-w-3xl px-4 pt-10">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal">
-              RELIF · Administración
+              {t.admin.kicker}
             </p>
             <h1 className="mt-1 font-display text-3xl font-semibold text-carbon">
-              Administración del sitio
+              {t.admin.title}
             </h1>
             <p className="mt-1 text-xs text-pizarra">{session.label}</p>
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal hover:text-teal"
-            >
-              ⟳ Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                void adminApi.signOut().then(() => setSession(null))
-              }}
-              className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal-deep hover:text-teal-deep"
-            >
-              Salir
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              void adminApi.signOut().then(() => setSession(null))
+            }}
+            className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal-deep hover:text-teal-deep"
+          >
+            {t.admin.signOut}
+          </button>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-1.5" role="tablist" aria-label="Secciones">
+        <div
+          className="mt-6 flex flex-wrap gap-1.5"
+          role="tablist"
+          aria-label={t.admin.sectionsLabel}
+        >
           {TABS.map((entry) => (
             <button
               key={entry.id}
@@ -371,84 +205,30 @@ export function AdminPage() {
                   : 'border border-carbon/15 text-pizarra hover:border-carbon/35'
               }`}
             >
-              {entry.label}
+              {t.admin.tabs[entry.labelKey]}
             </button>
           ))}
         </div>
 
-        {tab !== 'solicitudes' && session.backend !== 'firestore' ? (
+        {/* Every section here writes through firestore.rules, which the Express
+            prototype has no equivalent for. Reads still work on any adapter, so
+            the public site is unaffected by which backend is configured. */}
+        {session.backend !== 'firestore' ? (
           <p className="mt-8 rounded-2xl border border-dashed border-carbon/25 p-6 text-sm text-pizarra">
-            La edición de contenido requiere el backend de Firebase. Este panel está conectado al
-            servidor local de desarrollo, que sólo administra solicitudes.
+            {t.admin.contentNeedsFirebase}
           </p>
-        ) : null}
-
-        {tab === 'iniciativas' && session.backend === 'firestore' ? (
+        ) : (
           <div className="mt-8">
-            <InitiativesEditor />
+            {tab === 'iniciativas' ? <InitiativesEditor /> : null}
+            {tab === 'bibliografia' ? <BibliographyEditor /> : null}
+            {tab === 'congreso' ? <CongressEditor /> : null}
           </div>
-        ) : null}
-
-        {tab === 'documentos' && session.backend === 'firestore' ? (
-          <div className="mt-8">
-            <ResourcesEditor />
-          </div>
-        ) : null}
-
-        {tab === 'congreso' && session.backend === 'firestore' ? (
-          <div className="mt-8">
-            <CongressEditor />
-          </div>
-        ) : null}
-
-        {tab === 'bibliografia' && session.backend === 'firestore' ? (
-          <div className="mt-8">
-            <BibliographyEditor />
-          </div>
-        ) : null}
-
-        {error && tab === 'solicitudes' ? (
-          <p
-            role="alert"
-            className="mt-6 rounded-xl border border-naranja/40 bg-naranja/10 p-4 text-sm text-carbon"
-          >
-            {error}
-          </p>
-        ) : null}
-
-        {tab === 'solicitudes' && pending === null && !error ? (
-          <p className="mt-10 text-sm text-pizarra">Cargando solicitudes…</p>
-        ) : null}
-
-        {tab === 'solicitudes' && pending !== null && pending.length === 0 ? (
-          <p className="mt-10 rounded-2xl border border-dashed border-carbon/20 p-10 text-center text-sm text-pizarra">
-            No hay solicitudes pendientes.
-          </p>
-        ) : null}
-
-        {tab === 'solicitudes' && pending !== null && pending.length > 0 ? (
-          <>
-            <p className="mt-6 text-sm text-pizarra" role="status">
-              {pending.length} solicitud{pending.length === 1 ? '' : 'es'} recibida
-              {pending.length === 1 ? '' : 's'}
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-pizarra">
-              Cada persona de esta lista escribió al sitio para presentarse. El siguiente paso es
-              escribirle y conversar; el perfil público se crea después, con el formulario de
-              incorporación.
-            </p>
-            <ul className="mt-4 space-y-4">
-              {pending.map((entry) => (
-                <PendingCard key={entry.id} entry={entry} onDiscard={discard} />
-              ))}
-            </ul>
-          </>
-        ) : null}
+        )}
 
         <p className="mt-12 text-center text-xs text-pizarra/70">
-          Los perfiles del directorio se crean con el formulario de incorporación, no desde aquí.{' '}
+          {t.admin.footerNote}{' '}
           <a href="/" className="font-semibold text-teal hover:underline">
-            ← Volver al sitio
+            ← {t.admin.backToSite}
           </a>
         </p>
       </div>

@@ -12,8 +12,9 @@
  *   npm run grant-admin -- someone@example.com
  *   npm run grant-admin -- someone@example.com --revoke
  *
- * The target account must have signed in to /admin at least once, because a
- * claim can only be attached to a user record that already exists.
+ * The target account must already exist in Firebase Auth — created in the
+ * console under Authentication > Users, or by signing in to /admin once —
+ * because a claim can only be attached to an existing user record.
  */
 import { cert, initializeApp, applicationDefault, getApps } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
@@ -66,8 +67,9 @@ try {
   const message = error instanceof Error ? error.message : String(error)
   if (message.includes('no user record')) {
     console.error(
-      `No account for ${email}. Have them open /admin and sign in with Google once,\n` +
-        'then run this again — a claim can only attach to an existing user record.',
+      `No account for ${email}. Create it first in the Firebase console under\n` +
+        'Authentication > Users (Email/Password), then run this again — a claim\n' +
+        'can only attach to an existing user record.',
     )
   } else if (message.includes('Could not load the default credentials')) {
     console.error(

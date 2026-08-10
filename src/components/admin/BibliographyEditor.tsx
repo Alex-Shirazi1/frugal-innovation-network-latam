@@ -2,10 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { contentAdmin } from '../../api/adminApi'
 import { createDataSource } from '../../api'
 import { bibliography as seed, type BibliographyEntry } from '../../data/bibliography'
+import { useI18n } from '../../i18n/I18nContext'
 import {
   ContentEditorShell,
   EditorField,
   editorInputClass,
+  fill,
+  rowActionClass,
+  rowDestructiveActionClass,
 } from './ContentEditorShell'
 
 function emptyEntry(): BibliographyEntry {
@@ -28,11 +32,17 @@ interface FormProps {
   onCancel: () => void
 }
 
+/** Which validation failed, plus the number that made it fail if relevant. */
+type FormError = { kind: 'required' | 'path' | 'save' } | { kind: 'duplicate'; number: string }
+
 function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
+  const { t } = useI18n()
   const [draft, setDraft] = useState<BibliographyEntry>(initial)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<FormError | null>(null)
   const isNew = initial.id === ''
+  const e = t.admin.editor
+  const copy = t.admin.bibliography
 
   function set<K extends keyof BibliographyEntry>(key: K, value: BibliographyEntry[K]) {
     setDraft((prev) => ({ ...prev, [key]: value }))
@@ -43,7 +53,7 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
     const title = draft.title.trim()
     const file = draft.file.trim()
     if (!paperNumber || !title || !file) {
-      setError('Número, título y archivo son obligatorios.')
+      setError({ kind: 'required' })
       return
     }
     /*
@@ -53,13 +63,13 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
      * here is better than accepting a path that silently 404s.
      */
     if (/^https?:\/\//.test(file)) {
-      setError('El archivo debe ser una ruta dentro del sitio, no una URL completa.')
+      setError({ kind: 'path' })
       return
     }
 
     const id = isNew ? `biblio-${paperNumber.padStart(3, '0')}` : draft.id
     if (isNew && existingIds.includes(id)) {
-      setError(`Ya existe una entrada con el número ${paperNumber}.`)
+      setError({ kind: 'duplicate', number: paperNumber })
       return
     }
 
@@ -76,7 +86,7 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
       })
       onSaved()
     } catch {
-      setError('No se pudo guardar. Revisa tu conexión e intenta de nuevo.')
+      setError({ kind: 'save' })
     } finally {
       setSaving(false)
     }
@@ -85,50 +95,52 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
   return (
     <div className="rounded-2xl border border-teal/40 bg-teal-tint/40 p-5">
       <h4 className="mb-3 font-display text-base font-semibold">
-        {isNew ? 'Nueva entrada' : `Editando: ${initial.paperNumber}`}
+        {isNew ? copy.newHeading : fill(copy.editingHeading, { name: initial.paperNumber })}
       </h4>
 
       <div className="grid gap-3">
         <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
-          <EditorField label="Número *">
+          <EditorField label={`${copy.numberLabel} *`}>
             <input
               className={editorInputClass}
               value={draft.paperNumber}
-              onChange={(e) => set('paperNumber', e.target.value)}
+              onChange={(event) => set('paperNumber', event.target.value)}
               disabled={!isNew}
             />
           </EditorField>
-          <EditorField label="Título *">
+          <EditorField label={`${copy.titleLabel} *`}>
             <input
               className={editorInputClass}
               value={draft.title}
-              onChange={(e) => set('title', e.target.value)}
+              onChange={(event) => set('title', event.target.value)}
             />
           </EditorField>
         </div>
 
-        <EditorField label="Autoría">
+        <EditorField label={copy.authorsLabel}>
           <input
             className={editorInputClass}
             value={draft.authors}
-            onChange={(e) => set('authors', e.target.value)}
+            onChange={(event) => set('authors', event.target.value)}
           />
         </EditorField>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <EditorField label="Año" hint="Vacío si el documento no lo indica">
+          <EditorField label={copy.yearLabel} hint={copy.yearHint}>
             <input
               className={editorInputClass}
               type="number"
               value={draft.year ?? ''}
-              onChange={(e) => set('year', e.target.value ? Number(e.target.value) : null)}
+              onChange={(event) => set('year', event.target.value ? Number(event.target.value) : null)}
             />
           </EditorField>
-          <EditorField label="Idioma">
+          <EditorField label={copy.languageLabel}>
             <select
               className={editorInputClass}
               value={draft.language}
-              onChange={(e) => set('language', e.target.value as BibliographyEntry['language'])}
+              onChange={(event) =>
+                set('language', event.target.value as BibliographyEntry['language'])
+              }
             >
               <option value="ES">ES</option>
               <option value="EN">EN</option>
@@ -136,14 +148,11 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
           </EditorField>
         </div>
 
-        <EditorField
-          label="Archivo *"
-          hint="Ruta dentro del sitio, p. ej. /docs/biblio/001.pdf. La subida de archivos aún no está disponible."
-        >
+        <EditorField label={`${copy.fileLabel} *`} hint={copy.fileHint}>
           <input
             className={editorInputClass}
             value={draft.file}
-            onChange={(e) => set('file', e.target.value)}
+            onChange={(event) => set('file', event.target.value)}
             placeholder="/docs/biblio/…"
           />
         </EditorField>
@@ -151,7 +160,13 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
 
       {error ? (
         <p role="alert" className="mt-3 text-xs font-medium text-rojo">
-          {error}
+          {error.kind === 'required'
+            ? copy.requiredFields
+            : error.kind === 'path'
+              ? copy.filePathOnly
+              : error.kind === 'duplicate'
+                ? fill(copy.duplicateNumber, { number: error.number })
+                : e.saveFailed}
         </p>
       ) : null}
 
@@ -162,14 +177,14 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
           disabled={saving}
           className="rounded-full bg-teal px-5 py-2 text-xs font-semibold text-blanco hover:bg-teal-deep disabled:opacity-60"
         >
-          {saving ? 'Guardando…' : 'Guardar'}
+          {saving ? e.saving : e.save}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="rounded-full border border-carbon/15 px-5 py-2 text-xs font-semibold text-pizarra hover:border-carbon/35"
         >
-          Cancelar
+          {e.cancel}
         </button>
       </div>
     </div>
@@ -177,10 +192,13 @@ function EntryForm({ initial, existingIds, onSaved, onCancel }: FormProps) {
 }
 
 function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => void }) {
+  const { t } = useI18n()
   const [items, setItems] = useState<BibliographyEntry[] | null>(null)
   const [editing, setEditing] = useState<BibliographyEntry | null>(null)
   const [query, setQuery] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<'load' | 'delete' | null>(null)
+  const e = t.admin.editor
+  const copy = t.admin.bibliography
 
   useEffect(() => {
     let cancelled = false
@@ -190,7 +208,7 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
         if (!cancelled) setItems(loaded)
       })
       .catch(() => {
-        if (!cancelled) setError('No se pudo cargar la bibliografía.')
+        if (!cancelled) setError('load')
       })
     return () => {
       cancelled = true
@@ -208,23 +226,23 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
   }, [items, query])
 
   async function remove(entry: BibliographyEntry) {
-    if (!window.confirm(`¿Eliminar "${entry.title}"? Desaparecerá del sitio público.`)) return
+    if (!window.confirm(fill(e.deleteConfirm, { name: entry.title }))) return
     try {
       await contentAdmin.deleteBibliographyEntry(entry.id)
       onChanged()
     } catch {
-      setError('No se pudo eliminar.')
+      setError('delete')
     }
   }
 
   if (error) {
     return (
       <p role="alert" className="text-sm text-rojo">
-        {error}
+        {error === 'load' ? copy.loadFailed : e.deleteFailed}
       </p>
     )
   }
-  if (!items) return <p className="text-sm text-pizarra">Cargando…</p>
+  if (!items) return <p className="text-sm text-pizarra">{e.loading}</p>
 
   return (
     <div className="space-y-4">
@@ -246,52 +264,51 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
             onClick={() => setEditing(emptyEntry())}
             className="rounded-full bg-carbon px-5 py-2 text-xs font-semibold text-blanco hover:bg-carbon/85"
           >
-            + Añadir entrada
+            {copy.add}
           </button>
           <input
             type="search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por número, título o autoría…"
-            aria-label="Buscar en la bibliografía"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={copy.searchPlaceholder}
+            aria-label={copy.searchLabel}
             className="min-w-0 flex-1 rounded-full border border-carbon/15 bg-white px-4 py-2 text-xs outline-none focus:border-teal"
           />
         </div>
       )}
 
       <p className="text-xs text-pizarra" role="status">
-        {shown.length} de {items.length} entradas
+        {fill(copy.countShown, { shown: shown.length, total: items.length })}
       </p>
 
       <ul className="space-y-2">
         {shown.map((entry) => (
           <li
             key={entry.id}
-            className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-carbon/10 bg-white/80 p-3"
+            /* See the note in InitiativesEditor: flex-wrap dropped the whole
+               button group onto its own line whenever a title ran long, so
+               rows disagreed with each other down the list. */
+            className="flex flex-col gap-3 rounded-xl border border-carbon/10 bg-white/80 p-3 sm:flex-row sm:items-start sm:justify-between"
           >
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">
                 <span className="text-pizarra">{entry.paperNumber}</span> · {entry.title}
               </p>
               <p className="mt-0.5 text-xs text-pizarra">
-                {entry.authors || '—'} · {entry.year ?? 's. f.'} · {entry.language}
+                {entry.authors || '—'} · {entry.year ?? copy.noYear} · {entry.language}
               </p>
               <p className="mt-0.5 truncate text-[11px] text-pizarra/70">{entry.file}</p>
             </div>
-            <div className="flex shrink-0 gap-2">
-              <button
-                type="button"
-                onClick={() => setEditing(entry)}
-                className="rounded-full border border-carbon/15 px-3 py-1.5 text-xs font-semibold text-pizarra hover:border-teal hover:text-teal"
-              >
-                Editar
+            <div className="flex shrink-0 gap-2 self-start">
+              <button type="button" onClick={() => setEditing(entry)} className={rowActionClass}>
+                {e.edit}
               </button>
               <button
                 type="button"
                 onClick={() => void remove(entry)}
-                className="rounded-full border border-rojo/30 px-3 py-1.5 text-xs font-semibold text-rojo hover:bg-rojo/5"
+                className={rowDestructiveActionClass}
               >
-                Eliminar
+                {e.remove}
               </button>
             </div>
           </li>
@@ -302,12 +319,13 @@ function List({ reloadKey, onChanged }: { reloadKey: number; onChanged: () => vo
 }
 
 export function BibliographyEditor() {
+  const { t } = useI18n()
   return (
     <ContentEditorShell
       kind="bibliography"
-      title="Bibliografía"
+      title={t.admin.bibliography.sectionName}
       seedCount={seed.length}
-      importDescription="La bibliografía se puede administrar desde aquí: añadir, editar y eliminar entradas del listado académico."
+      importDescription={t.admin.bibliography.importDescription}
     >
       {({ reloadKey, onChanged }) => <List reloadKey={reloadKey} onChanged={onChanged} />}
     </ContentEditorShell>
