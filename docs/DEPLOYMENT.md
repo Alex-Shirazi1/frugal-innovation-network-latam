@@ -53,13 +53,21 @@ Console > **Firestore Database** > *Create database*.
   prefer data closer to the network. **This is permanent** — it cannot be
   changed later without recreating the database.
 
-### 3. Enable Google sign-in
+### 3. Enable Email/Password sign-in
 
-Console > **Authentication** > *Get started* > **Google** > enable > Save.
+Console > **Authentication** > *Get started* > **Email/Password** > enable >
+Save. Leave "Email link (passwordless sign-in)" off.
 
 Then under **Authentication > Settings > Authorized domains**, confirm your
 hosting domain is listed (`raif-af800.web.app` and any custom domain). Sign-in
 silently fails from unlisted domains.
+
+Not Google sign-in. The network has one shared mailbox rather than a set of
+named moderators, so identity through a personal Google account modelled a
+distinction that does not exist — and it required whoever holds the panel to
+have a Google account at all. Email/password keeps the same security boundary:
+the password is hashed on Firebase's side and never enters the bundle, and the
+`admin` claim is still what authorises.
 
 ### 4. Deploy the security rules
 
@@ -90,33 +98,35 @@ npx firebase deploy --only firestore:rules,firestore:indexes
 Do not hand-edit `firestore.rules` — it is generated, and the drift test will
 fail the build. Change `src/data/onboardingOptions.ts` and run `npm run rules`.
 
-### 5. Grant Allan the admin claim
+### 5. Create the account and grant the admin claim
 
 This is the only step with no console UI. Moderation is gated on a custom claim,
 not merely on being signed in, so someone has to set it once per moderator.
 
-Have Allan sign in to `/admin` once first so his account exists. Then, from
-**Project settings > Service accounts**, click *Generate new private key* and
-run this locally — **never commit the key**:
+Authenticate once, then run the script — no service-account key is downloaded,
+so there is no long-lived secret to leak or remember to delete:
 
 ```bash
-npm i -g firebase-admin   # or run in a scratch folder
-GOOGLE_APPLICATION_CREDENTIALS=./serviceAccountKey.json node -e "
-const admin = require('firebase-admin');
-admin.initializeApp();
-admin.auth().getUserByEmail('allan@example.com')
-  .then(u => admin.auth().setCustomUserClaims(u.uid, { admin: true }))
-  .then(() => console.log('admin claim granted'))
-  .catch(e => { console.error(e.message); process.exit(1); });
-"
+gcloud auth application-default login
+npm run grant-admin -- contacto@redinnovacionfrugal.lat --create
 ```
 
-Replace the email with Allan's real Google account. Delete the key file
-afterwards; `.gitignore` already blocks `serviceAccountKey*.json`, but the safe
-move is to remove it and revoke it in the console.
+`--create` makes the account when it does not exist yet and prints a
+**password-reset link**. Open that link to choose the password. Doing it this
+way means the password is never typed into a terminal, a chat window or a
+shell history — the only place it ends up is Firebase Auth's hash and whatever
+password manager you paste it into.
 
-He then reloads `/admin` and gets the queue. Without the claim he sees
-"this account has no moderation permissions", which is the intended refusal.
+For an account that already exists, drop `--create`. To remove a moderator:
+
+```bash
+npm run grant-admin -- someone@example.com --revoke
+```
+
+Signing in is not enough on its own: an account without the claim is signed
+straight back out and sees "this account has no moderation permissions", which
+is the intended refusal. After the claim is granted the account must sign out
+and back in, because the claim rides in the ID token.
 
 ### 6. Point the site at Firestore
 
@@ -206,6 +216,91 @@ fraction of one percent. Hosting for a static site is likewise free.
 The only way this generates a bill is enabling Blaze, which nothing in this
 design requires. If someone later proposes Cloud Functions, scheduled jobs, or
 server-side rendering, that is the moment to talk to Allan about cost.
+
+## Where secrets live, and why GitHub is the right place
+
+Worth being precise, because "secrets" here covers two different things.
+
+**The `VITE_*` values are not secrets.** Vite inlines them into the JavaScript
+at build time, so every one of them is readable by anyone who opens the
+deployed site and views source. That is not a leak — it is how a static site
+works, and `firestore.rules` is the actual security boundary. They live in
+GitHub Actions secrets for two reasons that have nothing to do with
+confidentiality:
+
+- the repository is public, so a value committed to it is in the history of
+  every clone and fork permanently;
+- a secret can be rotated by changing one field, without a code change.
+
+Moving them to Google Secret Manager or Firebase would change where CI reads
+them from and nothing else — they would still end up inlined in the bundle. A
+browser application cannot hold a secret. If something genuinely must stay
+private, it cannot go in the client at all; it needs a server, which this
+project deliberately does not have.
+
+**`FIREBASE_SERVICE_ACCOUNT` is a real secret.** It grants administrative
+access to the whole project. A GitHub Actions secret is a reasonable home, but
+the stronger option is **Workload Identity Federation**: GitHub mints a
+short-lived token per run and no long-lived JSON key exists anywhere. That is
+the one secrets change actually worth making here. Firebase offers nothing that
+improves on it.
+
+## Migrating to a different Firebase project
+
+Everything below was configured by hand on `raif-af800` and has to be
+reproduced on any replacement. The repository does not encode it.
+
+**Project**
+
+- Project id `raif-af800` (display name RAIF, number 278114521173), on the
+  **Spark** plan. Deliberately no billing account — see "Ongoing costs".
+- Set the new id in `.firebaserc`, in `npm run emulators`, and in
+  `server/scripts/seed-emulator.ts` / `grant-admin.ts`, which default to it.
+
+**Hosting** — serves `dist`, with every path rewritten to `/index.html` for the
+SPA. Config is committed in `firebase.json`; nothing to do by hand.
+
+**Firestore** — create the database, then let CI deploy rules and indexes.
+Collections used: `submissions`, `members`, `initiatives`, `bibliography`,
+`resources`, and `siteContent/congress`. `firestore.rules` is **generated** from
+`src/data/onboardingOptions.ts` by `npm run rules`; edit the generator, not the
+output.
+
+**Authentication** — enable the **Email/Password** provider, add the hosting
+domains under Authorized domains, then create each moderator and grant the
+`admin` claim (step 5). The claim is not stored in Firestore and does not
+migrate with a data export — it lives on the Auth user record and must be
+re-granted per project.
+
+**Service account for CI** — the deploy uses
+`firebase-adminsdk-fbsvc@<project>.iam.gserviceaccount.com`. Twelve consecutive
+deploys once failed because it lacked permissions; the rules step failed first
+and the hosting step was skipped. It needs:
+
+- `roles/serviceusage.serviceUsageViewer` (`serviceusage.services.get`)
+- `roles/datastore.indexAdmin` (`datastore.indexes.*`)
+- `roles/firebaserules.admin` (`firebaserules.rulesets.test`)
+
+If deploys start failing after a migration, check these bindings first.
+
+**GitHub Actions secrets** the workflow reads:
+
+| Secret | Purpose | Real secret? |
+|---|---|---|
+| `FIREBASE_SERVICE_ACCOUNT` | CI deploy credentials | **Yes** |
+| `VITE_FIREBASE_API_KEY` · `_PROJECT_ID` · `_APP_ID` | web config | No — publishable |
+| `VITE_NOTIFY_TARGET` | FormSubmit alias for join notifications | No |
+| `VITE_TRANSLATE_CONTACT` | MyMemory quota contact | No |
+| `VITE_POSTHOG_KEY` | analytics project key | No — write-only |
+
+**Emulator** — ports and `singleProjectMode` are committed in `firebase.json`.
+Note that `singleProjectMode` means `npm test` writes its fixtures into a
+running emulator regardless of project id.
+
+**Known issue, not yet fixed** — `firebase.json` has no `headers` block, so
+`index.html` is served with `cache-control: max-age=3600`. A returning visitor
+can see a stale build for up to an hour after a deploy. The fix is `no-cache`
+on `index.html` and long-lived immutable caching on the hashed `/assets/*`.
 
 ## Things deliberately not done
 

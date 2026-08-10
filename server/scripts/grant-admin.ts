@@ -1,6 +1,6 @@
 /**
- * Grants or revokes the `admin` custom claim that firestore.rules checks before
- * allowing moderation.
+ * Creates a moderator account, and grants or revokes the `admin` custom claim
+ * that firestore.rules checks before allowing moderation.
  *
  * Moderation is gated on the claim rather than on merely being signed in, and
  * there is no console UI for setting claims, so this script is the only way in.
@@ -9,12 +9,18 @@
  * file is ever downloaded or left on disk:
  *
  *   gcloud auth application-default login
+ *   npm run grant-admin -- someone@example.com --create
  *   npm run grant-admin -- someone@example.com
  *   npm run grant-admin -- someone@example.com --revoke
  *
- * The target account must already exist in Firebase Auth — created in the
- * console under Authentication > Users, or by signing in to /admin once —
- * because a claim can only be attached to an existing user record.
+ * `--create` makes the account when it does not exist yet and prints a
+ * password-reset link instead of setting a password. That is the point: a
+ * password passed on a command line is in the shell history, the terminal
+ * scrollback and anything reading either. Sending the person to a reset link
+ * means the only copies are Firebase Auth's hash and their password manager.
+ *
+ * Without `--create` the account must already exist, because a claim can only
+ * be attached to an existing user record.
  */
 import { cert, initializeApp, applicationDefault, getApps } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
@@ -23,10 +29,18 @@ import { readFileSync } from 'node:fs'
 const args = process.argv.slice(2)
 const email = args.find((a) => !a.startsWith('--'))
 const revoke = args.includes('--revoke')
+const create = args.includes('--create')
 const keyFile = args.find((a) => a.startsWith('--key='))?.slice('--key='.length)
 
 if (!email) {
-  console.error('usage: npm run grant-admin -- <email> [--revoke] [--key=path/to/sa.json]')
+  console.error(
+    'usage: npm run grant-admin -- <email> [--create] [--revoke] [--key=path/to/sa.json]',
+  )
+  process.exit(1)
+}
+
+if (create && revoke) {
+  console.error('--create and --revoke contradict each other; pick one.')
   process.exit(1)
 }
 
@@ -45,8 +59,28 @@ if (getApps().length === 0) {
 
 const auth = getAuth()
 
+/**
+ * Fetches the account, creating it first when asked to.
+ *
+ * Created with no password at all rather than a generated one. Firebase is
+ * happy to hold a passwordless email account, and the reset link below is what
+ * gives it a password — so there is never a moment where a working password
+ * exists that the person does not control.
+ */
+async function resolveUser() {
+  try {
+    return await auth.getUserByEmail(email!)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (!create || !message.includes('no user record')) throw error
+    const created = await auth.createUser({ email: email!, emailVerified: false })
+    console.log(`created ${email} (${created.uid})`)
+    return created
+  }
+}
+
 try {
-  const user = await auth.getUserByEmail(email)
+  const user = await resolveUser()
   const existing = user.customClaims ?? {}
 
   if (revoke) {
@@ -61,15 +95,32 @@ try {
 
   const after = (await auth.getUser(user.uid)).customClaims
   console.log('claims now:', JSON.stringify(after))
+
+  if (create && !revoke) {
+    // Printed rather than emailed: Firebase only sends this itself through its
+    // own template, and the address may well be a shared inbox nobody is
+    // watching right now. Handing over the link puts the choice of how it
+    // travels with whoever ran the command.
+    const link = await auth.generatePasswordResetLink(email)
+    console.log('\nSet the password with this link (single use, expires in an hour):\n')
+    console.log(`  ${link}\n`)
+    console.log('Choose it in a password manager rather than inventing one here.')
+  }
+
   console.log('\nThe account must sign out and back in (or hard-refresh /admin)')
   console.log('for the new token to carry the claim.')
 } catch (error: unknown) {
   const message = error instanceof Error ? error.message : String(error)
   if (message.includes('no user record')) {
     console.error(
-      `No account for ${email}. Create it first in the Firebase console under\n` +
-        'Authentication > Users (Email/Password), then run this again — a claim\n' +
-        'can only attach to an existing user record.',
+      `No account for ${email}. Re-run with --create to make one, or add it in\n` +
+        'the Firebase console under Authentication > Users — a claim can only\n' +
+        'attach to an existing user record.',
+    )
+  } else if (message.includes('CONFIGURATION_NOT_FOUND')) {
+    console.error(
+      'Email/Password sign-in is not enabled on this project. Turn it on under\n' +
+        'Authentication > Sign-in method, then run this again.',
     )
   } else if (message.includes('Could not load the default credentials')) {
     console.error(
