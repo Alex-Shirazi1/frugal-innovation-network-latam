@@ -1,5 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { planCompletion, translateInto, translateText, TranslationError } from './translate'
+import { networkEmails } from '../data/network'
 
 const fetchMock = vi.fn()
 
@@ -10,7 +11,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
-  vi.unstubAllEnvs()
 })
 
 /** A MyMemory success envelope. */
@@ -42,17 +42,19 @@ describe('translateText', () => {
   })
 
   /**
-   * The contact address is what buys 50,000 chars/day instead of 5,000, and it
-   * is easy to break silently — a typo in the variable name just drops the
-   * quota back with nothing to show for it.
+   * The contact address is what buys 50,000 chars/day instead of 5,000, and
+   * dropping it silently costs 90% of the quota with nothing to show for it.
+   * Asserted against the shared constant rather than a literal, so changing the
+   * network's address does not require editing this test.
    */
-  it('sends the contact address when one is configured', async () => {
-    vi.stubEnv('VITE_TRANSLATE_CONTACT', 'someone@example.com')
+  it("sends the network's contact address, which is what raises the quota", async () => {
     fetchMock.mockResolvedValue(ok('Annual gatherings'))
 
     await translateText('Encuentros anuales', 'es', 'en')
 
-    expect(fetchMock.mock.calls[0][0]).toContain('&de=someone%40example.com')
+    expect(fetchMock.mock.calls[0][0]).toContain(
+      `&de=${encodeURIComponent(networkEmails.general)}`,
+    )
   })
 
   /**
@@ -80,15 +82,6 @@ describe('translateText', () => {
     await translateText('Encuentros anuales', 'es', 'en')
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
-  })
-
-  it('omits the parameter entirely when no address is configured', async () => {
-    vi.stubEnv('VITE_TRANSLATE_CONTACT', '')
-    fetchMock.mockResolvedValue(ok('Annual gatherings'))
-
-    await translateText('Encuentros anuales', 'es', 'en')
-
-    expect(fetchMock.mock.calls[0][0]).not.toContain('de=')
   })
 
   /**

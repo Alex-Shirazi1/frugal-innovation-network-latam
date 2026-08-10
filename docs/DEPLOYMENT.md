@@ -290,8 +290,10 @@ If deploys start failing after a migration, check these bindings first.
 | `FIREBASE_SERVICE_ACCOUNT` | CI deploy credentials | **Yes** |
 | `VITE_FIREBASE_API_KEY` · `_PROJECT_ID` · `_APP_ID` | web config | No — publishable |
 | `VITE_NOTIFY_TARGET` | FormSubmit alias for join notifications | No |
-| `VITE_TRANSLATE_CONTACT` | MyMemory quota contact | No |
 | `VITE_POSTHOG_KEY` | analytics project key | No — write-only |
+
+The MyMemory translation contact is **not** in this list: it is the network's
+own address, read from `networkEmails.general` in the code. Nothing to set.
 
 **Emulator** — ports and `singleProjectMode` are committed in `firebase.json`.
 Note that `singleProjectMode` means `npm test` writes its fixtures into a

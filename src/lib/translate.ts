@@ -15,6 +15,7 @@
  * Everything here produces suggestions. Nothing in this file writes to
  * Firestore — the editor fills the inputs and a human presses Save.
  */
+import { networkEmails } from '../data/network'
 
 /**
  * The three languages every piece of editable content carries.
@@ -59,24 +60,24 @@ const REQUEST_TIMEOUT_MS = 10_000
  * Contact address sent as MyMemory's `de=` parameter, which raises the daily
  * quota from 5,000 to 50,000 characters.
  *
- * Read from the environment rather than written here because this repository is
- * public: an address in the source is in the git history of every clone and fork
- * for good, and cannot be rotated. Vite still inlines it into the bundle, so it
- * IS publicly readable on the deployed site and will be scraped — use a throwaway
- * address, not the network's real inbox.
+ * The network's own address, taken from the same constant the contact section
+ * renders — not an environment variable and not a deployment secret.
  *
- * MyMemory asks for an address they can actually reach if the traffic looks
- * wrong. A made-up one would work right up until they need to use it, at which
- * point the response is to block the address's traffic — worse than the smaller
- * quota it was buying. Unset simply means the anonymous 5,000, which is already
- * more than the editors use.
+ * It was briefly both. The reasoning was that Vite inlines the value into the
+ * bundle, so a committed address is publicly readable; keeping it in a secret
+ * at least kept it out of a public repository's history. That reasoning does
+ * not apply to *this* address: the site already prints it on the contact
+ * section, so it is in the bundle either way and the secret was protecting
+ * something already published. Storing it in Firestore or Remote Config would
+ * be the same — both are client-readable — while adding a round-trip and a
+ * fallback path to hide a value that is on the page.
  *
- * Read per request, not at module load, so tests can vary it.
+ * So: one constant, no secret to set, nothing to reproduce when the project
+ * moves. MyMemory asks for an address they can reach if the traffic looks
+ * wrong, and this is a real, monitored inbox, which is what they are asking
+ * for.
  */
-function contactAddress(): string | null {
-  const value = import.meta.env.VITE_TRANSLATE_CONTACT?.trim()
-  return value ? value : null
-}
+const CONTACT_ADDRESS = networkEmails.general
 
 interface MyMemoryResponse {
   responseData?: { translatedText?: string }
@@ -278,10 +279,9 @@ async function performTranslation(
     throw new TranslationError('too-long')
   }
 
-  const contact = contactAddress()
   const url =
     `${ENDPOINT}?q=${encodeURIComponent(source)}&langpair=${encodeURIComponent(`${from}|${to}`)}` +
-    (contact ? `&de=${encodeURIComponent(contact)}` : '')
+    `&de=${encodeURIComponent(CONTACT_ADDRESS)}`
 
   let response: Response
   try {

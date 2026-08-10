@@ -25,16 +25,6 @@ interface ImportMetaEnv {
   readonly VITE_NOTIFY_TARGET?: string
 
   /**
-   * Contact address sent to MyMemory as its `de=` parameter, raising the
-   * translation quota from 5,000 to 50,000 characters a day. Vite bakes this
-   * into the bundle, so it is readable on the live site and will be scraped —
-   * use a throwaway address, not the network's inbox. It must still receive
-   * mail: MyMemory asks for one so they can make contact if traffic looks
-   * wrong, and blocks addresses that bounce. Unset means the anonymous quota.
-   */
-  readonly VITE_TRANSLATE_CONTACT?: string
-
-  /**
    * Points the Firebase SDK at the local emulator suite instead of the real
    * project. Development only — the branch is also gated on import.meta.env.DEV.
    */
