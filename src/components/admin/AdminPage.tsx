@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { adminApi, type AdminSession } from '../../api/adminApi'
 import { AdminHeader } from './AdminHeader'
 import { InitiativesEditor } from './InitiativesEditor'
 import { BibliographyEditor } from './BibliographyEditor'
 import { CongressEditor } from './CongressEditor'
 import { useI18n } from '../../i18n/I18nContext'
+import { useIdleTimeout } from '../../hooks/useIdleTimeout'
 
 const inputClass =
   'w-full rounded-xl border border-carbon/15 bg-white px-4 py-3 text-sm outline-none transition-colors focus:border-teal'
@@ -20,7 +21,13 @@ const inputClass =
  * is hashed on Firebase's side and never enters this bundle, and the `admin`
  * custom claim that firestore.rules actually checks is still what authorises.
  */
-function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void }) {
+interface LoginGateProps {
+  onSignedIn: (session: AdminSession) => void
+  /** Set when the previous session ended on its own, so the gate can say why. */
+  timedOut: boolean
+}
+
+function LoginGate({ onSignedIn, timedOut }: LoginGateProps) {
   const { t } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -39,6 +46,14 @@ function LoginGate({ onSignedIn }: { onSignedIn: (session: AdminSession) => void
     <div className="mx-auto max-w-sm px-4 pt-24">
       <h1 className="font-display text-2xl font-semibold text-carbon">{t.admin.signInTitle}</h1>
       <p className="mt-2 text-sm text-pizarra">{t.admin.signInLede}</p>
+
+      {/* Shown before any attempt, so an automatic sign-out does not read as a
+          fault. Suppressed once the person starts interacting with the form. */}
+      {timedOut && status === 'idle' ? (
+        <p role="status" className="mt-4 text-xs font-medium text-pizarra">
+          {t.admin.signedOutIdle}
+        </p>
+      ) : null}
 
       <form
         onSubmit={(event) => {
@@ -124,6 +139,25 @@ export function AdminPage() {
   const [tab, setTab] = useState<TabId>('iniciativas')
   const [session, setSession] = useState<AdminSession | null>(null)
   const [restoring, setRestoring] = useState(true)
+  const [timedOut, setTimedOut] = useState(false)
+
+  /*
+   * One sign-out path for the button and the idle timeout alike. Both clear the
+   * Firebase session rather than only the local state: dropping `session` would
+   * hide the panel while leaving a valid, self-refreshing token in the browser,
+   * which is the appearance of signing out without the fact of it.
+   */
+  const endSession = useCallback(async (reason: 'user' | 'idle') => {
+    await adminApi.signOut().catch(() => undefined)
+    setTimedOut(reason === 'idle')
+    setSession(null)
+  }, [])
+
+  // Only armed while signed in, so the listeners are absent on the login gate.
+  useIdleTimeout(
+    useCallback(() => void endSession('idle'), [endSession]),
+    session !== null,
+  )
 
   // Restore an existing session (Firebase auth state, or the dev key) on load.
   useEffect(() => {
@@ -157,7 +191,13 @@ export function AdminPage() {
     return (
       <main className="min-h-screen bg-niebla/60">
         <AdminHeader />
-        <LoginGate onSignedIn={setSession} />
+        <LoginGate
+          onSignedIn={(next) => {
+            setTimedOut(false)
+            setSession(next)
+          }}
+          timedOut={timedOut}
+        />
       </main>
     )
   }
@@ -178,9 +218,7 @@ export function AdminPage() {
           </div>
           <button
             type="button"
-            onClick={() => {
-              void adminApi.signOut().then(() => setSession(null))
-            }}
+            onClick={() => void endSession('user')}
             className="rounded-full border border-carbon/15 px-4 py-2 text-xs font-semibold text-pizarra hover:border-teal-deep hover:text-teal-deep"
           >
             {t.admin.signOut}
