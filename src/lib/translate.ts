@@ -113,6 +113,34 @@ function isQuotaNotice(text: string): boolean {
   return /MYMEMORY WARNING|ALL AVAILABLE FREE TRANSLATIONS|QUOTA/i.test(text)
 }
 
+/**
+ * Whether a reply is a translation at all, rather than debris.
+ *
+ * MyMemory answers from a shared translation memory that anyone can write to,
+ * so a polluted entry comes back looking entirely healthy. Asking it for the
+ * English word "test" in Spanish returns:
+ *
+ *     { translatedText: '-', match: 1, responseStatus: 200 }
+ *
+ * A confident, successful, punctuation-only answer. It passes the quota check,
+ * the status check and the non-empty check, so the editor accepted it and wrote
+ * "-" into the Spanish title — which is the required field and the fallback
+ * every other language renders through, so saving it would have blanked the
+ * card's name on the public site in all three languages.
+ *
+ * The test is deliberately weak: at least one letter or digit, anywhere. Every
+ * real translation clears it, so it cannot reject good output; junk like "-",
+ * "?" or "..." cannot. Nothing stronger is safe — translations legitimately
+ * differ wildly from the source in length, script and word count, and `match`
+ * cannot help because this reply claimed a perfect one.
+ *
+ * Unicode-aware so that accents, cedillas and non-Latin scripts count as
+ * letters: /\w/ would fail "ñ" and reject a perfectly good Spanish word.
+ */
+function looksLikeTranslation(text: string): boolean {
+  return /[\p{L}\p{N}]/u.test(text)
+}
+
 /* ------------------------------------------------------- On-device provider */
 
 /**
@@ -207,7 +235,10 @@ async function translateOnDevice(
       translator.then((instance) => instance.translate(text)),
       REQUEST_TIMEOUT_MS,
     )
-    return result.trim() || null
+    const trimmed = result.trim()
+    // Same guard as the network path: debris falls through to the fallback
+    // rather than being written into a field.
+    return trimmed && looksLikeTranslation(trimmed) ? trimmed : null
   } catch {
     // A failed create() must not poison the cache for the next attempt.
     cacheFor(factory).delete(pair)
@@ -307,6 +338,7 @@ async function performTranslation(
   if (Number(body.responseStatus) !== 200) {
     throw new TranslationError(isQuotaNotice(body.responseDetails ?? '') ? 'quota' : 'unavailable')
   }
+  if (!looksLikeTranslation(translated)) throw new TranslationError('unavailable')
 
   return decodeEntities(translated)
 }

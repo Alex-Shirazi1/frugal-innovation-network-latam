@@ -99,6 +99,52 @@ describe('translateText', () => {
     })
   })
 
+  /**
+   * The exact reply that put "-" into a production Spanish title. MyMemory's
+   * shared memory has a polluted entry for the English word "test", and hands
+   * it back claiming a perfect match with a 200 status, so every other guard
+   * waves it through.
+   */
+  it('rejects punctuation-only debris that claims to be a perfect match', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        responseData: { translatedText: '-', match: 1 },
+        responseStatus: 200,
+      }),
+    })
+
+    await expect(translateText('test', 'en', 'es')).rejects.toMatchObject({
+      reason: 'unavailable',
+    })
+  })
+
+  it.each(['-', '?', '...', '   —   ', '!!'])(
+    'rejects %j rather than writing it into a field',
+    async (debris) => {
+      fetchMock.mockResolvedValue(ok(debris))
+
+      await expect(translateText('test', 'en', 'es')).rejects.toMatchObject({
+        reason: 'unavailable',
+      })
+    },
+  )
+
+  /**
+   * The guard must not be stricter than "contains a letter or a digit".
+   * Accents, cedillas and non-Latin scripts are letters; /\w/ would reject
+   * them and throw away perfectly good Spanish and Portuguese.
+   */
+  it.each(['ñ', 'Ação', 'Año 2026', '教育', 'Água e saneamento'])(
+    'accepts %j as a real translation',
+    async (good) => {
+      fetchMock.mockResolvedValue(ok(good))
+
+      await expect(translateText('x', 'en', 'es')).resolves.toBe(good)
+    },
+  )
+
   it('reports a 429 as a quota failure', async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 429, json: async () => ({}) })
 
@@ -245,6 +291,16 @@ describe('on-device translation', () => {
     stubTranslator(async () => {
       throw new Error('model exploded')
     })
+    fetchMock.mockResolvedValue(ok('Annual gatherings'))
+
+    await expect(translateText('Encuentros anuales', 'es', 'en')).resolves.toBe(
+      'Annual gatherings',
+    )
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('falls back to the network when the model returns punctuation-only debris', async () => {
+    stubTranslator(async () => '-')
     fetchMock.mockResolvedValue(ok('Annual gatherings'))
 
     await expect(translateText('Encuentros anuales', 'es', 'en')).resolves.toBe(
