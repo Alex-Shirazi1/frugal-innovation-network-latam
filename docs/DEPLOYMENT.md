@@ -299,10 +299,39 @@ own address, read from `networkEmails.general` in the code. Nothing to set.
 Note that `singleProjectMode` means `npm test` writes its fixtures into a
 running emulator regardless of project id.
 
-**Known issue, not yet fixed** — `firebase.json` has no `headers` block, so
-`index.html` is served with `cache-control: max-age=3600`. A returning visitor
-can see a stale build for up to an hour after a deploy. The fix is `no-cache`
-on `index.html` and long-lived immutable caching on the hashed `/assets/*`.
+## Response headers
+
+`firebase.json` carries a `headers` block. JSON cannot hold comments, so the
+reasoning lives here.
+
+**Caching.** `index.html` is `no-cache, must-revalidate` so a deploy is picked
+up immediately — it used to inherit `max-age=3600`, which meant a returning
+visitor could see an hour-old build. Hashed `/assets/*` are `immutable` for a
+year, and PDFs and images get 30 days. The caching is not only a freshness fix:
+Hosting bandwidth is the tightest quota on the Spark plan, and `public/` is
+~45 MB of bibliography PDFs, so repeat visitors served from cache are quota not
+spent.
+
+**CSP.** Enumerated from what the code actually requests, not from a template.
+Anything added to this list should be traceable to a real call site:
+
+| Directive | Why |
+| --- | --- |
+| `script-src 'self'` | No external scripts. `posthog-js` is a bundled dynamic import (`src/lib/analytics.tsx`), not a CDN tag, so no host or `unsafe-inline` is needed. |
+| `style-src` + `unsafe-inline` | The Google Fonts stylesheet, plus ~10 components using React `style={{...}}` props, which emit inline style attributes. |
+| `font-src` | `fonts.gstatic.com`, per the `preconnect` in `index.html`. |
+| `connect-src` | Firestore, Identity Toolkit and Secure Token (Firebase SDK); MyMemory (`src/lib/translate.ts`); FormSubmit (`src/lib/notifyNewMember.ts`); PostHog ingestion. |
+| `img-src 'self' data:` | No hotlinked images anywhere — institution entries carry links, not logos. |
+| `frame-src`/`frame-ancestors 'none'` | The site embeds nothing and must not be embedded. Spotify is a link, not an iframe. |
+
+Two things to watch. If `VITE_POSTHOG_HOST` is repointed at the EU cloud or a
+self-hosted instance, `connect-src` needs that origin too. And if PostHog
+session replay is ever enabled it fetches extra assets, which will show up as
+console CSP violations rather than as silent breakage.
+
+`Strict-Transport-Security` deliberately omits `preload`. Preloading is a
+practical one-way door for the apex domain and every subdomain under it, and it
+is not this repo's call to make.
 
 ## Things deliberately not done
 
