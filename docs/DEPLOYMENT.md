@@ -304,34 +304,49 @@ running emulator regardless of project id.
 `firebase.json` carries a `headers` block. JSON cannot hold comments, so the
 reasoning lives here.
 
-**Caching.** `index.html` is `no-cache, must-revalidate` so a deploy is picked
-up immediately — it used to inherit `max-age=3600`, which meant a returning
-visitor could see an hour-old build. Hashed `/assets/*` are `immutable` for a
-year, and PDFs and images get 30 days. The caching is not only a freshness fix:
-Hosting bandwidth is the tightest quota on the Spark plan, and `public/` is
-~45 MB of bibliography PDFs, so repeat visitors served from cache are quota not
-spent.
+**Caching.** `no-cache, must-revalidate` is the default on `**`, with hashed
+`/assets/*` overridden to `immutable` for a year and PDFs and images to 30 days.
+Later, more specific entries win — verified against the hosting emulator, not
+assumed.
+
+The default deliberately sits on `**` rather than on `/index.html`. **Hosting
+matches header rules against the request path, not against the rewrite
+destination.** Every route on this site is rewritten to `/index.html`, so a rule
+scoped to `/index.html` matches nothing a visitor actually requests: `/` and
+`/admin` kept inheriting `max-age=3600` and a returning visitor could still see
+an hour-old build. This was live for one deploy before being caught.
+
+The caching is not only a freshness fix. Hosting transfer is the tightest quota
+on the Spark plan and `public/` is ~45 MB of bibliography PDFs, so a repeat
+visitor served from cache is quota not spent.
 
 **CSP.** Enumerated from what the code actually requests, not from a template.
 Anything added to this list should be traceable to a real call site:
 
 | Directive | Why |
 | --- | --- |
-| `script-src 'self'` | No external scripts. `posthog-js` is a bundled dynamic import (`src/lib/analytics.tsx`), not a CDN tag, so no host or `unsafe-inline` is needed. |
+| `script-src` | `'self'` plus `us-assets.i.posthog.com`. The `posthog-js` module itself is a bundled dynamic import (`src/lib/analytics.tsx`), but at runtime it fetches its own extensions from that asset host — `config.js`, `web-vitals.js`, `posthog-recorder.js`, `dead-clicks-autocapture.js`. No `unsafe-inline` is needed. |
 | `style-src` + `unsafe-inline` | The Google Fonts stylesheet, plus ~10 components using React `style={{...}}` props, which emit inline style attributes. |
 | `font-src` | `fonts.gstatic.com`, per the `preconnect` in `index.html`. |
 | `connect-src` | Firestore, Identity Toolkit and Secure Token (Firebase SDK); MyMemory (`src/lib/translate.ts`); FormSubmit (`src/lib/notifyNewMember.ts`); PostHog ingestion. |
 | `img-src 'self' data:` | No hotlinked images anywhere — institution entries carry links, not logos. |
 | `frame-src`/`frame-ancestors 'none'` | The site embeds nothing and must not be embedded. Spotify is a link, not an iframe. |
 
-Two things to watch. If `VITE_POSTHOG_HOST` is repointed at the EU cloud or a
-self-hosted instance, `connect-src` needs that origin too. And if PostHog
-session replay is ever enabled it fetches extra assets, which will show up as
-console CSP violations rather than as silent breakage.
+If `VITE_POSTHOG_HOST` is ever repointed at the EU cloud or a self-hosted
+instance, both `connect-src` and `script-src` need the matching origins — the
+EU asset host is `eu-assets.i.posthog.com`.
 
-`Strict-Transport-Security` deliberately omits `preload`. Preloading is a
-practical one-way door for the apex domain and every subdomain under it, and it
-is not this repo's call to make.
+**Check the console on the live site after changing any of this, not just
+locally.** A local build without `VITE_POSTHOG_KEY` never loads PostHog at all,
+so the entire analytics half of this policy is untested until it is deployed.
+That is how the missing asset host reached production: clean locally, four
+blocked scripts live.
+
+`Strict-Transport-Security` here omits `preload`, because preloading is a
+practical one-way door for an apex domain and every subdomain under it. Note
+that on `*.web.app` and `*.firebaseapp.com` Hosting substitutes its own HSTS
+header with `preload` regardless, since Google already has those domains on the
+preload list. The value set here is what a custom domain would receive.
 
 ## Things deliberately not done
 
