@@ -79,10 +79,17 @@ const REQUEST_TIMEOUT_MS = 10_000
  */
 const CONTACT_ADDRESS = networkEmails.general
 
+interface MyMemoryMatch {
+  translation?: string
+  match?: number | string
+  quality?: number | string
+}
+
 interface MyMemoryResponse {
   responseData?: { translatedText?: string }
   responseStatus?: number | string
   responseDetails?: string
+  matches?: MyMemoryMatch[]
 }
 
 /**
@@ -139,6 +146,37 @@ function isQuotaNotice(text: string): boolean {
  */
 function looksLikeTranslation(text: string): boolean {
   return /[\p{L}\p{N}]/u.test(text)
+}
+
+/**
+ * The best runner-up when the headline answer is debris.
+ *
+ * MyMemory returns its whole candidate list alongside the one it picked, and
+ * picks purely on match score. Asking for "test" in Spanish gives:
+ *
+ *     '-'       match 1.00   <- chosen
+ *     'prueba'  match 0.99
+ *
+ * The right answer was in the response all along, beaten by a hundredth of a
+ * point by a polluted entry. Rather than refusing the whole translation, take
+ * the highest-scoring candidate that is actually a translation.
+ *
+ * Only ever consulted when the headline answer fails `looksLikeTranslation`, so
+ * a healthy reply is never second-guessed — this cannot quietly substitute a
+ * different translation for a good one. Costs nothing: the candidates are in
+ * the response already, so no second request and no extra quota.
+ */
+function bestUsableMatch(body: MyMemoryResponse): string | null {
+  const candidates = Array.isArray(body.matches) ? body.matches : []
+  const usable = candidates
+    .map((candidate) => ({
+      text: typeof candidate.translation === 'string' ? candidate.translation.trim() : '',
+      score: Number(candidate.match) || 0,
+    }))
+    .filter(({ text }) => text && looksLikeTranslation(text) && !isQuotaNotice(text))
+    .sort((a, b) => b.score - a.score)
+
+  return usable[0]?.text ?? null
 }
 
 /* ------------------------------------------------------- On-device provider */
@@ -338,9 +376,11 @@ async function performTranslation(
   if (Number(body.responseStatus) !== 200) {
     throw new TranslationError(isQuotaNotice(body.responseDetails ?? '') ? 'quota' : 'unavailable')
   }
-  if (!looksLikeTranslation(translated)) throw new TranslationError('unavailable')
 
-  return decodeEntities(translated)
+  const usable = looksLikeTranslation(translated) ? translated : bestUsableMatch(body)
+  if (!usable) throw new TranslationError('unavailable')
+
+  return decodeEntities(usable)
 }
 
 export type LocalisedText = Partial<Record<ContentLang, string>>

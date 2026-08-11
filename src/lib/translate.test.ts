@@ -120,6 +120,81 @@ describe('translateText', () => {
     })
   })
 
+  /**
+   * The real production response: MyMemory picked '-' on a match of 1.00 while
+   * the correct answer sat one line below on 0.99. Refusing outright threw away
+   * a translation that was already in the reply.
+   */
+  it('falls back to the best candidate when the headline answer is debris', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        responseData: { translatedText: '-', match: 1 },
+        responseStatus: 200,
+        matches: [
+          { translation: '-', match: 1 },
+          { translation: 'prueba', match: 0.99 },
+          { translation: 'prueba', match: 0.99 },
+        ],
+      }),
+    })
+
+    await expect(translateText('test', 'en', 'es')).resolves.toBe('prueba')
+  })
+
+  it('picks the highest-scoring usable candidate, not merely the first', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        responseData: { translatedText: '???' },
+        responseStatus: 200,
+        matches: [
+          { translation: '???', match: 1 },
+          { translation: 'peor', match: 0.4 },
+          { translation: 'mejor', match: 0.95 },
+        ],
+      }),
+    })
+
+    await expect(translateText('x', 'en', 'es')).resolves.toBe('mejor')
+  })
+
+  /**
+   * The fallback must never second-guess a healthy answer, or it could quietly
+   * swap in a different translation than the one MyMemory chose.
+   */
+  it('ignores the candidate list when the headline answer is fine', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        responseData: { translatedText: 'prueba' },
+        responseStatus: 200,
+        matches: [{ translation: 'something else entirely', match: 1 }],
+      }),
+    })
+
+    await expect(translateText('test', 'en', 'es')).resolves.toBe('prueba')
+  })
+
+  it('still fails when every candidate is debris', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        responseData: { translatedText: '-' },
+        responseStatus: 200,
+        matches: [{ translation: '-', match: 1 }, { translation: '...', match: 0.9 }],
+      }),
+    })
+
+    await expect(translateText('test', 'en', 'es')).rejects.toMatchObject({
+      reason: 'unavailable',
+    })
+  })
+
   it.each(['-', '?', '...', '   —   ', '!!'])(
     'rejects %j rather than writing it into a field',
     async (debris) => {
