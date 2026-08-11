@@ -70,6 +70,57 @@ const REQUIRED_FIELDS = [
   'status',
 ]
 
+/**
+ * Fields a PUBLISHED member record may contain — the output shape of
+ * toPublishedMember in src/api/adminApi.ts.
+ *
+ * `email` is absent from this list on purpose, and that absence is the point.
+ * `members` is world-readable, so an applicant's address landing here would put
+ * it on the open web. adminApi builds the published record field by field
+ * rather than by spreading the submission for the same reason; this list is the
+ * half of that guarantee a client cannot skip. `hasOnly` turns "we remembered
+ * not to copy the email across" into "the database refuses to store one".
+ *
+ * `consentToPublish`, `status`, and `createdAt` are queue bookkeeping and are
+ * likewise not part of a published profile.
+ */
+const PUBLISHED_FIELDS = [
+  'firstName',
+  'lastName',
+  'fullName',
+  'title',
+  'position',
+  'jobPositionName',
+  'biography',
+  'affiliationId',
+  'country',
+  'region',
+  'interestIds',
+  'generalAreaIds',
+  'languages',
+  'socialUrl',
+  'avatarHue',
+]
+
+/**
+ * The subset without which a directory card cannot render. jobPositionName,
+ * biography, socialUrl, and affiliationId are all legitimately absent for some
+ * members, so they are validated when present rather than demanded.
+ */
+const PUBLISHED_REQUIRED_FIELDS = [
+  'firstName',
+  'lastName',
+  'fullName',
+  'title',
+  'position',
+  'country',
+  'region',
+  'interestIds',
+  'generalAreaIds',
+  'languages',
+  'avatarHue',
+]
+
 export function buildRules(): string {
   return `rules_version = '2';
 
@@ -134,6 +185,18 @@ service cloud.firestore {
             && (data.socialUrl.matches('https://.*') || data.socialUrl.matches('http://.*')));
     }
 
+    // The derived, translated card subtitle. Required whole rather than
+    // es-only: it is generated from positionTitles, never typed, so a missing
+    // language means the record was written by something other than the
+    // approval path — which is exactly what this is here to catch.
+    function localizedTitle(value) {
+      return value is map
+        && value.keys().hasOnly(['es', 'en', 'pt'])
+        && requiredText(value.es, ${fieldLimits.jobPositionName})
+        && requiredText(value.en, ${fieldLimits.jobPositionName})
+        && requiredText(value.pt, ${fieldLimits.jobPositionName});
+    }
+
     function validSubmission(data) {
       return data.keys().hasOnly(${list(CLIENT_FIELDS)})
         && data.keys().hasAll(${list(REQUIRED_FIELDS)})
@@ -159,6 +222,43 @@ service cloud.firestore {
         && data.status == 'pending';
     }
 
+    /**
+     * A published directory record.
+     *
+     * Validated even though only a moderator can write here, for two reasons.
+     * The directory is the one collection the whole world can read, so a bad
+     * write is immediately public rather than merely wrong. And a moderator
+     * account is exactly what an attacker would be using — shape validation is
+     * what stops a stolen session from turning a real person's profile into
+     * whatever it likes, or from quietly publishing their email address.
+     *
+     * Display fields are derived by the approval path, never typed, so they can
+     * be checked strictly here: fullName against its parts, title against the
+     * generated translations, avatarHue against the range avatarHueFor emits.
+     */
+    function validMember(data) {
+      return data.keys().hasOnly(${list(PUBLISHED_FIELDS)})
+        && data.keys().hasAll(${list(PUBLISHED_REQUIRED_FIELDS)})
+        && requiredText(data.firstName, ${fieldLimits.firstName})
+        && requiredText(data.lastName, ${fieldLimits.lastName})
+        && requiredText(data.fullName, ${fieldLimits.firstName + fieldLimits.lastName + 1})
+        && localizedTitle(data.title)
+        && positionTypes().hasAny([data.position])
+        && (!('jobPositionName' in data.keys())
+            || textWithin(data.jobPositionName, ${fieldLimits.jobPositionName}))
+        && (!('biography' in data.keys()) || textWithin(data.biography, ${fieldLimits.biography}))
+        && validAffiliation(data)
+        && validLocation(data)
+        && idsFrom(data.interestIds, interestIds(), ${fieldLimits.maxTechnicalInterests})
+        && idsFrom(data.generalAreaIds, areaIds(), ${fieldLimits.maxGeneralAreas})
+        && idsFrom(data.languages, languageIds(), ${fieldLimits.maxLanguages})
+        && validSocialUrl(data)
+        // avatarHueFor returns an integer hue in [0, 360).
+        && data.avatarHue is int
+        && data.avatarHue >= 0
+        && data.avatarHue < 360;
+    }
+
     // ---- Collections ------------------------------------------------------
 
     // Intake queue. Deliberately NOT publicly readable: it holds personal data
@@ -170,9 +270,13 @@ service cloud.firestore {
 
     // The published directory. World-readable by design; only a moderator
     // writes here, and only by copying an approved submission across.
+    // Delete is stated separately from create and update throughout: a delete
+    // carries no request.resource, so folding it in with a shape check would
+    // evaluate the validator against null and deny every removal.
     match /members/{memberId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow create, update: if isAdmin() && validMember(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // ---- Editable site content -------------------------------------------
@@ -257,7 +361,8 @@ service cloud.firestore {
     // else in this collection is denied rather than accepted with no shape.
     match /siteContent/congress {
       allow read: if true;
-      allow write: if isAdmin() && validCongress(request.resource.data);
+      allow create, update: if isAdmin() && validCongress(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     match /bibliography/{entryId} {

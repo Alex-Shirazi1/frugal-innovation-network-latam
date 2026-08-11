@@ -83,6 +83,18 @@ service cloud.firestore {
             && (data.socialUrl.matches('https://.*') || data.socialUrl.matches('http://.*')));
     }
 
+    // The derived, translated card subtitle. Required whole rather than
+    // es-only: it is generated from positionTitles, never typed, so a missing
+    // language means the record was written by something other than the
+    // approval path — which is exactly what this is here to catch.
+    function localizedTitle(value) {
+      return value is map
+        && value.keys().hasOnly(['es', 'en', 'pt'])
+        && requiredText(value.es, 120)
+        && requiredText(value.en, 120)
+        && requiredText(value.pt, 120);
+    }
+
     function validSubmission(data) {
       return data.keys().hasOnly(['firstName', 'lastName', 'email', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
         && data.keys().hasAll(['firstName', 'lastName', 'email', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
@@ -108,6 +120,43 @@ service cloud.firestore {
         && data.status == 'pending';
     }
 
+    /**
+     * A published directory record.
+     *
+     * Validated even though only a moderator can write here, for two reasons.
+     * The directory is the one collection the whole world can read, so a bad
+     * write is immediately public rather than merely wrong. And a moderator
+     * account is exactly what an attacker would be using — shape validation is
+     * what stops a stolen session from turning a real person's profile into
+     * whatever it likes, or from quietly publishing their email address.
+     *
+     * Display fields are derived by the approval path, never typed, so they can
+     * be checked strictly here: fullName against its parts, title against the
+     * generated translations, avatarHue against the range avatarHueFor emits.
+     */
+    function validMember(data) {
+      return data.keys().hasOnly(['firstName', 'lastName', 'fullName', 'title', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'avatarHue'])
+        && data.keys().hasAll(['firstName', 'lastName', 'fullName', 'title', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'avatarHue'])
+        && requiredText(data.firstName, 60)
+        && requiredText(data.lastName, 80)
+        && requiredText(data.fullName, 141)
+        && localizedTitle(data.title)
+        && positionTypes().hasAny([data.position])
+        && (!('jobPositionName' in data.keys())
+            || textWithin(data.jobPositionName, 120))
+        && (!('biography' in data.keys()) || textWithin(data.biography, 800))
+        && validAffiliation(data)
+        && validLocation(data)
+        && idsFrom(data.interestIds, interestIds(), 6)
+        && idsFrom(data.generalAreaIds, areaIds(), 3)
+        && idsFrom(data.languages, languageIds(), 6)
+        && validSocialUrl(data)
+        // avatarHueFor returns an integer hue in [0, 360).
+        && data.avatarHue is int
+        && data.avatarHue >= 0
+        && data.avatarHue < 360;
+    }
+
     // ---- Collections ------------------------------------------------------
 
     // Intake queue. Deliberately NOT publicly readable: it holds personal data
@@ -119,9 +168,13 @@ service cloud.firestore {
 
     // The published directory. World-readable by design; only a moderator
     // writes here, and only by copying an approved submission across.
+    // Delete is stated separately from create and update throughout: a delete
+    // carries no request.resource, so folding it in with a shape check would
+    // evaluate the validator against null and deny every removal.
     match /members/{memberId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow create, update: if isAdmin() && validMember(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     // ---- Editable site content -------------------------------------------
@@ -206,7 +259,8 @@ service cloud.firestore {
     // else in this collection is denied rather than accepted with no shape.
     match /siteContent/congress {
       allow read: if true;
-      allow write: if isAdmin() && validCongress(request.resource.data);
+      allow create, update: if isAdmin() && validCongress(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     match /bibliography/{entryId} {

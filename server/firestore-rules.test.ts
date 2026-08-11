@@ -54,6 +54,36 @@ function validSubmission(overrides: Record<string, unknown> = {}) {
   return payload
 }
 
+/**
+ * A published directory record that satisfies every clause of validMember —
+ * the output shape of toPublishedMember in src/api/adminApi.ts.
+ */
+function validMember(overrides: Record<string, unknown> = {}) {
+  const payload: Record<string, unknown> = {
+    firstName: 'Ada',
+    lastName: 'Lovelace',
+    fullName: 'Ada Lovelace',
+    title: { es: 'Investigadora', en: 'Researcher', pt: 'Pesquisadora' },
+    position: 'researcher',
+    jobPositionName: 'Investigadora Asociada',
+    biography: 'Trabaja en innovación frugal aplicada a salud comunitaria.',
+    affiliationId: 'iteso',
+    country: 'México',
+    region: 'Jalisco',
+    interestIds: ['salud', 'energia'],
+    generalAreaIds: ['ingenieria'],
+    languages: ['es', 'en'],
+    socialUrl: 'https://linkedin.com/in/ada',
+    avatarHue: 210,
+    ...overrides,
+  }
+  // Same omit-on-undefined contract as validSubmission above.
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === undefined) delete payload[key]
+  }
+  return payload
+}
+
 let testEnv: RulesTestEnvironment | undefined
 
 async function emulatorRunning(): Promise<boolean> {
@@ -177,7 +207,7 @@ describe.skipIf(!available)('firestore.rules', () => {
   describe('members — published directory', () => {
     beforeEach(async () => {
       await testEnv!.withSecurityRulesDisabled(async (ctx) => {
-        await setDoc(doc(ctx.firestore(), 'members/m1'), { fullName: 'Ada Lovelace' })
+        await setDoc(doc(ctx.firestore(), 'members/m1'), validMember())
       })
     })
 
@@ -187,14 +217,71 @@ describe.skipIf(!available)('firestore.rules', () => {
     })
 
     it('cannot be written by the public or by a plain signed-in user', async () => {
-      await assertFails(setDoc(doc(anon(), 'members/m2'), { fullName: 'Injected' }))
-      await assertFails(setDoc(doc(signedIn(), 'members/m2'), { fullName: 'Injected' }))
+      await assertFails(setDoc(doc(anon(), 'members/m2'), validMember()))
+      await assertFails(setDoc(doc(signedIn(), 'members/m2'), validMember()))
       await assertFails(deleteDoc(doc(anon(), 'members/m1')))
     })
 
     it('can be published and removed by a moderator', async () => {
-      await assertSucceeds(setDoc(doc(admin(), 'members/m2'), { fullName: 'Approved Person' }))
+      await assertSucceeds(setDoc(doc(admin(), 'members/m2'), validMember()))
       await assertSucceeds(deleteDoc(doc(admin(), 'members/m1')))
+    })
+
+    /*
+     * The reason validMember exists. `members` is the one world-readable
+     * collection, so an address stored here is an address on the open web —
+     * and a moderator session is precisely what a compromised account has.
+     */
+    it('refuses an email address even from a moderator', async () => {
+      await assertFails(
+        setDoc(doc(admin(), 'members/m2'), validMember({ email: 'ada.lovelace@example.org' })),
+      )
+    })
+
+    it('refuses queue bookkeeping on a published record', async () => {
+      for (const extra of [
+        { status: 'approved' },
+        { consentToPublish: true },
+        { createdAt: '2026-07-28T00:00:00.000Z' },
+      ]) {
+        await assertFails(setDoc(doc(admin(), 'members/m2'), validMember(extra)))
+      }
+    })
+
+    // Display identity is derived by the approval path, so anything malformed
+    // here means the write did not come from it.
+    it('refuses a forged or malformed display identity', async () => {
+      for (const bad of [
+        { title: 'Researcher' },
+        { title: { es: 'Investigadora' } },
+        { fullName: '' },
+        { avatarHue: 400 },
+        { avatarHue: 1.5 },
+        { position: 'director' },
+      ]) {
+        await assertFails(setDoc(doc(admin(), 'members/m2'), validMember(bad)))
+      }
+    })
+
+    it('still refuses an unknown region or affiliation', async () => {
+      await assertFails(setDoc(doc(admin(), 'members/m2'), validMember({ region: 'Atlantis' })))
+      await assertFails(
+        setDoc(doc(admin(), 'members/m2'), validMember({ affiliationId: 'not-a-university' })),
+      )
+    })
+
+    it('accepts a record that omits every optional field', async () => {
+      await assertSucceeds(
+        setDoc(
+          doc(admin(), 'members/m2'),
+          validMember({
+            jobPositionName: undefined,
+            biography: undefined,
+            socialUrl: undefined,
+            affiliationId: undefined,
+          }),
+        ),
+      )
     })
   })
 

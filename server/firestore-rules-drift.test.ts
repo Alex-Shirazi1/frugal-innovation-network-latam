@@ -53,6 +53,16 @@ describe('firestore.rules is in sync with the canonical data (run `npm run rules
     expect(committed).toContain("data.status == 'pending'")
     // Pending personal data is never world-readable.
     expect(committed).toContain('allow read, update, delete: if isAdmin();')
+    // The world-readable directory is shape-checked, not merely admin-gated.
+    expect(committed).toContain('allow create, update: if isAdmin() && validMember(')
+    /*
+     * `members` is world-readable, so the published shape must not admit an
+     * email key. Asserted against the generated hasOnly list rather than the
+     * whole file, because 'email' legitimately appears in validSubmission.
+     */
+    const publishedFields = committed.match(/function validMember\(data\) \{\s*return data\.keys\(\)\.hasOnly\(\[([^\]]*)\]\)/)
+    expect(publishedFields).not.toBeNull()
+    expect(publishedFields![1]).not.toContain('email')
     // Anything not explicitly matched is denied.
     expect(committed).toContain('allow read, write: if false;')
   })
