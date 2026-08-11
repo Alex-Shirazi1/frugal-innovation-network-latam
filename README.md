@@ -10,7 +10,7 @@ Modern React redesign of [redinnovacionfrugal.lat](https://redinnovacionfrugal.l
 
 - React 19 + TypeScript + Vite + React Router
 - Tailwind CSS v4 (design tokens via `@theme` in `src/styles/global.css`)
-- Production backend: Firestore (free Spark plan, no Cloud Functions) — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- Production backend: Firestore (free Spark plan, no Cloud Functions) — setup guide in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), current state and migration notes in [docs/FIREBASE-SETUP.md](docs/FIREBASE-SETUP.md)
 - Local dev backend: Express 5 + SQLite (`node:sqlite`, zero native deps) in `server/`
 - Tests: Vitest + Supertest + Firestore emulator (rules)
 
