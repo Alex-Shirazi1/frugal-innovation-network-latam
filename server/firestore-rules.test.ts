@@ -18,6 +18,8 @@ import {
 import { readFileSync } from 'node:fs'
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 
+import { MAX_CONGRESS_IMAGES } from '../src/data/congress'
+
 const HOST = '127.0.0.1'
 const PORT = 8080
 
@@ -469,6 +471,75 @@ describe.skipIf(!available)('firestore.rules', () => {
       // request.resource, so it must not be gated on a shape check.
       await assertSucceeds(deleteDoc(doc(admin(), 'siteContent/congress')))
       await assertSucceeds(deleteDoc(doc(admin(), 'resources/x')))
+    })
+
+    /*
+     * Congress photos.
+     *
+     * These carry more weight than most of the shape tests, because the rules
+     * cannot loop: validCongressImages is a generated ladder of index clauses,
+     * each guarded by a size check. That construction rests on rules indexing a
+     * list and short-circuiting `||` before reading an index that is not there,
+     * and the only honest way to know both hold is to run them.
+     */
+    const image = (overrides: Record<string, unknown> = {}) => ({
+      url: 'https://example.org/congreso/foto.jpg',
+      alt: { es: 'Asistentes en la sesión de apertura' },
+      ...overrides,
+    })
+    const images = (count: number) =>
+      Array.from({ length: count }, (_, i) => image({ url: `https://example.org/f${i}.jpg` }))
+
+    it('accepts a congress card with photos, and one without', async () => {
+      await assertSucceeds(
+        setDoc(doc(admin(), 'siteContent/congress'), congress({ images: images(3) })),
+      )
+      // Absent stays valid: the document already in Firestore predates the field.
+      await assertSucceeds(setDoc(doc(admin(), 'siteContent/congress'), congress()))
+      // An empty list is how the panel represents "remove every photo".
+      await assertSucceeds(
+        setDoc(doc(admin(), 'siteContent/congress'), congress({ images: [] })),
+      )
+    })
+
+    it('validates every photo in the list, not just the first', async () => {
+      // A bad entry in the last guarded slot is the one a naive rule would miss.
+      const trailing = [...images(4), image({ url: 'http://example.org/insecure.jpg' })]
+      await assertFails(
+        setDoc(doc(admin(), 'siteContent/congress'), congress({ images: trailing })),
+      )
+      const missingAlt = [...images(2), { url: 'https://example.org/x.jpg' }]
+      await assertFails(
+        setDoc(doc(admin(), 'siteContent/congress'), congress({ images: missingAlt })),
+      )
+    })
+
+    it('rejects photos that are the wrong shape', async () => {
+      const cases: Record<string, unknown>[] = [
+        { images: 'https://example.org/foto.jpg' },
+        { images: [image({ caption: 'extra key' })] },
+        { images: [image({ alt: { es: '' } })] },
+        { images: [image({ alt: { en: 'Spanish is the required one' } })] },
+        { images: [image({ url: '' })] },
+      ]
+      for (const override of cases) {
+        await assertFails(setDoc(doc(admin(), 'siteContent/congress'), congress(override)))
+      }
+    })
+
+    it('holds the ceiling exactly, so the generated ladder covers every slot', async () => {
+      await assertSucceeds(
+        setDoc(
+          doc(admin(), 'siteContent/congress'),
+          congress({ images: images(MAX_CONGRESS_IMAGES) }),
+        ),
+      )
+      await assertFails(
+        setDoc(
+          doc(admin(), 'siteContent/congress'),
+          congress({ images: images(MAX_CONGRESS_IMAGES + 1) }),
+        ),
+      )
     })
 
     it('can be created, edited and deleted by a moderator', async () => {

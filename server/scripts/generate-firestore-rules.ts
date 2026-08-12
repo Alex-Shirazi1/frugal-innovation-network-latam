@@ -14,6 +14,7 @@ import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { MAX_CONGRESS_IMAGES } from '../../src/data/congress'
 import { institutions } from '../../src/data/institutions'
 import {
   countries,
@@ -390,9 +391,36 @@ service cloud.firestore {
         && requiredText(data.file, 500);
     }
 
+    // A congress photo. Stored as a URL because accepting an upload would mean
+    // Cloud Storage, and Cloud Storage now means billing — see src/data/congress.ts.
+    function validCongressImage(value) {
+      return value is map
+        && value.keys().hasOnly(['url', 'alt'])
+        && value.keys().hasAll(['url', 'alt'])
+        && requiredText(value.url, 500)
+        && value.url.matches('https://.*')
+        && editableText(value.alt);
+    }
+
+    /*
+     * Rules have no loop, so every index is spelled out up to the ceiling in
+     * src/data/congress.ts and this function is generated rather than written.
+     * Each clause is guarded by the size check ahead of it, and \`||\`
+     * short-circuits, so the index is only read once it is known to exist.
+     */
+    function validCongressImages(value) {
+      return value is list
+        && value.size() <= ${MAX_CONGRESS_IMAGES}
+${Array.from(
+  { length: MAX_CONGRESS_IMAGES },
+  (_, i) => `        && (value.size() < ${i + 1} || validCongressImage(value[${i}]))`,
+).join('\n')};
+    }
+
     function validCongress(data) {
-      return data.keys().hasOnly(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+      return data.keys().hasOnly(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl', 'images'])
         && data.keys().hasAll(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+        && (!('images' in data.keys()) || validCongressImages(data.images))
         && editableText(data.kicker)
         && editableText(data.title)
         && editableText(data.subtitle)

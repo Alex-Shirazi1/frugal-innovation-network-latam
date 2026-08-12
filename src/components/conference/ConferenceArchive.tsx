@@ -74,6 +74,29 @@ export function ConferenceArchive() {
             </a>
           </div>
 
+          {/*
+            * Photos of the event, when the network has added any. The aspect
+            * ratio is fixed rather than left to the file: these are arbitrary
+            * URLs off other people's servers, so their real dimensions are not
+            * known until they load, and a grid that resizes on arrival would
+            * shove the page around underneath whoever is reading it.
+            */}
+          {congress.images && congress.images.length > 0 ? (
+            <ul className="grid grid-cols-2 gap-3 border-b border-carbon/10 px-5 py-6 md:grid-cols-4 md:px-10">
+              {congress.images.map((image, index) => (
+                <li key={`${index}-${image.url}`}>
+                  <img
+                    src={image.url}
+                    alt={localizeText(image.alt, lang)}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-4/3 w-full rounded-xl object-cover"
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
           {speakers.length > 0 ? (
             <div className="px-5 py-8 md:px-10 md:py-10">
               <h3 className="mb-4 font-display text-lg font-semibold text-carbon">

@@ -287,9 +287,36 @@ service cloud.firestore {
         && requiredText(data.file, 500);
     }
 
+    // A congress photo. Stored as a URL because accepting an upload would mean
+    // Cloud Storage, and Cloud Storage now means billing — see src/data/congress.ts.
+    function validCongressImage(value) {
+      return value is map
+        && value.keys().hasOnly(['url', 'alt'])
+        && value.keys().hasAll(['url', 'alt'])
+        && requiredText(value.url, 500)
+        && value.url.matches('https://.*')
+        && editableText(value.alt);
+    }
+
+    /*
+     * Rules have no loop, so every index is spelled out up to the ceiling in
+     * src/data/congress.ts and this function is generated rather than written.
+     * Each clause is guarded by the size check ahead of it, and `||`
+     * short-circuits, so the index is only read once it is known to exist.
+     */
+    function validCongressImages(value) {
+      return value is list
+        && value.size() <= 4
+        && (value.size() < 1 || validCongressImage(value[0]))
+        && (value.size() < 2 || validCongressImage(value[1]))
+        && (value.size() < 3 || validCongressImage(value[2]))
+        && (value.size() < 4 || validCongressImage(value[3]));
+    }
+
     function validCongress(data) {
-      return data.keys().hasOnly(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+      return data.keys().hasOnly(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl', 'images'])
         && data.keys().hasAll(['kicker', 'title', 'subtitle', 'details', 'siteCta', 'siteUrl'])
+        && (!('images' in data.keys()) || validCongressImages(data.images))
         && editableText(data.kicker)
         && editableText(data.title)
         && editableText(data.subtitle)

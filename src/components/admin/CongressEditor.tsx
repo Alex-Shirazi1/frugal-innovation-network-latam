@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { contentAdmin } from '../../api/adminApi'
 import { createDataSource } from '../../api'
-import type { Congress } from '../../data/congress'
+import { MAX_CONGRESS_IMAGES, type Congress, type CongressImage } from '../../data/congress'
 import type { EditableText } from '../../data/initiatives'
 import { useI18n } from '../../i18n/I18nContext'
 import type { ContentLang, LocalisedText } from '../../lib/translate'
@@ -20,7 +20,8 @@ import { EditorField, editorInputClass, fill } from './ContentEditorShell'
  * the next one is months away — so it is a plain form rather than anything
  * clever. The dates and the destination change annually; that is the point.
  */
-type CongressField = keyof Omit<Congress, 'siteUrl'>
+/** The translatable text fields — not siteUrl, and not the photo list. */
+type CongressField = keyof Omit<Congress, 'siteUrl' | 'images'>
 
 /** Field order, with the translation keys for the label and optional hint. */
 const FIELDS: Array<{
@@ -36,7 +37,11 @@ const FIELDS: Array<{
 ]
 
 /** Which failure, not its wording — see the note in ContentEditorShell. */
-type CongressError = { kind: 'load' | 'url' | 'save' } | { kind: 'missing'; field: string }
+type CongressError =
+  | { kind: 'load' | 'url' | 'save' }
+  | { kind: 'missing'; field: string }
+  /** Photos are reported by position, because they have no name to report. */
+  | { kind: 'photoUrl' | 'photoAlt'; index: number }
 
 interface CongressFieldProps {
   label: string
@@ -132,9 +137,24 @@ export function CongressEditor() {
     }
   }, [])
 
-  function setText(key: keyof Omit<Congress, 'siteUrl'>, lang: keyof EditableText, value: string) {
+  function setText(key: CongressField, lang: keyof EditableText, value: string) {
     setSaved(false)
     setDraft((prev) => (prev ? { ...prev, [key]: { ...prev[key], [lang]: value } } : prev))
+  }
+
+  const photos = draft?.images ?? []
+
+  function setPhotos(next: CongressImage[]) {
+    setSaved(false)
+    setDraft((prev) => (prev ? { ...prev, images: next } : prev))
+  }
+
+  /** Swaps with the neighbour in `direction`; the ends are already guarded. */
+  function movePhoto(index: number, direction: -1 | 1) {
+    const target = index + direction
+    setPhotos(
+      photos.map((photo, i) => (i === index ? photos[target] : i === target ? photos[index] : photo)),
+    )
   }
 
   async function save() {
@@ -149,12 +169,29 @@ export function CongressEditor() {
       setError({ kind: 'url' })
       return
     }
+    /*
+     * https only, unlike siteUrl, which still accepts http for the network's own
+     * older microsite. An http image would be blocked as mixed content on a page
+     * served over https, so it would not render even if the rules took it — and
+     * the rules do not.
+     */
+    for (const [index, photo] of photos.entries()) {
+      if (!/^https:\/\/.+/.test(photo.url.trim())) {
+        setError({ kind: 'photoUrl', index })
+        return
+      }
+      if (!photo.alt.es?.trim()) {
+        setError({ kind: 'photoAlt', index })
+        return
+      }
+    }
 
     setSaving(true)
     try {
       await contentAdmin.saveCongress({
         ...draft,
         siteUrl: draft.siteUrl.trim(),
+        images: photos.map((photo) => ({ ...photo, url: photo.url.trim() })),
       })
       setSaved(true)
       setError(null)
@@ -173,7 +210,11 @@ export function CongressEditor() {
         ? copy.urlInvalid
         : error.kind === 'missing'
           ? fill(copy.missingField, { field: error.field })
-          : e.saveFailed
+          : error.kind === 'photoUrl'
+            ? fill(copy.photoUrlInvalid, { n: String(error.index + 1) })
+            : error.kind === 'photoAlt'
+              ? fill(copy.photoAltMissing, { n: String(error.index + 1) })
+              : e.saveFailed
 
   if (error && !draft) {
     return (
@@ -210,6 +251,103 @@ export function CongressEditor() {
           />
         </EditorField>
       </div>
+
+      <section className="rounded-2xl border border-carbon/10 bg-white/80 p-4">
+        <h3 className="text-sm font-semibold text-carbon">{copy.photosLabel}</h3>
+        <p className="mt-1 text-xs text-pizarra">
+          {fill(copy.photosHint, { max: String(MAX_CONGRESS_IMAGES) })}
+        </p>
+
+        <ul className="mt-4 space-y-4">
+          {photos.map((photo, index) => (
+            // Position is the only identity a photo has — the stored shape is
+            // exactly {url, alt}, and the rules reject any third key.
+            <li key={index} className="rounded-xl border border-carbon/10 p-3">
+              <EditorField label={`${copy.photoUrlLabel} *`}>
+                <input
+                  className={editorInputClass}
+                  value={photo.url}
+                  onChange={(event) =>
+                    setPhotos(
+                      photos.map((p, i) => (i === index ? { ...p, url: event.target.value } : p)),
+                    )
+                  }
+                />
+              </EditorField>
+
+              {/*
+                * A preview, because nothing on the server checks that the link
+                * resolves. Pasting a URL that 404s is the likeliest mistake here
+                * and this is the only place it is cheap to notice.
+                */}
+              {photo.url.trim() ? (
+                <img
+                  src={photo.url}
+                  alt=""
+                  loading="lazy"
+                  className="mt-2 max-h-32 rounded-lg object-cover"
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none'
+                  }}
+                  onLoad={(event) => {
+                    event.currentTarget.style.display = ''
+                  }}
+                />
+              ) : null}
+
+              <div className="mt-3">
+                <CongressField
+                  label={fill(copy.photoAltLabel, { n: String(index + 1) })}
+                  hint={copy.photoAltHint}
+                  value={photo.alt}
+                  onChange={(lang, value) =>
+                    setPhotos(
+                      photos.map((p, i) =>
+                        i === index ? { ...p, alt: { ...p.alt, [lang]: value } } : p,
+                      ),
+                    )
+                  }
+                />
+              </div>
+
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => movePhoto(index, -1)}
+                  disabled={index === 0}
+                  className="rounded-full border border-carbon/20 px-3 py-1 text-xs font-medium text-carbon hover:bg-carbon/5 disabled:opacity-40"
+                >
+                  {copy.movePhotoUp}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => movePhoto(index, 1)}
+                  disabled={index === photos.length - 1}
+                  className="rounded-full border border-carbon/20 px-3 py-1 text-xs font-medium text-carbon hover:bg-carbon/5 disabled:opacity-40"
+                >
+                  {copy.movePhotoDown}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhotos(photos.filter((_, i) => i !== index))}
+                  className="rounded-full border border-rojo/30 px-3 py-1 text-xs font-medium text-rojo hover:bg-rojo/5"
+                >
+                  {copy.removePhoto}
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          onClick={() => setPhotos([...photos, { url: '', alt: { es: '' } }])}
+          disabled={photos.length >= MAX_CONGRESS_IMAGES}
+          className="mt-4 rounded-full border border-teal/40 px-4 py-1.5 text-xs font-semibold text-teal hover:bg-teal/5 disabled:opacity-40"
+        >
+          {copy.addPhoto}
+        </button>
+      </section>
 
       {error ? (
         <p role="alert" className="text-xs font-medium text-rojo">
