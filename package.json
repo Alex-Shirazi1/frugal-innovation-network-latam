@@ -18,7 +18,8 @@
     "emulators": "firebase emulators:start --only firestore,auth --project raif-af800",
     "seed:emulator": "tsx server/scripts/seed-emulator.ts",
     "grant-admin": "tsx server/scripts/grant-admin.ts",
-    "relock": "./scripts/relock.sh"
+    "relock": "./scripts/relock.sh",
+    "seed:members": "tsx server/scripts/seed-members.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.2",

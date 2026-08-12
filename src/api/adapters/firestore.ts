@@ -123,17 +123,23 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
       return snap.data() as Congress
     },
 
+    /**
+     * The published directory: stored records, or the bundled seed while there
+     * are none.
+     *
+     * A fallback rather than a concatenation, matching every other collection
+     * here. The two used to be added together, which meant publishing one real
+     * member produced a directory of that person plus 54 fabricated ones — the
+     * fake data stayed on the public site until somebody edited the repository.
+     * Falling back instead means the first real profile clears the mock
+     * directory on its own, and the admin panel's count matches the site's.
+     */
     async getMembers(): Promise<Member[]> {
       const db = await getDb(config)
       const { collection, getDocs } = await import('firebase/firestore')
       const snapshot = await getDocs(collection(db, MEMBERS))
-      const approved = snapshot.docs.map((d) => ({ ...(d.data() as Omit<Member, 'id'>), id: d.id }))
-
-      // Seed profiles are mock data that lives in the repo, so the published
-      // directory is approved Firestore records plus the bundled snapshot —
-      // same composition the Express backend returns.
-      const seed = await bundledDataSource.getMembers()
-      return [...approved, ...seed]
+      if (snapshot.empty) return bundledDataSource.getMembers()
+      return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Member, 'id'>), id: d.id }))
     },
 
     async submitIntake(submission: IntakeSubmission): Promise<IntakeResult> {

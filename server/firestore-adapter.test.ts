@@ -163,7 +163,13 @@ describe.skipIf(!available)('Firestore adapter', () => {
       expect(members).toHaveLength(54)
     })
 
-    it('puts approved records ahead of the seed directory', async () => {
+    /*
+     * The seed is a fallback, not an addend. Publishing one real member used to
+     * yield that person plus 54 fabricated ones, which left the mock directory on
+     * the public site until somebody edited the repository. Now the first real
+     * profile replaces the mock set outright.
+     */
+    it('serves only stored records once any profile exists', async () => {
       const source = createFirestoreDataSource(config)
       await source.submitIntake(makeSubmission())
 
@@ -173,7 +179,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
       asAnon()
       const members = await source.getMembers()
-      expect(members).toHaveLength(55)
+      expect(members).toHaveLength(1)
       expect(members[0].fullName).toBe('Ana Prueba García')
     })
 
