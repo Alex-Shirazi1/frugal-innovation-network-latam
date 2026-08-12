@@ -131,6 +131,18 @@ try {
       'No credentials found. Run:\n  gcloud auth application-default login\n' +
         'or pass --key=path/to/serviceAccountKey.json',
     )
+  } else if (message.includes('invalid_grant') || message.includes('invalid_rapt')) {
+    // Stored ADC exists but is expired, revoked, or belongs to an account with
+    // no access to this project — which reads as an opaque "400 undefined"
+    // otherwise. Worth naming, because the fix is not obvious from the message.
+    console.error(
+      `Credentials were rejected for project "${projectId}".\n\n` +
+        'The stored application-default credentials are expired, revoked, or belong\n' +
+        'to an account without access to this project. Sign in again as the account\n' +
+        'that owns it:\n\n' +
+        '  gcloud auth application-default login\n\n' +
+        'Nothing was written.',
+    )
   } else {
     console.error(message)
   }
