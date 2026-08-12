@@ -39,6 +39,16 @@ export interface Member {
   socialUrl?: string
   /** Deterministic hue used for the avatar placeholder */
   avatarHue: number
+  /**
+   * ISO instant the profile was published, set once at publish time.
+   *
+   * Optional because the bundled seed profiles have no such moment — they are
+   * compiled into the repo rather than published through the pipeline. Distinct
+   * from the submission's `createdAt`, which is queue bookkeeping and is
+   * deliberately not carried onto a published record: this is when the person
+   * became visible, not when they first wrote in.
+   */
+  publishedAt?: string
 }
 
 /**
