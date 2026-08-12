@@ -39,3 +39,8 @@ firestore-debug.log
 firebase-debug.log
 ui-debug.log
 .firebase/
+
+# Firestore exports (npm run export). These contain submission and formResponse
+# records, including the email addresses deliberately kept out of the
+# world-readable members collection. Never commit them.
+firestore-backups/
