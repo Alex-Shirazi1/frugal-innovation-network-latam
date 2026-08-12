@@ -92,7 +92,9 @@ without touching the rules or redeploying.
 4. Open `/admin` and sign in.
 
 To rotate: change the password in the console, or send another reset. To revoke
-someone entirely: `npm run grant-admin -- <address> --revoke`.
+someone entirely: `npm run grant-admin -- <address> --revoke --revoke-sessions`.
+The second flag matters — a password change alone leaves their existing session
+signed in, because Firebase renews it indefinitely.
 
 **Language.** The panel carries the same es/en/pt switch as the public site and
 shares its `relif-lang` preference, so a language chosen on either is the one

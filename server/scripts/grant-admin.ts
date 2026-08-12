@@ -12,6 +12,8 @@
  *   npm run grant-admin -- someone@example.com --create
  *   npm run grant-admin -- someone@example.com
  *   npm run grant-admin -- someone@example.com --revoke
+ *   npm run grant-admin -- someone@example.com --revoke-sessions
+ *   npm run grant-admin -- someone@example.com --revoke --revoke-sessions
  *
  * `--create` makes the account when it does not exist yet and prints a
  * password-reset link instead of setting a password. That is the point: a
@@ -33,6 +35,27 @@ const create = args.includes('--create')
 const keyFile = args.find((a) => a.startsWith('--key='))?.slice('--key='.length)
 
 /**
+ * Invalidates every refresh token the account holds.
+ *
+ * Firebase renews ID tokens indefinitely, so a stolen session — a lost laptop,
+ * a phished password, a moderator who has left — stays valid forever, and
+ * changing the password does not end it. This is the only way to cut one off.
+ *
+ * Separate from `--revoke` because the two answer different questions. Dropping
+ * the claim decides what an account may do the next time it presents a token;
+ * this decides whether it gets another token at all. Offboarding wants both,
+ * and a laptop left on a train wants only this one.
+ */
+const revokeSessions = args.includes('--revoke-sessions')
+
+/**
+ * `--revoke-sessions` on its own is a session operation, not a claim operation.
+ * Without this, a bare address falls through to the grant branch below and
+ * killing someone's sessions would hand them admin on the way out.
+ */
+const claimChangeRequested = create || revoke || !revokeSessions
+
+/**
  * Which claim to operate on.
  *
  * `importer` is for the Google Form transport account and grants strictly less
@@ -46,8 +69,9 @@ const claim: 'admin' | 'importer' = args.includes('--importer') ? 'importer' : '
 if (!email) {
   console.error(
     'usage: npm run grant-admin -- <email> [--create] [--revoke] [--importer]\n' +
-      '                            [--key=path/to/sa.json]\n\n' +
-      '  --importer  operate on the form-transport claim instead of admin',
+      '                            [--revoke-sessions] [--key=path/to/sa.json]\n\n' +
+      '  --importer         operate on the form-transport claim instead of admin\n' +
+      '  --revoke-sessions  invalidate the refresh tokens, ending signed-in sessions',
   )
   process.exit(1)
 }
@@ -96,20 +120,41 @@ try {
   const user = await resolveUser()
   const existing = user.customClaims ?? {}
 
-  if (revoke) {
-    // Drop only the claim being operated on; any other claim survives.
-    const rest = { ...existing }
-    delete rest[claim]
-    await auth.setCustomUserClaims(user.uid, rest)
-    console.log(`revoked ${claim} from ${email} (${user.uid})`)
-  } else {
-    // Merge rather than replace, so any unrelated claims survive.
-    await auth.setCustomUserClaims(user.uid, { ...existing, [claim]: true })
-    console.log(`granted ${claim} to ${email} (${user.uid})`)
+  if (claimChangeRequested) {
+    if (revoke) {
+      // Drop only the claim being operated on; any other claim survives.
+      const rest = { ...existing }
+      delete rest[claim]
+      await auth.setCustomUserClaims(user.uid, rest)
+      console.log(`revoked ${claim} from ${email} (${user.uid})`)
+    } else {
+      // Merge rather than replace, so any unrelated claims survive.
+      await auth.setCustomUserClaims(user.uid, { ...existing, [claim]: true })
+      console.log(`granted ${claim} to ${email} (${user.uid})`)
+    }
+
+    const after = (await auth.getUser(user.uid)).customClaims
+    console.log('claims now:', JSON.stringify(after))
   }
 
-  const after = (await auth.getUser(user.uid)).customClaims
-  console.log('claims now:', JSON.stringify(after))
+  if (revokeSessions) {
+    await auth.revokeRefreshTokens(user.uid)
+    // Read it back rather than stamping Date.now(): the cutoff Firebase records
+    // is the one it will actually compare against, and it is not this clock.
+    const { tokensValidAfterTime } = await auth.getUser(user.uid)
+    console.log(`revoked refresh tokens for ${email} (${user.uid})`)
+    console.log(`tokens issued before ${tokensValidAfterTime} are no longer renewable`)
+    console.log(
+      '\nThis does not sign the account out on the spot. The ID token already in\n' +
+        'the browser stays valid until it expires, which Firebase caps at an hour;\n' +
+        'after that the client cannot mint a new one and has to sign in again.\n' +
+        'Dropping the claim lands on that same boundary, because the claim is read\n' +
+        'from the token rather than looked up per request. So an hour is the floor\n' +
+        'either way, and for offboarding you want both — the claim so the account\n' +
+        'is powerless when it does come back, the tokens so it cannot come back:\n' +
+        `  npm run grant-admin -- ${email} --revoke --revoke-sessions`,
+    )
+  }
 
   if (create && !revoke) {
     // Printed rather than emailed: Firebase only sends this itself through its
@@ -122,8 +167,10 @@ try {
     console.log('Choose it in a password manager rather than inventing one here.')
   }
 
-  console.log('\nThe account must sign out and back in (or hard-refresh /admin)')
-  console.log('for the new token to carry the claim.')
+  if (claimChangeRequested) {
+    console.log('\nThe account must sign out and back in (or hard-refresh /admin)')
+    console.log('for the new token to carry the claim.')
+  }
 } catch (error: unknown) {
   const message = error instanceof Error ? error.message : String(error)
   if (message.includes('no user record')) {
