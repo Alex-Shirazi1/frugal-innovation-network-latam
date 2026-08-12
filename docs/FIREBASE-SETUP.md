@@ -108,8 +108,16 @@ touching the rules or redeploying.
 gcloud auth application-default login
 npm run grant-admin -- someone@example.com --create   # new moderator
 npm run grant-admin -- someone@example.com            # existing account
-npm run grant-admin -- someone@example.com --revoke   # remove
+npm run grant-admin -- someone@example.com --revoke   # remove the claim
+npm run grant-admin -- someone@example.com --revoke --revoke-sessions   # offboard
 ```
+
+`--revoke-sessions` invalidates the account's refresh tokens. Without it a
+signed-in session renews itself forever, so a lost laptop or a phished password
+stays live and changing the password does not end it. Neither flag takes effect
+the instant it runs: both the `admin` claim and the session are read from an ID
+token that Firebase issues for up to an hour, so an hour is the floor either way.
+The flag is what stops the hour from being forever.
 
 `--create` makes the account and prints a **password-reset link** rather than
 setting a password, so the password never enters a terminal, a shell history or
@@ -227,7 +235,8 @@ nothing errors and nothing looks broken.
     into the panel, so it is worth putting to Allan — but it cannot be switched on
     without changing the billing posture. Until then, the mitigations are a
     unique password in a password manager, the 30-minute idle timeout, and
-    `grant-admin --revoke` to disable an account immediately.
+    `grant-admin --revoke --revoke-sessions` to cut an account off — within the
+    hour an already-issued ID token stays valid, not instantly.
 13. **Set a budget or quota alert**, so a traffic spike or an abuse run is
     noticed rather than silently exhausting the day's Firestore reads or the
     Hosting transfer allowance.
@@ -268,9 +277,15 @@ first when a deploy misbehaves.**
   creates — that is how the public join form works, and it means anyone can post
   to the intake queue with `curl`. Step 11 of the production checklist. It is
   also the cheapest protection against a Firestore quota exhaustion run.
-- **No backups exist.** Nothing dumps Firestore anywhere. If content is deleted,
-  the only recovery is the repo seed, which loses every real edit. Managed
-  backups need Blaze; a local export script does not.
+- **Backups are manual.** `npm run export` dumps every collection to timestamped
+  JSON under `firestore-backups/` (gitignored, and it must stay that way — the
+  file carries `submissions` and `formResponses`, including the email addresses
+  the rules keep out of the world-readable `members`). Nothing runs it on a
+  schedule: scheduled exports need Blaze, so somebody has to remember, and the
+  honest expectation is "whatever the last person exported". Run it before any
+  bulk edit or import. Note it captures documents only — custom claims live on
+  the Auth user record and are not covered, so a restore also means re-running
+  `grant-admin` for each moderator.
 - **Hosting transfer is the tightest quota.** `public/` is roughly 45 MB, mostly
   bibliography PDFs, and Spark's daily transfer allowance is small enough that a
   scripted download loop could exhaust it. Compressing the PDFs is the cheapest
