@@ -44,6 +44,7 @@ export function MembersEditor() {
   const [arrived, setArrived] = useState<ArrivedResponse[]>([])
   const [members, setMembers] = useState<AdminMember[]>([])
   const [editing, setEditing] = useState<Editing>({ kind: 'none' })
+  const [search, setSearch] = useState('')
   const [status, setStatus] = useState<'loading' | 'ready' | 'unavailable'>('loading')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -82,6 +83,29 @@ export function MembersEditor() {
       setBusy(false)
     }
   }
+
+  /**
+   * Name, institution or country, accent-insensitively.
+   *
+   * Accent folding matters more here than it looks: a directory of Latin American
+   * academics is full of names a moderator will type without diacritics, and
+   * "Nunez" failing to find "Núñez" reads as a missing profile rather than as a
+   * fussy search box.
+   */
+  const fold = (value: string) =>
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+
+  const query = fold(search.trim())
+  const visible = query
+    ? members.filter((member) =>
+        [member.fullName, member.country, member.region, member.jobPositionName]
+          .filter(Boolean)
+          .some((field) => fold(field).includes(query)),
+      )
+    : members
 
   const formatDate = (iso: string) => {
     if (!iso) return '—'
@@ -250,13 +274,34 @@ export function MembersEditor() {
           </button>
         </div>
 
+        {/*
+          Worth having from the first dozen profiles and essential past fifty.
+          Filters in the browser rather than by query: the whole collection is
+          already loaded, and a Firestore prefix query cannot match a surname in
+          the middle of a full name anyway.
+        */}
+        {members.length > 0 ? (
+          <input
+            type="search"
+            className="mt-4 w-full rounded-xl border border-carbon/15 bg-white px-4 py-2.5 text-sm outline-none transition-colors focus:border-teal"
+            value={search}
+            placeholder={copy.searchPlaceholder}
+            aria-label={copy.searchLabel}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        ) : null}
+
         {members.length === 0 ? (
           <p className="mt-4 rounded-2xl border border-dashed border-carbon/15 px-4 py-6 text-center text-sm text-pizarra">
             {copy.publishedEmpty}
           </p>
+        ) : visible.length === 0 ? (
+          <p className="mt-4 rounded-2xl border border-dashed border-carbon/15 px-4 py-6 text-center text-sm text-pizarra">
+            {copy.searchEmpty.replace('{query}', search)}
+          </p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {members.map((member) => (
+            {visible.map((member) => (
               <li
                 key={member.id}
                 className="rounded-2xl border border-carbon/10 bg-white p-4 sm:flex sm:items-center sm:justify-between sm:gap-4"

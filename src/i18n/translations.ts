@@ -343,8 +343,11 @@ export const es = {
       publishedOn: 'Publicado el {date}',
       confirmDiscard: '¿Descartar esta respuesta? No elimina a nadie de la red.',
       confirmDelete: '¿Eliminar el perfil de {name} del directorio público?',
-      seedNotice: 'El directorio público también muestra {count} perfiles de ejemplo incluidos en el código. No se editan aquí.',
+      seedNotice: 'Mientras no haya perfiles publicados, el directorio público muestra {count} perfiles de ejemplo incluidos en el código. Al publicar el primero, dejan de mostrarse.',
       unknownName: 'Sin nombre',
+      searchLabel: 'Buscar perfiles',
+      searchPlaceholder: 'Buscar por nombre, país o puesto…',
+      searchEmpty: 'Ningún perfil coincide con «{query}».',
       firstName: 'Nombre',
       lastName: 'Apellido',
       position: 'Tipo de cargo',
@@ -381,7 +384,7 @@ export const es = {
       },
     },
     footerNote:
-      'Los perfiles del directorio no se administran aquí. Se crean con el formulario de incorporación que la red envía después de conversar con la persona.',
+      'Los perfiles del directorio se crean con el formulario de incorporación que la red envía después de conversar con la persona. Aquí se publican y se corrigen.',
     contentNeedsFirebase:
       'La edición de contenido requiere el backend de Firebase. Este panel está conectado al servidor local de desarrollo, que no tiene ruta de escritura para el contenido del sitio.',
 
@@ -826,8 +829,11 @@ export const en: Dictionary = {
       publishedOn: 'Published {date}',
       confirmDiscard: 'Discard this response? It removes nobody from the network.',
       confirmDelete: 'Remove {name} from the public directory?',
-      seedNotice: 'The public directory also shows {count} sample profiles compiled into the code. Those are not edited here.',
+      seedNotice: 'While no profiles are published, the public directory shows {count} sample profiles compiled into the code. Publishing the first one replaces them.',
       unknownName: 'No name',
+      searchLabel: 'Search profiles',
+      searchPlaceholder: 'Search by name, country or job title…',
+      searchEmpty: 'No profile matches \u201c{query}\u201d.',
       firstName: 'First name',
       lastName: 'Last name',
       position: 'Position type',
@@ -864,7 +870,7 @@ export const en: Dictionary = {
       },
     },
     footerNote:
-      'Directory profiles are not managed here. They are created with the incorporation form the network sends after talking to the person.',
+      'Directory profiles are created with the incorporation form the network sends after talking to the person. Here they are published and corrected.',
     contentNeedsFirebase:
       'Content editing requires the Firebase backend. This panel is connected to the local development server, which has no write path for site content.',
 
@@ -1294,8 +1300,11 @@ export const pt: Dictionary = {
       publishedOn: 'Publicado em {date}',
       confirmDiscard: 'Descartar esta resposta? Não remove ninguém da rede.',
       confirmDelete: 'Remover o perfil de {name} do diretório público?',
-      seedNotice: 'O diretório público também mostra {count} perfis de exemplo compilados no código. Eles não são editados aqui.',
+      seedNotice: 'Enquanto não houver perfis publicados, o diretório público mostra {count} perfis de exemplo compilados no código. Ao publicar o primeiro, eles deixam de aparecer.',
       unknownName: 'Sem nome',
+      searchLabel: 'Buscar perfis',
+      searchPlaceholder: 'Buscar por nome, país ou cargo…',
+      searchEmpty: 'Nenhum perfil corresponde a \u201c{query}\u201d.',
       firstName: 'Nome',
       lastName: 'Sobrenome',
       position: 'Tipo de cargo',
@@ -1332,7 +1341,7 @@ export const pt: Dictionary = {
       },
     },
     footerNote:
-      'Os perfis do diretório não são administrados aqui. São criados com o formulário de incorporação que a rede envia depois de conversar com a pessoa.',
+      'Os perfis do diretório são criados com o formulário de incorporação que a rede envia depois de conversar com a pessoa. Aqui eles são publicados e corrigidos.',
     contentNeedsFirebase:
       'A edição de conteúdo requer o backend do Firebase. Este painel está conectado ao servidor local de desenvolvimento, que não tem rota de escrita para o conteúdo do site.',
 

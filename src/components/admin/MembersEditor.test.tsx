@@ -156,6 +156,39 @@ describe('MembersEditor', () => {
     expect(screen.queryByLabelText(/Nombre completo/)).not.toBeInTheDocument()
   })
 
+  it('filters the published list by name', async () => {
+    list.mockResolvedValue([
+      published(),
+      { ...published(), id: 'm2', fullName: 'Beatriz Delfa Rodríguez' },
+    ])
+    renderTab()
+
+    await userEvent.type(await screen.findByLabelText('Buscar perfiles'), 'beatriz')
+
+    expect(screen.getByText('Beatriz Delfa Rodríguez')).toBeInTheDocument()
+    expect(screen.queryByText('Ada Lovelace')).not.toBeInTheDocument()
+  })
+
+  /*
+   * A directory of Latin American names is typed without diacritics constantly.
+   * "Nunez" missing "Núñez" would read as an absent profile, not a fussy search.
+   */
+  it('matches names typed without their accents', async () => {
+    list.mockResolvedValue([{ ...published(), id: 'm3', fullName: 'Ana Núñez Ferreira' }])
+    renderTab()
+
+    await userEvent.type(await screen.findByLabelText('Buscar perfiles'), 'nunez')
+    expect(screen.getByText('Ana Núñez Ferreira')).toBeInTheDocument()
+  })
+
+  it('says so when a search matches nothing', async () => {
+    list.mockResolvedValue([published()])
+    renderTab()
+
+    await userEvent.type(await screen.findByLabelText('Buscar perfiles'), 'zzzz')
+    expect(screen.getByText(/Ningún perfil coincide/)).toBeInTheDocument()
+  })
+
   it('names the compiled-in sample profiles so the count gap is not a mystery', async () => {
     renderTab()
     expect(await screen.findByText(/54 perfiles de ejemplo/)).toBeInTheDocument()
