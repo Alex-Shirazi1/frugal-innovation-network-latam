@@ -17,6 +17,8 @@
  * plan, since Functions would force Blaze and a billing account.
  */
 import { readFirebaseConfig, getAuthClient, getDb } from '../lib/firebase'
+import { validateMemberDraft, type MemberDraft } from '../domain/memberDraft'
+import { mapFormResponse, type ImportRow } from '../domain/memberImport'
 import { resolveDataSourceKind } from './index'
 import { avatarHueFor, positionTitles } from '../domain/intake'
 import type { ApiResponse, Member, PendingMember, PositionType } from './types'
@@ -195,7 +197,14 @@ const firestoreAdmin = {
     // Publish first, then clear the queue entry. If the delete fails the record
     // is live and the entry reappears in the queue — visible and recoverable,
     // which is the safer direction to fail.
-    await setDoc(doc(db, 'members', id), toPublishedMember(snap.data() as SubmissionDocument))
+    //
+    // publishedAt is stamped here rather than inside toPublishedMember, which
+    // also builds the pending list — a queue entry carrying a publication date
+    // would be claiming something that has not happened.
+    await setDoc(doc(db, 'members', id), {
+      ...toPublishedMember(snap.data() as SubmissionDocument),
+      publishedAt: new Date().toISOString(),
+    })
     await deleteDoc(submissionRef)
   },
 
@@ -270,6 +279,162 @@ const httpAdmin = {
   },
 }
 
+
+/* ------------------------------------------------------------ Members admin */
+
+/** A published profile as the panel sees it: the record plus its document id. */
+export interface AdminMember extends Member {
+  /** Absent on the bundled seed profiles, which were never published. */
+  publishedAt?: string
+}
+
+/** A form response awaiting a decision, already mapped and validated. */
+export interface ArrivedResponse {
+  id: string
+  receivedAt: string
+  /** Question titles to answers, verbatim, for showing what was actually said. */
+  answers: Record<string, string>
+  outcome: ImportRow
+}
+
+/**
+ * Directory management: the manual half of the members tab.
+ *
+ * The automatic half is the incorporation form, and it stays primary — these
+ * exist because a directory nobody can correct or remove from is worse than one
+ * with a typo in it. Until now the only way to take a profile down was opening
+ * the Firebase console, which is not something the network can be asked to do
+ * when somebody writes in asking to be removed.
+ */
+export const membersAdmin = {
+  /**
+   * Published profiles held in Firestore.
+   *
+   * Deliberately NOT the same list the public directory renders. That one is
+   * these records plus the bundled mock seed concatenated at read time, and the
+   * seed lives in the repository — it cannot be edited or deleted from a panel,
+   * so listing it here would offer actions that silently do nothing.
+   */
+  async list(): Promise<AdminMember[]> {
+    const db = await getDb(requireConfig())
+    const { collection, getDocs } = await import('firebase/firestore')
+    const snapshot = await getDocs(collection(db, 'members'))
+    return snapshot.docs.map((docSnap) => ({
+      ...(docSnap.data() as Omit<Member, 'id'>),
+      id: docSnap.id,
+    }))
+  },
+
+  /** Creates or overwrites a profile from a hand-typed draft. */
+  async save(id: string | null, draft: Partial<MemberDraft>): Promise<string> {
+    const validation = validateMemberDraft(draft)
+    if (!validation.ok || !validation.member) {
+      throw new Error(validation.error ?? 'missing-required')
+    }
+
+    const db = await getDb(requireConfig())
+    const { addDoc, collection, doc, getDoc, setDoc } = await import('firebase/firestore')
+
+    if (!id) {
+      const created = await addDoc(collection(db, 'members'), {
+        ...validation.member,
+        publishedAt: new Date().toISOString(),
+      })
+      return created.id
+    }
+
+    // An edit preserves the original publication date — it is when the person
+    // appeared, not when their biography was last corrected.
+    const existing = await getDoc(doc(db, 'members', id))
+    const publishedAt =
+      (existing.data() as AdminMember | undefined)?.publishedAt ?? new Date().toISOString()
+    await setDoc(doc(db, 'members', id), { ...validation.member, publishedAt })
+    return id
+  },
+
+  async remove(id: string): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { deleteDoc, doc } = await import('firebase/firestore')
+    await deleteDoc(doc(db, 'members', id))
+  },
+
+  /**
+   * Incorporation-form responses that have not been published yet.
+   *
+   * A response is immutable — it records what somebody actually submitted — so
+   * there is no flag on it saying "done". Instead a published profile takes the
+   * response's own document id, which makes "already handled" a question about
+   * the directory rather than state on the record, and makes publishing the same
+   * response twice idempotent rather than duplicating the person.
+   */
+  async listArrived(): Promise<ArrivedResponse[]> {
+    const db = await getDb(requireConfig())
+    const { collection, getDocs } = await import('firebase/firestore')
+    const [responses, members] = await Promise.all([
+      getDocs(collection(db, 'formResponses')),
+      getDocs(collection(db, 'members')),
+    ])
+    const published = new Set(members.docs.map((docSnap) => docSnap.id))
+
+    return responses.docs
+      .filter((docSnap) => !published.has(docSnap.id))
+      .map((docSnap) => {
+        const data = docSnap.data() as { answers?: Record<string, string>; receivedAt?: string }
+        const answers = data.answers ?? {}
+        return {
+          id: docSnap.id,
+          receivedAt: data.receivedAt ?? '',
+          answers,
+          outcome: mapFormResponse(answers),
+        }
+      })
+      .sort((a, b) => a.receivedAt.localeCompare(b.receivedAt))
+  },
+
+  /**
+   * Publishes an arrived response, optionally with corrections.
+   *
+   * `draft` is supplied when a moderator had to resolve something the mapping
+   * could not — an institution not on the whitelist, a region that did not match
+   * the country. Without it the mapped record is published as-is.
+   */
+  async publishArrived(id: string, draft?: Partial<MemberDraft>): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { doc, getDoc, setDoc } = await import('firebase/firestore')
+
+    let member: Omit<Member, 'id' | 'publishedAt'>
+    if (draft) {
+      const validation = validateMemberDraft(draft)
+      if (!validation.ok || !validation.member) {
+        throw new Error(validation.error ?? 'missing-required')
+      }
+      member = validation.member
+    } else {
+      const snap = await getDoc(doc(db, 'formResponses', id))
+      if (!snap.exists()) throw new Error('not-found')
+      const answers = (snap.data() as { answers?: Record<string, string> }).answers ?? {}
+      const outcome = mapFormResponse(answers)
+      if (!outcome.ok || !outcome.member) throw new Error(outcome.error ?? 'missing-required')
+      const { email: _held, ...rest } = outcome.member
+      member = rest
+    }
+
+    // Same id as the response, which is what marks it handled. The response
+    // itself is kept: it holds the reply address, and `members` deliberately
+    // does not.
+    await setDoc(doc(db, 'members', id), {
+      ...member,
+      publishedAt: new Date().toISOString(),
+    })
+  },
+
+  /** Discards a response. Spam housekeeping, not a membership decision. */
+  async discardArrived(id: string): Promise<void> {
+    const db = await getDb(requireConfig())
+    const { deleteDoc, doc } = await import('firebase/firestore')
+    await deleteDoc(doc(db, 'formResponses', id))
+  },
+}
 
 /* --------------------------------------------------- Editable site content */
 

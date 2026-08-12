@@ -4,6 +4,7 @@ import { AdminHeader } from './AdminHeader'
 import { InitiativesEditor } from './InitiativesEditor'
 import { BibliographyEditor } from './BibliographyEditor'
 import { CongressEditor } from './CongressEditor'
+import { MembersEditor } from './MembersEditor'
 import { useI18n } from '../../i18n/I18nContext'
 import { useIdleTimeout } from '../../hooks/useIdleTimeout'
 
@@ -110,19 +111,23 @@ function LoginGate({ onSignedIn, timedOut }: LoginGateProps) {
 }
 
 /**
- * The three sections the network maintains itself.
+ * What the network maintains itself: three content sections, plus the directory.
  *
- * There is deliberately no membership queue here. Joining is a conversation,
- * not a screen: the public form's whole job is to put an email in the network's
- * inbox, after which someone writes back, has a call, and — if it is a fit —
- * sends the private Google Form. Filling that in is what creates a profile, and
- * the profile is published only if the person asked for it to be. None of those
- * steps happen in a dashboard, so a dashboard for them modelled work nobody
- * does.
+ * There is still deliberately no approve-or-deny screen, and the distinction
+ * matters. Joining is a conversation, not a button: the public form's whole job
+ * is to put an email in the network's inbox, after which someone writes back, has
+ * a call, and — if it is a fit — sends the private incorporation form. Filling in
+ * THAT form is what creates a profile.
  *
- * Submissions are still stored and still readable by an admin (`listPending` in
- * adminApi, exercised by the adapter tests) — they simply have no screen. That
- * is the recovery path if a notification email is ever missed.
+ * The members tab is the far end of that process, not a gate in front of it. It
+ * publishes responses from the incorporation form, which by definition come from
+ * people already vetted offline, and it can correct or remove a profile
+ * afterwards. Admission is never the decision being taken on this screen.
+ *
+ * Site-form submissions remain stored and admin-readable (`listPending` in
+ * adminApi, exercised by the adapter tests) and still have no screen of their
+ * own — they are interest, not applications. That is the recovery path if a
+ * notification email is ever missed.
  *
  * `labelKey` rather than a label: the ids are stable state, the words are not.
  */
@@ -130,6 +135,7 @@ const TABS = [
   { id: 'iniciativas', labelKey: 'initiatives' },
   { id: 'bibliografia', labelKey: 'bibliography' },
   { id: 'congreso', labelKey: 'congress' },
+  { id: 'miembros', labelKey: 'members' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -260,6 +266,7 @@ export function AdminPage() {
             {tab === 'iniciativas' ? <InitiativesEditor /> : null}
             {tab === 'bibliografia' ? <BibliographyEditor /> : null}
             {tab === 'congreso' ? <CongressEditor /> : null}
+            {tab === 'miembros' ? <MembersEditor /> : null}
           </div>
         )}
 
