@@ -1,11 +1,14 @@
-# Firebase: what is set up, and what a new project would need
+# Firebase: what is set up, and how to move it to production
 
 Companion to [DEPLOYMENT.md](DEPLOYMENT.md), which is the step-by-step guide.
 This is the **state of the world** — what exists today on `raif-af800`, who can
 change it, and what is not encoded anywhere in this repository and would
 therefore have to be redone by hand on a replacement project.
 
-Last verified against the live project: **2026-08-10**.
+Live project state last verified: **2026-08-10**. The collections table, the
+production checklist and the known issues were updated **2026-08-12** when the
+incorporation-form pipeline landed — those additions describe the code as
+committed, not a re-inspection of the console.
 
 ## The project
 
@@ -56,7 +59,8 @@ real documents, and `submissions` correctly refuses an anonymous reader with
 | Collection | Public read? | Written by |
 |---|---|---|
 | `submissions` | **no** — holds personal data | the join form (create only) |
-| `members` | yes | a moderator, publishing a submission |
+| `formResponses` | **no** — holds personal data | the Apps Script transport, via the `importer` claim |
+| `members` | yes | a moderator, from the panel |
 | `initiatives` | yes | the admin panel |
 | `bibliography` | yes | the admin panel |
 | `resources` | yes | nothing any more — editor removed |
@@ -65,6 +69,13 @@ real documents, and `submissions` correctly refuses an anonymous reader with
 An **empty** collection makes the site fall back to the seed compiled into the
 bundle. That is why the panel has an explicit Import step, and why deleting
 every card from a section restores the original rather than blanking the page.
+It also means an empty `members` collection publishes 54 fabricated profiles —
+see "Moving to a production project" below.
+
+`formResponses` is the most sensitive collection here: it holds a vetted
+applicant's contact address alongside every answer they gave, it is retained
+after publication because `members` deliberately stores no address, and it has no
+update rule at all — a response records what somebody actually submitted.
 
 ## Logins and credentials
 
@@ -139,24 +150,104 @@ The one worthwhile improvement is **Workload Identity Federation** for
 long-lived JSON key exists anywhere. That is a better answer than a different
 vault.
 
-## What a new Firebase project would need
+## Moving to a production project
 
-None of this is in the repo. All of it has to be redone.
+None of the console configuration is in the repo. All of it has to be redone,
+and the order below is deliberate.
 
-1. **Create the project**, keep it on Spark. Update the id in `.firebaserc`, in
-   the `emulators` script in `package.json`, and in `server/scripts/`
-   (`seed-emulator.ts` and `grant-admin.ts` default to `raif-af800`).
-2. **Create the Firestore database.** Location is permanent. CI deploys rules
-   and indexes on the next push.
+### Read this before anything else
+
+**A fresh project will publish 54 fabricated academics.**
+
+The `members` collection is empty on a new project, and an empty collection makes
+the site fall back to the seed compiled into the bundle — which is 54 invented
+people with invented job titles, biographies and dead `scholar.example.org`
+links. Point a real domain at a fresh project and that is what the public sees.
+
+There are two ways out and you must pick one before launch:
+
+- Publish real profiles first. The first stored record replaces the mock set
+  outright, so one real member is enough to clear all 54.
+- Or strip the mock seed from `src/data/members.ts`, which leaves the directory
+  genuinely empty until real profiles exist.
+
+This is the single most likely way a production launch goes wrong, because
+nothing errors and nothing looks broken.
+
+### Never do these on a production project
+
+- **`npm run seed:members`** — writes those 54 fabricated profiles into
+  Firestore on purpose. It is a preproduction tool. It prints the project id and
+  demands `--confirm` for exactly this reason.
+- **Reusing the preproduction transport or moderator passwords.** Generate new
+  ones; the old project stays alive and its credentials keep working.
+- **Hand-editing `firestore.rules`.** It is generated. Edit
+  `server/scripts/generate-firestore-rules.ts` and run `npm run rules`.
+
+### The checklist
+
+1. **Create the project.** Keep it on Spark. Update the id in **five** places:
+   `.firebaserc`, the `emulators` script in `package.json`, and the defaults in
+   `server/scripts/seed-emulator.ts`, `grant-admin.ts` and `seed-members.ts`.
+2. **Create the Firestore database. The location is permanent** — there is no
+   move later, only an export and re-import into a new project.
 3. **Enable Email/Password** under Authentication, and add the hosting domains
-   to Authorized domains — sign-in fails *silently* from unlisted domains.
-4. **Re-grant the `admin` claim** to every moderator. It lives on the Auth user
-   record and **does not come across in a data export** — this is the step most
-   likely to be forgotten.
-5. **Grant the CI service account** its roles (below).
-6. **Set the Actions secrets** for the new project.
-7. **Press Import** in the panel for Iniciativas and Bibliografía, or the
-   editors stay inert while the site serves the bundled seed.
+   plus the eventual custom domain to **Authorized domains**. Sign-in fails
+   *silently* from an unlisted domain, with no console error worth reading.
+4. **Re-grant the `admin` claim** to every moderator:
+   `npm run grant-admin -- someone@example.org --create`. Custom claims live on
+   the Auth user record and **do not come across in a data export** — the step
+   most likely to be forgotten, and the symptom is a moderator who can sign in
+   but whose every write is refused.
+5. **Create the incorporation-form transport account:**
+   `npm run grant-admin -- transport@example.org --create --importer`. The
+   `importer` claim is narrower than `admin` by design — it may only deposit form
+   responses, not read them or publish anybody.
+6. **Grant the CI service account** its three roles (below).
+7. **Set the Actions secrets** for the new project: `VITE_FIREBASE_API_KEY`,
+   `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`, `FIREBASE_SERVICE_ACCOUNT`,
+   plus `VITE_NOTIFY_TARGET` and `VITE_POSTHOG_KEY` if those are wanted.
+8. **Push to `main`.** CI deploys rules, indexes and hosting. Rules bring every
+   collection's permissions with them, so nothing about `formResponses`,
+   `members` or the claims needs configuring by hand.
+9. **Press Import** in the panel for Iniciativas and Bibliografía. Until then the
+   editors are inert while the site serves the bundled seed.
+10. **Re-install the Apps Script transport** on the incorporation form, pointing
+    its `FIREBASE_PROJECT_ID` and `FIREBASE_API_KEY` script properties at the new
+    project and its `IMPORTER_EMAIL` / `IMPORTER_PASSWORD` at the account from
+    step 5. Run `testTransport` once; discard the `PRUEBA / DESCARTAR` row it
+    deposits. See DEPLOYMENT.md, "Wiring the incorporation form".
+11. **Turn on App Check** (free) and add `request.app != null` to the
+    `submissions` create rule. Until this is done, anyone can post to the intake
+    queue with `curl` — the public join form relies on unauthenticated create.
+12. **Decide about MFA** for moderator accounts. This is a cost decision, not a
+    technical one: multi-factor authentication requires the Identity Platform
+    upgrade, which is the paid tier this project deliberately declines (see "The
+    Spark plan is a constraint" above). Credential theft is the realistic route
+    into the panel, so it is worth putting to Allan — but it cannot be switched on
+    without changing the billing posture. Until then, the mitigations are a
+    unique password in a password manager, the 30-minute idle timeout, and
+    `grant-admin --revoke` to disable an account immediately.
+13. **Set a budget or quota alert**, so a traffic spike or an abuse run is
+    noticed rather than silently exhausting the day's Firestore reads or the
+    Hosting transfer allowance.
+14. **Point the domain.** The existing site's DNS is managed in cPanel; the
+    redirect is the last step, after the checks below pass.
+
+### Before pointing the domain at it
+
+- The directory shows real people, not the 54 mocks (see above).
+- A moderator can sign in at `/admin` and edit all four tabs.
+- A test submission through the public join form arrives as a FormSubmit email.
+- `testTransport` deposited a row and it appeared in the Members tab.
+- The browser console on the deployed site is clean — CSP problems only appear
+  once the site is live with analytics configured, never in a local build.
+
+### What you do NOT need to do
+
+Collections are created implicitly by their first write, so there is nothing to
+provision. Rules and indexes deploy from the repo. There is no schema and no
+migration.
 
 ### The CI service account roles
 
@@ -173,11 +264,18 @@ first when a deploy misbehaves.**
 
 ## Known issues
 
-- **`firebase.json` has no `headers` block**, so `index.html` is served with
-  `cache-control: max-age=3600`. A returning visitor can see a stale build for
-  up to an hour. Fix: `no-cache` on `index.html`, long-lived immutable caching
-  on the hashed `/assets/*`. Until then, verify a deploy with a hard refresh or
-  a cache-busting query string.
+- **App Check is not enabled**, so `submissions` still accepts unauthenticated
+  creates — that is how the public join form works, and it means anyone can post
+  to the intake queue with `curl`. Step 11 of the production checklist. It is
+  also the cheapest protection against a Firestore quota exhaustion run.
+- **No backups exist.** Nothing dumps Firestore anywhere. If content is deleted,
+  the only recovery is the repo seed, which loses every real edit. Managed
+  backups need Blaze; a local export script does not.
+- **Hosting transfer is the tightest quota.** `public/` is roughly 45 MB, mostly
+  bibliography PDFs, and Spark's daily transfer allowance is small enough that a
+  scripted download loop could exhaust it. Compressing the PDFs is the cheapest
+  mitigation; there is no fallback for Hosting being out of quota, unlike
+  Firestore.
 - **`singleProjectMode` is on** in the emulator config, so `npm test` writes its
   fixtures into a running emulator regardless of project id. Stray "Ada
   Lovelace" rows come from that, not from real data.
