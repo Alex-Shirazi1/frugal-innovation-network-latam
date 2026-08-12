@@ -100,6 +100,7 @@ const PUBLISHED_FIELDS = [
   'languages',
   'socialUrl',
   'avatarHue',
+  'publishedAt',
 ]
 
 /**
@@ -137,6 +138,19 @@ service cloud.firestore {
     // Set it once per moderator with the Admin SDK (see docs/DEPLOYMENT.md).
     function isAdmin() {
       return request.auth != null && request.auth.token.admin == true;
+    }
+
+    /**
+     * The Google Form transport, and nothing else.
+     *
+     * A separate claim from admin rather than reusing it, because the two need
+     * opposite privileges: the script may only deposit raw responses, while
+     * publishing them is a moderator's job. A leaked transport password can
+     * therefore add to an admin-only inbox and can neither read it nor put
+     * anybody on the public directory.
+     */
+    function isImporter() {
+      return request.auth != null && request.auth.token.importer == true;
     }
 
     // ---- Generated whitelists --------------------------------------------
@@ -253,6 +267,10 @@ service cloud.firestore {
         && idsFrom(data.generalAreaIds, areaIds(), ${fieldLimits.maxGeneralAreas})
         && idsFrom(data.languages, languageIds(), ${fieldLimits.maxLanguages})
         && validSocialUrl(data)
+        // Optional: seed profiles were compiled in rather than published, so they
+        // have no publication moment. Length-capped rather than format-checked —
+        // rules cannot parse a date, and the panel is what writes it.
+        && (!('publishedAt' in data.keys()) || requiredText(data.publishedAt, 40))
         // avatarHueFor returns an integer hue in [0, 360).
         && data.avatarHue is int
         && data.avatarHue >= 0
@@ -266,6 +284,39 @@ service cloud.firestore {
     match /submissions/{submissionId} {
       allow create: if validSubmission(request.resource.data);
       allow read, update, delete: if isAdmin();
+    }
+
+    /**
+     * Raw incorporation-form responses, deposited by the Apps Script transport.
+     *
+     * Stored verbatim as question-title to answer pairs, with no mapping applied.
+     * The controlled vocabularies live in src/data/onboardingOptions.ts and are
+     * generated into this file; a second copy inside a Google-hosted script would
+     * be a copy nothing checks, so the script stays dumb and the panel maps.
+     *
+     * Never publicly readable: this is the most sensitive collection on the
+     * project. It holds a vetted applicant's contact address alongside everything
+     * they were asked, and it is retained after publication because the network
+     * replies to people by email long after their profile goes up.
+     *
+     * No update rule at all. A response is a record of what somebody actually
+     * submitted; correcting it is not a thing that should be possible, and a
+     * mapping decision belongs on the published record instead.
+     */
+    function validFormResponse(data) {
+      return data.keys().hasOnly(['answers', 'receivedAt'])
+        && data.keys().hasAll(['answers', 'receivedAt'])
+        && data.answers is map
+        // A bound, not a schema: question titles are Allan's to change, but an
+        // authenticated transport should not be able to write unbounded documents.
+        && data.answers.size() > 0
+        && data.answers.size() <= 40
+        && requiredText(data.receivedAt, 40);
+    }
+
+    match /formResponses/{responseId} {
+      allow create: if isImporter() && validFormResponse(request.resource.data);
+      allow read, delete: if isAdmin();
     }
 
     // The published directory. World-readable by design; only a moderator

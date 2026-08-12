@@ -32,9 +32,22 @@ const revoke = args.includes('--revoke')
 const create = args.includes('--create')
 const keyFile = args.find((a) => a.startsWith('--key='))?.slice('--key='.length)
 
+/**
+ * Which claim to operate on.
+ *
+ * `importer` is for the Google Form transport account and grants strictly less
+ * than `admin`: it may deposit raw form responses and nothing else — it cannot
+ * read the responses back, and it cannot publish anyone to the directory. Kept
+ * as a separate claim rather than a lesser admin so that the password living in
+ * Apps Script can never become moderator access.
+ */
+const claim: 'admin' | 'importer' = args.includes('--importer') ? 'importer' : 'admin'
+
 if (!email) {
   console.error(
-    'usage: npm run grant-admin -- <email> [--create] [--revoke] [--key=path/to/sa.json]',
+    'usage: npm run grant-admin -- <email> [--create] [--revoke] [--importer]\n' +
+      '                            [--key=path/to/sa.json]\n\n' +
+      '  --importer  operate on the form-transport claim instead of admin',
   )
   process.exit(1)
 }
@@ -84,13 +97,15 @@ try {
   const existing = user.customClaims ?? {}
 
   if (revoke) {
-    const { admin: _dropped, ...rest } = existing
+    // Drop only the claim being operated on; any other claim survives.
+    const rest = { ...existing }
+    delete rest[claim]
     await auth.setCustomUserClaims(user.uid, rest)
-    console.log(`revoked admin from ${email} (${user.uid})`)
+    console.log(`revoked ${claim} from ${email} (${user.uid})`)
   } else {
     // Merge rather than replace, so any unrelated claims survive.
-    await auth.setCustomUserClaims(user.uid, { ...existing, admin: true })
-    console.log(`granted admin to ${email} (${user.uid})`)
+    await auth.setCustomUserClaims(user.uid, { ...existing, [claim]: true })
+    console.log(`granted ${claim} to ${email} (${user.uid})`)
   }
 
   const after = (await auth.getUser(user.uid)).customClaims

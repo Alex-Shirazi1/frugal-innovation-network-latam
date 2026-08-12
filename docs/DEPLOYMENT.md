@@ -299,6 +299,80 @@ own address, read from `networkEmails.general` in the code. Nothing to set.
 Note that `singleProjectMode` means `npm test` writes its fixtures into a
 running emulator regardless of project id.
 
+## Wiring the incorporation form
+
+The private Google Form the network sends after vetting somebody is the real
+source of member profiles. `scripts/apps-script/formTransport.gs` carries each
+response into Firestore; the admin panel maps it and a moderator publishes it.
+
+**Why the transport is dumb.** It forwards question titles and answers verbatim
+and maps nothing. The controlled vocabularies live in
+`src/data/onboardingOptions.ts`, are generated into `firestore.rules`, and a
+drift test fails the build if the two diverge. A second copy inside a
+Google-hosted script would be a copy nothing checks, and would start silently
+rejecting applicants the day a country is added here.
+
+**Why an account and not a service-account key.** A service account
+authenticates through IAM, which bypasses security rules altogether — the shape
+checks would not run. The transport signs in as a real Firebase Auth user, so
+every rule stays in force.
+
+### Setup
+
+1. Create the transport account and grant it the narrow claim:
+
+       npm run grant-admin -- transport@yourdomain.org --create --importer
+
+   `--create` prints a password-reset link rather than setting a password. Choose
+   the password in a password manager; it goes in step 3 and nowhere else.
+
+2. Open the form, then Extensions > Apps Script, and paste
+   `scripts/apps-script/formTransport.gs`.
+
+3. Project Settings > Script properties, and add four. **Not in the file** — this
+   repository is public:
+
+   | Property | Value |
+   | --- | --- |
+   | `FIREBASE_API_KEY` | the web API key (publishable, same one the site ships) |
+   | `FIREBASE_PROJECT_ID` | `raif-af800` |
+   | `IMPORTER_EMAIL` | the account from step 1 |
+   | `IMPORTER_PASSWORD` | its password |
+
+4. Run `testTransport` once by hand. It deposits a row labelled
+   `PRUEBA / DESCARTAR`, which proves the sign-in, the claim and the rules in one
+   go. Discard it from the panel afterwards.
+
+5. Triggers > Add Trigger > `onFormSubmit`, event type **On form submit**.
+
+### What the claim can and cannot do
+
+`importer` permits exactly one operation: creating documents in `formResponses`.
+It cannot read them back, and it cannot write to `members`. So the worst outcome
+from a leaked transport password is junk in a moderator-only inbox — asserted by
+the `formResponses` cases in `server/firestore-rules.test.ts`.
+
+### Two things the form itself must have
+
+- **A consent question.** `consentToPublish` must be true or the rules reject the
+  record, by design. Allan agreed on the call to add it.
+- **First and last name as separate questions.** The schema splits them because
+  Allan asked for that. One combined field forces the importer to guess where a
+  surname begins, which breaks on compound Spanish surnames.
+
+Picklists are strongly preferred over free text for institution, position,
+interests, areas, languages, country and region. Free text still works — labels
+resolve in all three languages, accented or not — but unmatched values surface as
+decisions for a moderator instead of importing cleanly.
+
+### Retention
+
+`formResponses` is kept after publication, because the network replies to people
+by email long after a profile goes up, and `members` deliberately holds no
+address. It is the most sensitive collection in the project: admin-only read, no
+public access, and no update path at all. Whether responses should be pruned
+after some period is an open question for Allan.
+
 ## Response headers
 
 `firebase.json` carries a `headers` block. JSON cannot hold comments, so the

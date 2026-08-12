@@ -116,6 +116,8 @@ describe.skipIf(!available)('firestore.rules', () => {
   const anon = () => testEnv!.unauthenticatedContext().firestore()
   const signedIn = () => testEnv!.authenticatedContext('someone').firestore()
   const admin = () => testEnv!.authenticatedContext('allan', { admin: true }).firestore()
+  /** The Apps Script transport: deposits form responses, and can do nothing else. */
+  const importer = () => testEnv!.authenticatedContext('transport', { importer: true }).firestore()
 
   describe('submissions — public intake', () => {
     it('accepts a fully valid submission from an anonymous visitor', async () => {
@@ -204,6 +206,76 @@ describe.skipIf(!available)('firestore.rules', () => {
     })
   })
 
+  describe('formResponses — the incorporation-form transport', () => {
+    const response = (overrides: Record<string, unknown> = {}) => ({
+      answers: { Nombre: 'Ada', Apellido: 'Lovelace', 'Correo electrónico': 'ada@example.org' },
+      receivedAt: '2026-08-11T21:04:12.000Z',
+      ...overrides,
+    })
+
+    it('accepts a deposit from the transport account', async () => {
+      await assertSucceeds(addDoc(collection(importer(), 'formResponses'), response()))
+    })
+
+    it('refuses deposits from the public or a plain signed-in user', async () => {
+      await assertFails(addDoc(collection(anon(), 'formResponses'), response()))
+      await assertFails(addDoc(collection(signedIn(), 'formResponses'), response()))
+    })
+
+    /*
+     * Least privilege, and the reason importer is a separate claim from admin: a
+     * leaked transport password must not expose the applicants already collected.
+     */
+    it('does not let the transport read back what it deposited', async () => {
+      await testEnv!.withSecurityRulesDisabled(async (ctx) => {
+        await setDoc(doc(ctx.firestore(), 'formResponses/f1'), response())
+      })
+      await assertFails(getDoc(doc(importer(), 'formResponses/f1')))
+      await assertFails(getDocs(collection(importer(), 'formResponses')))
+    })
+
+    it('does not let the transport publish anyone to the directory', async () => {
+      await assertFails(setDoc(doc(importer(), 'members/m9'), validMember()))
+    })
+
+    it('never exposes an applicant response to the public', async () => {
+      await testEnv!.withSecurityRulesDisabled(async (ctx) => {
+        await setDoc(doc(ctx.firestore(), 'formResponses/f1'), response())
+      })
+      await assertFails(getDoc(doc(anon(), 'formResponses/f1')))
+      await assertFails(getDoc(doc(signedIn(), 'formResponses/f1')))
+    })
+
+    it('lets a moderator read and clear responses', async () => {
+      await testEnv!.withSecurityRulesDisabled(async (ctx) => {
+        await setDoc(doc(ctx.firestore(), 'formResponses/f1'), response())
+      })
+      await assertSucceeds(getDoc(doc(admin(), 'formResponses/f1')))
+      await assertSucceeds(deleteDoc(doc(admin(), 'formResponses/f1')))
+    })
+
+    it('refuses a rewrite of a response, by anyone', async () => {
+      await testEnv!.withSecurityRulesDisabled(async (ctx) => {
+        await setDoc(doc(ctx.firestore(), 'formResponses/f1'), response())
+      })
+      // A response records what somebody actually submitted; editing it is not a
+      // capability this collection has, for the transport or for a moderator.
+      await assertFails(setDoc(doc(importer(), 'formResponses/f1'), response()))
+      await assertFails(setDoc(doc(admin(), 'formResponses/f1'), response()))
+    })
+
+    it('bounds what an authenticated transport can deposit', async () => {
+      const tooMany: Record<string, string> = {}
+      for (let i = 0; i < 41; i += 1) tooMany[`Pregunta ${i}`] = 'x'
+      await assertFails(addDoc(collection(importer(), 'formResponses'), response({ answers: tooMany })))
+      await assertFails(addDoc(collection(importer(), 'formResponses'), response({ answers: {} })))
+      await assertFails(
+        addDoc(collection(importer(), 'formResponses'), response({ extra: 'unexpected' })),
+      )
+      await assertFails(addDoc(collection(importer(), 'formResponses'), response({ receivedAt: '' })))
+    })
+  })
+
   describe('members — published directory', () => {
     beforeEach(async () => {
       await testEnv!.withSecurityRulesDisabled(async (ctx) => {
@@ -270,6 +342,29 @@ describe.skipIf(!available)('firestore.rules', () => {
       )
     })
 
+    /*
+     * publishedAt answers "when did this person appear", which createdAt cannot:
+     * createdAt is queue bookkeeping and stays rejected on a published record.
+     */
+    it('accepts a publication date, and still refuses queue bookkeeping', async () => {
+      await assertSucceeds(
+        setDoc(
+          doc(admin(), 'members/m2'),
+          validMember({ publishedAt: '2026-08-11T21:30:00.000Z' }),
+        ),
+      )
+      await assertFails(
+        setDoc(doc(admin(), 'members/m3'), validMember({ createdAt: '2026-08-11T21:30:00.000Z' })),
+      )
+    })
+
+    it('refuses a publication date that is empty or absurdly long', async () => {
+      await assertFails(setDoc(doc(admin(), 'members/m2'), validMember({ publishedAt: '' })))
+      await assertFails(
+        setDoc(doc(admin(), 'members/m2'), validMember({ publishedAt: 'x'.repeat(41) })),
+      )
+    })
+
     it('accepts a record that omits every optional field', async () => {
       await assertSucceeds(
         setDoc(
@@ -323,12 +418,57 @@ describe.skipIf(!available)('firestore.rules', () => {
       await assertSucceeds(getDoc(doc(anon(), 'bibliography/biblio-001')))
     })
 
+    const congress = (overrides: Record<string, unknown> = {}) => ({
+      kicker: { es: 'Congreso' },
+      title: { es: 'Mundos de Transformación' },
+      subtitle: { es: 'Innovaciones para la justicia social y ambiental' },
+      details: { es: 'Tres días de trabajo en San Salvador.' },
+      siteCta: { es: 'Ver el sitio del congreso' },
+      siteUrl: 'https://example.org/congreso',
+      ...overrides,
+    })
+
+    const resource = (overrides: Record<string, unknown> = {}) => ({
+      title: { es: 'Marco RELIF' },
+      language: 'ES',
+      type: 'PDF',
+      file: '/docs/marco-relif.pdf',
+      ...overrides,
+    })
+
+    it('is readable by anyone — it is site content, not personal data', async () => {
+      await assertSucceeds(getDoc(doc(anon(), 'initiatives/encuentros')))
+      await assertSucceeds(getDoc(doc(anon(), 'bibliography/biblio-001')))
+      await assertSucceeds(getDoc(doc(anon(), 'siteContent/congress')))
+      await assertSucceeds(getDoc(doc(anon(), 'resources/r1')))
+    })
+
+    /*
+     * Every editable collection, not a sample of them. The congress document and
+     * the resources table were previously only covered on the admin path, so
+     * nothing would have caught a rule that let the public write them.
+     */
     it('cannot be written by the public or by a plain signed-in user', async () => {
       await assertFails(setDoc(doc(anon(), 'initiatives/x'), initiative()))
       await assertFails(setDoc(doc(signedIn(), 'initiatives/x'), initiative()))
       await assertFails(setDoc(doc(anon(), 'bibliography/x'), entry()))
       await assertFails(setDoc(doc(signedIn(), 'bibliography/x'), entry()))
+      await assertFails(setDoc(doc(anon(), 'siteContent/congress'), congress()))
+      await assertFails(setDoc(doc(signedIn(), 'siteContent/congress'), congress()))
+      await assertFails(setDoc(doc(anon(), 'resources/x'), resource()))
+      await assertFails(setDoc(doc(signedIn(), 'resources/x'), resource()))
       await assertFails(deleteDoc(doc(signedIn(), 'initiatives/x')))
+      await assertFails(deleteDoc(doc(signedIn(), 'siteContent/congress')))
+      await assertFails(deleteDoc(doc(signedIn(), 'resources/x')))
+    })
+
+    it('lets a moderator write the congress document and the resources table', async () => {
+      await assertSucceeds(setDoc(doc(admin(), 'siteContent/congress'), congress()))
+      await assertSucceeds(setDoc(doc(admin(), 'resources/x'), resource()))
+      // The delete split added alongside validMember — a delete carries no
+      // request.resource, so it must not be gated on a shape check.
+      await assertSucceeds(deleteDoc(doc(admin(), 'siteContent/congress')))
+      await assertSucceeds(deleteDoc(doc(admin(), 'resources/x')))
     })
 
     it('can be created, edited and deleted by a moderator', async () => {
