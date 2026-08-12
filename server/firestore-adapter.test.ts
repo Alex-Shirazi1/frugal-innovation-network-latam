@@ -53,7 +53,7 @@ const available = await emulatorRunning()
 let testEnv: RulesTestEnvironment | undefined
 
 // Imported after the mock is registered so the adapter picks up the fake getDb.
-const { createFirestoreDataSource } = await import('../src/api/adapters/firestore')
+const { createFirestoreDataSource, READ_LIMITS } = await import('../src/api/adapters/firestore')
 const { adminApi, publishSubmission } = await import('../src/api/adminApi')
 const { makeSubmission } = await import('../src/test/fixtures')
 
@@ -190,6 +190,51 @@ describe.skipIf(!available)('Firestore adapter', () => {
       const members = await source.getMembers()
       expect(members).toHaveLength(54)
       expect(members.some((m) => m.fullName === 'Ana Prueba García')).toBe(false)
+    })
+
+    /*
+     * The read is capped, so a runaway collection cannot bill an unbounded number
+     * of document reads per visitor. Written with rules disabled and in batches
+     * because the point is the size of the collection, not how it got there.
+     */
+    it('caps the directory read and says so rather than dropping records quietly', async () => {
+      const overflow = READ_LIMITS.members + 1
+      const { collection, doc, writeBatch } = await import('firebase/firestore')
+
+      await testEnv!.withSecurityRulesDisabled(async (ctx) => {
+        const db = ctx.firestore() as unknown as Firestore
+        for (let i = 0; i < overflow; i += 500) {
+          const batch = writeBatch(db)
+          for (let j = i; j < Math.min(i + 500, overflow); j++) {
+            // Padded so ids sort predictably; the adapter does not order these.
+            batch.set(doc(collection(db, 'members'), `m${String(j).padStart(4, '0')}`), {
+              fullName: `Member ${j}`,
+            })
+          }
+          await batch.commit()
+        }
+      })
+
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const members = await createFirestoreDataSource(config).getMembers()
+      expect(members).toHaveLength(READ_LIMITS.members)
+      expect(warn).toHaveBeenCalledOnce()
+      expect(warn.mock.calls[0][0]).toContain('members read hit its 500-document limit')
+      warn.mockRestore()
+    })
+
+    it('stays quiet when the directory fits under the cap', async () => {
+      const source = createFirestoreDataSource(config)
+      await source.submitIntake(makeSubmission())
+      asAdmin()
+      const [entry] = await adminApi.listPending()
+      await publishSubmission(entry.id)
+
+      asAnon()
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      await source.getMembers()
+      expect(warn).not.toHaveBeenCalled()
+      warn.mockRestore()
     })
   })
 

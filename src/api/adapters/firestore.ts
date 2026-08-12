@@ -50,6 +50,46 @@ export const SITE_CONTENT = 'siteContent'
 /** Document id of the congress block inside `siteContent`. */
 export const CONGRESS_DOC = 'congress'
 
+/**
+ * Ceilings on the collection reads.
+ *
+ * Every read here used to fetch a whole collection, which bills one document
+ * read per record per visitor. Reads are the tightest daily quota on the Spark
+ * plan (50,000), so the cost of a page view grew with the size of the directory:
+ * at 60 members that is 60 reads a visit, and the ceiling arrives sooner every
+ * time the network admits somebody. A cap turns an unbounded worst case —
+ * a mistaken bulk import, a script writing in a loop — into a fixed one.
+ *
+ * Set well above any realistic size rather than close to it. Allan expects 40 to
+ * 60 members and said "minimum 50", and the bibliography is 43 papers today, so
+ * these leave room for years of growth; they exist to stop runaway reads, not to
+ * ration ordinary use. Hitting one means something is wrong, which is why it is
+ * reported rather than silently absorbed.
+ */
+export const READ_LIMITS = {
+  members: 500,
+  initiatives: 200,
+  bibliography: 500,
+  resources: 200,
+} as const
+
+/**
+ * Reports a read that came back exactly full.
+ *
+ * A snapshot the size of its own limit is indistinguishable from a collection
+ * that happens to hold exactly that many documents, so this can cry wolf once at
+ * the boundary. That is the right way round: the alternative is dropping records
+ * from the public site with nothing anywhere saying so, and the section simply
+ * looking short to whoever notices first.
+ */
+function reportIfTruncated(name: string, size: number, ceiling: number): void {
+  if (size < ceiling) return
+  console.warn(
+    `[relif] ${name} read hit its ${ceiling}-document limit. Records beyond it are ` +
+      `not being shown. Raise READ_LIMITS.${name} in src/api/adapters/firestore.ts.`,
+  )
+}
+
 /** Only these keys may reach Firestore; the rules reject anything else. */
 function toSubmissionDocument(submission: IntakeSubmission, createdAt: string) {
   return {
@@ -91,25 +131,38 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
      */
     async getInitiatives(): Promise<Initiative[]> {
       const db = await getDb(config)
-      const { collection, getDocs, orderBy, query } = await import('firebase/firestore')
-      const snapshot = await getDocs(query(collection(db, INITIATIVES), orderBy('order')))
+      const { collection, getDocs, limit, orderBy, query } = await import('firebase/firestore')
+      const snapshot = await getDocs(
+        query(collection(db, INITIATIVES), orderBy('order'), limit(READ_LIMITS.initiatives)),
+      )
       if (snapshot.empty) return bundledDataSource.getInitiatives()
+      reportIfTruncated(INITIATIVES, snapshot.size, READ_LIMITS.initiatives)
       return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Initiative, 'id'>), id: d.id }))
     },
 
     async getBibliography(): Promise<BibliographyEntry[]> {
       const db = await getDb(config)
-      const { collection, getDocs, orderBy, query } = await import('firebase/firestore')
-      const snapshot = await getDocs(query(collection(db, BIBLIOGRAPHY), orderBy('paperNumber')))
+      const { collection, getDocs, limit, orderBy, query } = await import('firebase/firestore')
+      const snapshot = await getDocs(
+        query(
+          collection(db, BIBLIOGRAPHY),
+          orderBy('paperNumber'),
+          limit(READ_LIMITS.bibliography),
+        ),
+      )
       if (snapshot.empty) return bundledDataSource.getBibliography()
+      reportIfTruncated(BIBLIOGRAPHY, snapshot.size, READ_LIMITS.bibliography)
       return snapshot.docs.map((d) => ({ ...(d.data() as Omit<BibliographyEntry, 'id'>), id: d.id }))
     },
 
     async getResources(): Promise<Resource[]> {
       const db = await getDb(config)
-      const { collection, getDocs, orderBy, query } = await import('firebase/firestore')
-      const snapshot = await getDocs(query(collection(db, RESOURCES), orderBy('year', 'desc')))
+      const { collection, getDocs, limit, orderBy, query } = await import('firebase/firestore')
+      const snapshot = await getDocs(
+        query(collection(db, RESOURCES), orderBy('year', 'desc'), limit(READ_LIMITS.resources)),
+      )
       if (snapshot.empty) return bundledDataSource.getResources()
+      reportIfTruncated(RESOURCES, snapshot.size, READ_LIMITS.resources)
       return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Resource, 'id'>), id: d.id }))
     },
 
@@ -136,9 +189,13 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
      */
     async getMembers(): Promise<Member[]> {
       const db = await getDb(config)
-      const { collection, getDocs } = await import('firebase/firestore')
-      const snapshot = await getDocs(collection(db, MEMBERS))
+      const { collection, getDocs, limit, query } = await import('firebase/firestore')
+      // No orderBy: the directory has never had a defined order here, and adding
+      // one would quietly rearrange the public page. The limit therefore keeps
+      // whichever documents Firestore returns first, which is by document id.
+      const snapshot = await getDocs(query(collection(db, MEMBERS), limit(READ_LIMITS.members)))
       if (snapshot.empty) return bundledDataSource.getMembers()
+      reportIfTruncated(MEMBERS, snapshot.size, READ_LIMITS.members)
       return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Member, 'id'>), id: d.id }))
     },
 
