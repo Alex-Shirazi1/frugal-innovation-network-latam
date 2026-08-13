@@ -3,6 +3,7 @@ import { useApiData } from '../../api/ApiDataContext'
 import { Modal } from '../ui/Modal'
 import { placeLabel } from '../../data/onboardingOptions'
 import type { Member, ResearchInterest } from '../../api/types'
+import { initialsOf } from '../../lib/initials'
 
 interface MemberDetailProps {
   member: Member
@@ -11,9 +12,6 @@ interface MemberDetailProps {
 
 const avatarPalette = ['#168599', '#8ebc41', '#f6a620', '#e94824', '#4d6a79']
 
-function initialsOf(firstName: string, lastName: string): string {
-  return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
-}
 
 /** Renders a labelled row, or nothing at all when the value is empty. */
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -89,7 +87,7 @@ export function MemberDetail({ member, onClose }: MemberDetailProps) {
             className="flex size-16 shrink-0 items-center justify-center rounded-full font-display text-2xl font-semibold text-blanco"
             style={{ background: accent }}
           >
-            {initialsOf(member.firstName, member.lastName)}
+            {initialsOf(member.fullName)}
           </span>
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-pizarra">

@@ -7,8 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { toDraft, validateMemberDraft, type MemberDraft } from './memberDraft'
 
 const draft = (overrides: Partial<MemberDraft> = {}): Partial<MemberDraft> => ({
-  firstName: 'Ada',
-  lastName: 'Lovelace',
+  fullName: 'Ada Lovelace',
   position: 'researcher',
   jobPositionName: 'Investigadora Asociada',
   biography: 'Trabaja en innovación frugal.',
@@ -43,14 +42,28 @@ describe('validateMemberDraft', () => {
     expect(JSON.stringify(result.member)).not.toContain('relif.invalid')
   })
 
+  /*
+   * fullName is deliberately NOT on this list. It used to be derived from a
+   * first/last pair, so a caller-supplied value was ignored; the name is now
+   * stored exactly as typed, which makes it an input like any other. What must
+   * still be impossible is forging the *display* fields — the localized title
+   * comes from the position whitelist and the avatar hue from the name — since
+   * those are what a reader takes as the record speaking for itself.
+   */
   it('does not accept derived fields from the caller', () => {
     const result = validateMemberDraft({
       ...draft(),
-      fullName: 'Forged Name',
+      title: { es: 'Forjado', en: 'Forged', pt: 'Forjado' },
       avatarHue: 999,
     } as Partial<MemberDraft>)
-    expect(result.member?.fullName).toBe('Ada Lovelace')
+    expect(result.member?.title).not.toEqual({ es: 'Forjado', en: 'Forged', pt: 'Forjado' })
     expect(result.member?.avatarHue).not.toBe(999)
+  })
+
+  it('stores the name exactly as it was typed', () => {
+    expect(validateMemberDraft(draft({ fullName: 'María Fernanda Gómez Ruiz' })).member?.fullName).toBe(
+      'María Fernanda Gómez Ruiz',
+    )
   })
 
   it('enforces the same whitelists as the public form', () => {
@@ -63,7 +76,7 @@ describe('validateMemberDraft', () => {
     expect(validateMemberDraft(draft({ generalAreaIds: [] })).error).toBe('missing-areas')
     expect(validateMemberDraft(draft({ languages: [] })).error).toBe('missing-languages')
     expect(validateMemberDraft(draft({ socialUrl: 'not-a-url' })).error).toBe('invalid-url')
-    expect(validateMemberDraft(draft({ firstName: '' })).error).toBe('missing-required')
+    expect(validateMemberDraft(draft({ fullName: '' })).error).toBe('missing-required')
   })
 
   it('silently discards unknown ids rather than storing them', () => {

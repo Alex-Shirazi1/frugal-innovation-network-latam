@@ -3,6 +3,7 @@ import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
 import { placeLabel } from '../../data/onboardingOptions'
 import type { Member } from '../../api/types'
+import { initialsOf } from '../../lib/initials'
 
 interface MemberCardProps {
   member: Member
@@ -12,9 +13,6 @@ interface MemberCardProps {
   className?: string
 }
 
-function initialsOf(firstName: string, lastName: string): string {
-  return `${firstName[0] ?? ''}${lastName[0] ?? ''}`.toUpperCase()
-}
 
 export const MemberCard = memo(function MemberCard({
   member,
@@ -41,7 +39,7 @@ export const MemberCard = memo(function MemberCard({
             background: ['#168599', '#8ebc41', '#f6a620', '#e94824', '#4d6a79'][member.avatarHue % 5],
           }}
         >
-          {initialsOf(member.firstName, member.lastName)}
+          {initialsOf(member.fullName)}
         </span>
         <div className="min-w-0">
           <h3 className="truncate font-semibold leading-snug">

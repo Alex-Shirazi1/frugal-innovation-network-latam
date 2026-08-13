@@ -32,7 +32,9 @@ describe('seed member data integrity', () => {
 
   it('never repeats a surname within one member’s own name', () => {
     const doubled = mockMembers
-      .map((m) => m.lastName.split(' '))
+      // The generator emits "<given> <surname> <surname>", so the two surnames
+      // are the trailing pair of the whole name.
+      .map((m) => m.fullName.split(' ').slice(-2))
       .filter((parts) => parts[0] === parts[1])
     expect(doubled).toEqual([])
   })
@@ -75,9 +77,8 @@ describe('seed member data integrity', () => {
 
   it('carries every field Allan asked for, non-empty', () => {
     for (const m of mockMembers) {
-      expect(m.firstName.length).toBeGreaterThan(0)
-      expect(m.lastName.length).toBeGreaterThan(0)
-      expect(m.fullName).toBe(`${m.firstName} ${m.lastName}`)
+      expect(m.fullName.trim().length).toBeGreaterThan(0)
+      expect(m.fullName.split(' ').length).toBeGreaterThan(1)
       expect(m.jobPositionName.length).toBeGreaterThan(0)
       expect(m.biography.length).toBeGreaterThan(0)
       expect(m.interestIds.length).toBeGreaterThan(0)

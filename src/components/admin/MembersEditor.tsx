@@ -361,14 +361,17 @@ export function MembersEditor() {
 /**
  * Best-effort draft for a response the mapper could not validate at all.
  *
- * Only the two free-text names are lifted across; every controlled field is left
+ * Only the free-text name is lifted across; every controlled field is left
  * empty so a moderator picks from the real vocabularies rather than inheriting
  * whatever text failed to match.
  */
 function draftFromAnswers(response: ArrivedResponse): MemberDraft {
   return {
-    firstName: response.answers['Nombre'] ?? '',
-    lastName: response.answers['Apellido'] ?? '',
+    fullName:
+      response.answers['Nombre completo'] ??
+      response.answers['Nombre y apellidos completos:'] ??
+      response.answers['Nombre'] ??
+      '',
     position: '',
     jobPositionName: '',
     biography: '',

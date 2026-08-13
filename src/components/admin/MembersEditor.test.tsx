@@ -33,8 +33,7 @@ vi.mock('../../api/adminApi', () => ({
 }))
 
 const CLEAN_ANSWERS = {
-  Nombre: 'Ada',
-  Apellido: 'Lovelace',
+  'Nombre completo': 'Ada Lovelace',
   'Correo electrónico': 'ada@example.org',
   Cargo: 'researcher',
   Institución: 'ITESO',
@@ -152,8 +151,11 @@ describe('MembersEditor', () => {
     await userEvent.click(await screen.findByRole('button', { name: '+ Añadir a mano' }))
 
     expect(screen.getByText('Añadir perfil')).toBeInTheDocument()
-    // Derived fields are computed, never typed, so the form must not offer them.
-    expect(screen.queryByLabelText(/Nombre completo/)).not.toBeInTheDocument()
+    // The name IS typed — it is stored as the member wrote it. What the form
+    // must never offer is a derived field: the localized title comes from the
+    // position whitelist and the avatar hue from the name.
+    expect(screen.getByLabelText(/Nombre completo/)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/Título/)).not.toBeInTheDocument()
   })
 
   it('filters the published list by name', async () => {

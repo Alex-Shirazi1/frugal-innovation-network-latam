@@ -111,8 +111,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       expect(pending).toHaveLength(1)
       const entry = pending[0]
       expect(entry.status).toBe('pending')
-      expect(entry.firstName).toBe('Ana')
-      expect(entry.lastName).toBe('Prueba García')
+      expect(entry.fullName).toBe('Ana Prueba García')
       expect(entry.jobPositionName).toBe('Investigadora Asociada')
       expect(entry.biography).toContain('salud comunitaria')
       expect(entry.generalAreaIds).toEqual(['ingenieria'])
@@ -147,7 +146,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       ['unknown affiliation', { affiliationId: 'nope' }, 'invalid-affiliation'],
       ['no languages', { languages: [] }, 'missing-languages'],
       ['no general areas', { generalAreaIds: [] }, 'missing-areas'],
-      ['blank name', { firstName: ' ' }, 'missing-required'],
+      ['blank name', { fullName: ' ' }, 'missing-required'],
     ])('refuses %s', async (_label, patch, code) => {
       const source = createFirestoreDataSource(config)
       const result = await source.submitIntake(makeSubmission(patch))
@@ -324,13 +323,13 @@ describe.skipIf(!available)('Firestore adapter', () => {
     it('orders the queue oldest first so moderation is fair', async () => {
       asAnon()
       const source = createFirestoreDataSource(config)
-      await source.submitIntake(makeSubmission({ firstName: 'First' }))
-      await source.submitIntake(makeSubmission({ firstName: 'Second' }))
-      await source.submitIntake(makeSubmission({ firstName: 'Third' }))
+      await source.submitIntake(makeSubmission({ fullName: 'First Member' }))
+      await source.submitIntake(makeSubmission({ fullName: 'Second Member' }))
+      await source.submitIntake(makeSubmission({ fullName: 'Third Member' }))
 
       asAdmin()
       const pending = await adminApi.listPending()
-      expect(pending.map((p) => p.firstName)).toEqual(['First', 'Second', 'Third'])
+      expect(pending.map((p) => p.fullName)).toEqual(['First Member', 'Second Member', 'Third Member'])
     })
   })
 

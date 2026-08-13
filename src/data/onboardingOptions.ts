@@ -215,8 +215,15 @@ export const languageOptions: LanguageOption[] = [
 
 /** Upper bounds shared by the form, the validator, and the Firestore rules. */
 export const fieldLimits = {
-  firstName: 60,
-  lastName: 80,
+  /*
+   * One name field, not two. Spanish compound surnames make the boundary
+   * genuinely ambiguous — nothing can tell whether "María Fernanda Gómez Ruiz"
+   * surnames at "Gómez" or at "Fernanda" — so the network asks for the whole
+   * name and stores exactly what the member typed. 141 is the old
+   * firstName + space + lastName ceiling, kept so no existing record is
+   * suddenly over the limit.
+   */
+  fullName: 141,
   /** RFC 5321's maximum for a whole address. */
   email: 254,
   jobPositionName: 120,

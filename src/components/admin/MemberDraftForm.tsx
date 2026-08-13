@@ -24,8 +24,7 @@ import { positionTitles } from '../../domain/intake'
 import type { MemberDraft } from '../../domain/memberDraft'
 
 const EMPTY: MemberDraft = {
-  firstName: '',
-  lastName: '',
+  fullName: '',
   position: '',
   jobPositionName: '',
   biography: '',
@@ -139,20 +138,12 @@ export function MemberDraftForm({
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <EditorField label={`${copy.firstName} *`}>
+        <EditorField label={`${copy.fullName} *`}>
           <input
             className={editorInputClass}
-            value={draft.firstName}
-            maxLength={fieldLimits.firstName}
-            onChange={(event) => update('firstName', event.target.value)}
-          />
-        </EditorField>
-        <EditorField label={`${copy.lastName} *`}>
-          <input
-            className={editorInputClass}
-            value={draft.lastName}
-            maxLength={fieldLimits.lastName}
-            onChange={(event) => update('lastName', event.target.value)}
+            value={draft.fullName}
+            maxLength={fieldLimits.fullName}
+            onChange={(event) => update('fullName', event.target.value)}
           />
         </EditorField>
       </div>

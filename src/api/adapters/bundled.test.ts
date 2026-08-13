@@ -9,8 +9,7 @@ import { countries, researchInterests } from '../../data/onboardingOptions'
 function validSubmission(overrides: Partial<IntakeSubmission> = {}): IntakeSubmission {
   const country = countries[0]
   return makeSubmission({
-    firstName: 'Ada',
-    lastName: 'Lovelace',
+    fullName: 'Ada Lovelace',
     affiliationId: null,
     country: country.name,
     region: country.regions[0],
@@ -50,13 +49,13 @@ describe('processIntake', () => {
   })
 
   it('trims whitespace from the full name', async () => {
-    const result = await run(validSubmission({ firstName: '  Grace  ', lastName: '  Hopper  ' }))
+    const result = await run(validSubmission({ fullName: '  Grace  Hopper  ' }))
     expect(result.success).toBe(true)
     expect(result.data?.fullName).toBe('Grace Hopper')
   })
 
   it('rejects a blank first name', async () => {
-    const result = await run(validSubmission({ firstName: '   ' }))
+    const result = await run(validSubmission({ fullName: '   ' }))
     expect(result.success).toBe(false)
     expect(result.error).toBe('missing-required')
   })
@@ -118,7 +117,7 @@ describe('processIntake', () => {
   })
 
   it('rejects a blank last name', async () => {
-    const result = await run(validSubmission({ lastName: '  ' }))
+    const result = await run(validSubmission({ fullName: '  ' }))
     expect(result.success).toBe(false)
     expect(result.error).toBe('missing-required')
   })
@@ -144,9 +143,8 @@ describe('processIntake', () => {
   })
 
   it('splits and echoes the name parts it was given', async () => {
-    const result = await run(validSubmission({ firstName: 'Grace', lastName: 'Hopper' }))
-    expect(result.data?.firstName).toBe('Grace')
-    expect(result.data?.lastName).toBe('Hopper')
+    const result = await run(validSubmission({ fullName: 'Grace Hopper' }))
+    expect(result.data?.fullName).toBe('Grace Hopper')
     expect(result.data?.fullName).toBe('Grace Hopper')
   })
 
@@ -164,8 +162,8 @@ describe('processIntake', () => {
   })
 
   it('derives a deterministic avatarHue in the 0-359 range from the name', async () => {
-    const a = await run(validSubmission({ firstName: 'Ada Lovelace' }))
-    const b = await run(validSubmission({ firstName: 'Ada Lovelace' }))
+    const a = await run(validSubmission({ fullName: 'Ada Lovelace' }))
+    const b = await run(validSubmission({ fullName: 'Ada Lovelace' }))
     expect(a.data?.avatarHue).toBe(b.data?.avatarHue)
     expect(a.data?.avatarHue).toBeGreaterThanOrEqual(0)
     expect(a.data?.avatarHue).toBeLessThan(360)

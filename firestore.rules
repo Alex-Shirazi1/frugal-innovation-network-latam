@@ -109,10 +109,9 @@ service cloud.firestore {
     }
 
     function validSubmission(data) {
-      return data.keys().hasOnly(['firstName', 'lastName', 'email', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
-        && data.keys().hasAll(['firstName', 'lastName', 'email', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
-        && requiredText(data.firstName, 60)
-        && requiredText(data.lastName, 80)
+      return data.keys().hasOnly(['fullName', 'email', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'consentToPublish', 'status', 'createdAt'])
+        && data.keys().hasAll(['fullName', 'email', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'consentToPublish', 'status'])
+        && requiredText(data.fullName, 141)
         // Enforced here as well as in the validator: rules are the only check a
         // client cannot skip, and an application with no reply address is
         // useless to the network.
@@ -144,14 +143,14 @@ service cloud.firestore {
      * whatever it likes, or from quietly publishing their email address.
      *
      * Display fields are derived by the approval path, never typed, so they can
-     * be checked strictly here: fullName against its parts, title against the
-     * generated translations, avatarHue against the range avatarHueFor emits.
+     * be checked strictly here: title against the generated translations,
+     * avatarHue against the range avatarHueFor emits. fullName is the one field
+     * carried through verbatim — it is what the member typed — so it is length
+     * checked rather than derived.
      */
     function validMember(data) {
-      return data.keys().hasOnly(['firstName', 'lastName', 'fullName', 'title', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'avatarHue', 'publishedAt'])
-        && data.keys().hasAll(['firstName', 'lastName', 'fullName', 'title', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'avatarHue'])
-        && requiredText(data.firstName, 60)
-        && requiredText(data.lastName, 80)
+      return data.keys().hasOnly(['fullName', 'title', 'position', 'jobPositionName', 'biography', 'affiliationId', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'socialUrl', 'avatarHue', 'publishedAt'])
+        && data.keys().hasAll(['fullName', 'title', 'position', 'country', 'region', 'interestIds', 'generalAreaIds', 'languages', 'avatarHue'])
         && requiredText(data.fullName, 141)
         && localizedTitle(data.title)
         && positionTypes().hasAny([data.position])

@@ -92,7 +92,7 @@ export function notificationFields(
   institutionName: string | null,
 ): Record<string, string> {
   return {
-    Nombre: `${submission.firstName} ${submission.lastName}`.trim() || NOT_PROVIDED,
+    Nombre: submission.fullName.trim() || NOT_PROVIDED,
     // Second row on purpose: replying is the next action after reading the name.
     Correo: text(submission.email),
     'Tipo de posición': POSITION_LABELS[submission.position] ?? text(submission.position),

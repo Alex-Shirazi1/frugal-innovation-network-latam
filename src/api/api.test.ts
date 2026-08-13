@@ -44,8 +44,7 @@ describe('bundledDataSource', () => {
   })
 
   it.each([
-    ['empty first name', { ...validSubmission, firstName: ' ' }, 'missing-required'],
-    ['empty last name', { ...validSubmission, lastName: ' ' }, 'missing-required'],
+    ['empty name', { ...validSubmission, fullName: ' ' }, 'missing-required'],
     ['no general areas', { ...validSubmission, generalAreaIds: [] }, 'missing-areas'],
     ['no languages', { ...validSubmission, languages: [] }, 'missing-languages'],
     ['consent withheld', { ...validSubmission, consentToPublish: false }, 'consent-required'],
@@ -142,8 +141,7 @@ describe('createHttpDataSource', () => {
     const [url, init] = fetchMock.mock.calls[0]
     expect(url).toBe('/api/members/intake')
     expect(init.method).toBe('POST')
-    expect(JSON.parse(init.body).firstName).toBe('Ana')
-    expect(JSON.parse(init.body).lastName).toBe('Prueba García')
+    expect(JSON.parse(init.body).fullName).toBe('Ana Prueba García')
   })
 })
 

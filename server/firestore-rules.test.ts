@@ -26,8 +26,7 @@ const PORT = 8080
 /** A payload that satisfies every generated rule. */
 function validSubmission(overrides: Record<string, unknown> = {}) {
   const payload: Record<string, unknown> = {
-    firstName: 'Ada',
-    lastName: 'Lovelace',
+    fullName: 'Ada Lovelace',
     email: 'ada.lovelace@example.org',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
@@ -62,8 +61,6 @@ function validSubmission(overrides: Record<string, unknown> = {}) {
  */
 function validMember(overrides: Record<string, unknown> = {}) {
   const payload: Record<string, unknown> = {
-    firstName: 'Ada',
-    lastName: 'Lovelace',
     fullName: 'Ada Lovelace',
     title: { es: 'Investigadora', en: 'Researcher', pt: 'Pesquisadora' },
     position: 'researcher',
@@ -139,8 +136,8 @@ describe.skipIf(!available)('firestore.rules', () => {
     })
 
     it.each([
-      ['blank first name', { firstName: '' }],
-      ['overlong first name', { firstName: 'x'.repeat(61) }],
+      ['blank name', { fullName: '' }],
+      ['overlong name', { fullName: 'x'.repeat(142) }],
       ['overlong biography', { biography: 'x'.repeat(801) }],
       ['unknown position', { position: 'hacker' }],
       ['region not in the chosen country', { region: 'Lima' }],
@@ -153,7 +150,7 @@ describe.skipIf(!available)('firestore.rules', () => {
       ['unknown language', { languages: ['xx'] }],
       ['javascript: social url', { socialUrl: 'javascript:alert(1)' }],
       ['non-list interests', { interestIds: 'salud' }],
-      ['numeric first name', { firstName: 42 }],
+      ['numeric name', { fullName: 42 }],
       // The rules are the only email check a client cannot skip, so they carry
       // the same weight here as the taxonomy whitelists above.
       ['missing email', { email: undefined }],
@@ -168,13 +165,17 @@ describe.skipIf(!available)('firestore.rules', () => {
     })
 
     /**
-     * The forged-identity case. fullName/title/avatarHue are derived, so
+     * The forged-identity case. title and avatarHue are derived at approval, so
      * accepting them from a client would let a submitter control how they are
      * displayed regardless of what they actually entered.
+     *
+     * fullName is deliberately absent from this list: the name is now whatever
+     * the person typed, so a submission carrying one is the normal case, not an
+     * attack. What a client still cannot do is dictate the localized title, the
+     * avatar colour, or its own document id.
      */
     it('rejects derived fields supplied by the client', async () => {
       for (const patch of [
-        { fullName: 'Someone Else' },
         { title: { es: 'x', en: 'x', pt: 'x' } },
         { avatarHue: 200 },
         { id: 'forged' },

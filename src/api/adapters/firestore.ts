@@ -93,8 +93,7 @@ function reportIfTruncated(name: string, size: number, ceiling: number): void {
 /** Only these keys may reach Firestore; the rules reject anything else. */
 function toSubmissionDocument(submission: IntakeSubmission, createdAt: string) {
   return {
-    firstName: submission.firstName.trim(),
-    lastName: submission.lastName.trim(),
+    fullName: submission.fullName.trim(),
     // Lives on the submission only. `submissions` is admin-readable; `members`,
     // which is world-readable, never receives this field.
     email: submission.email.trim().toLowerCase(),

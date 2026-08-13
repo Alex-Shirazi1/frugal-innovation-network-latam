@@ -1,8 +1,6 @@
 [
   {
     "id": "mock-0",
-    "firstName": "Valentina",
-    "lastName": "Miranda Navarro",
     "fullName": "Valentina Miranda Navarro",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -31,8 +29,6 @@
   },
   {
     "id": "mock-1",
-    "firstName": "Mateo",
-    "lastName": "Ríos Ibarra",
     "fullName": "Mateo Ríos Ibarra",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -62,8 +58,6 @@
   },
   {
     "id": "mock-2",
-    "firstName": "Camila",
-    "lastName": "Vergara Cortés",
     "fullName": "Camila Vergara Cortés",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -93,8 +87,6 @@
   },
   {
     "id": "mock-3",
-    "firstName": "Santiago",
-    "lastName": "Bustos Quintero",
     "fullName": "Santiago Bustos Quintero",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -124,8 +116,6 @@
   },
   {
     "id": "mock-4",
-    "firstName": "Lucía",
-    "lastName": "Cortés Ferreira",
     "fullName": "Lucía Cortés Ferreira",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -154,8 +144,6 @@
   },
   {
     "id": "mock-5",
-    "firstName": "Sebastián",
-    "lastName": "Campos Ríos",
     "fullName": "Sebastián Campos Ríos",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -186,8 +174,6 @@
   },
   {
     "id": "mock-6",
-    "firstName": "Isabella",
-    "lastName": "Cabrera Zamora",
     "fullName": "Isabella Cabrera Zamora",
     "title": {
       "es": "Director de Emprendimiento",
@@ -216,8 +202,6 @@
   },
   {
     "id": "mock-7",
-    "firstName": "Diego",
-    "lastName": "Arriaga Aguilar",
     "fullName": "Diego Arriaga Aguilar",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -247,8 +231,6 @@
   },
   {
     "id": "mock-8",
-    "firstName": "Mariana",
-    "lastName": "Aguilar Molina",
     "fullName": "Mariana Aguilar Molina",
     "title": {
       "es": "Ingeniero de Producto",
@@ -278,8 +260,6 @@
   },
   {
     "id": "mock-9",
-    "firstName": "Joaquín",
-    "lastName": "Delgado Restrepo",
     "fullName": "Joaquín Delgado Restrepo",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -309,8 +289,6 @@
   },
   {
     "id": "mock-10",
-    "firstName": "Fernanda",
-    "lastName": "Ochoa Campos",
     "fullName": "Fernanda Ochoa Campos",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -339,8 +317,6 @@
   },
   {
     "id": "mock-11",
-    "firstName": "Emiliano",
-    "lastName": "Ferreira Escobar",
     "fullName": "Emiliano Ferreira Escobar",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -371,8 +347,6 @@
   },
   {
     "id": "mock-12",
-    "firstName": "Antonia",
-    "lastName": "Paredes Villanueva",
     "fullName": "Antonia Paredes Villanueva",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -401,8 +375,6 @@
   },
   {
     "id": "mock-13",
-    "firstName": "Tomás",
-    "lastName": "Peña Vergara",
     "fullName": "Tomás Peña Vergara",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -432,8 +404,6 @@
   },
   {
     "id": "mock-14",
-    "firstName": "Renata",
-    "lastName": "Ibarra Fuentes",
     "fullName": "Renata Ibarra Fuentes",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -463,8 +433,6 @@
   },
   {
     "id": "mock-15",
-    "firstName": "Gabriel",
-    "lastName": "Restrepo Delgado",
     "fullName": "Gabriel Restrepo Delgado",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -494,8 +462,6 @@
   },
   {
     "id": "mock-16",
-    "firstName": "Ximena",
-    "lastName": "Villanueva Tapia",
     "fullName": "Ximena Villanueva Tapia",
     "title": {
       "es": "Director de Emprendimiento",
@@ -524,8 +490,6 @@
   },
   {
     "id": "mock-17",
-    "firstName": "Andrés",
-    "lastName": "Sandoval Villanueva",
     "fullName": "Andrés Sandoval Villanueva",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -556,8 +520,6 @@
   },
   {
     "id": "mock-18",
-    "firstName": "Paula",
-    "lastName": "Zamora Cabrera",
     "fullName": "Paula Zamora Cabrera",
     "title": {
       "es": "Ingeniero de Producto",
@@ -586,8 +548,6 @@
   },
   {
     "id": "mock-19",
-    "firstName": "Rodrigo",
-    "lastName": "Fuentes Salazar",
     "fullName": "Rodrigo Fuentes Salazar",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -617,8 +577,6 @@
   },
   {
     "id": "mock-20",
-    "firstName": "Daniela",
-    "lastName": "Herrera Peña",
     "fullName": "Daniela Herrera Peña",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -648,8 +606,6 @@
   },
   {
     "id": "mock-21",
-    "firstName": "Felipe",
-    "lastName": "Quintero Bustos",
     "fullName": "Felipe Quintero Bustos",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -679,8 +635,6 @@
   },
   {
     "id": "mock-22",
-    "firstName": "Carolina",
-    "lastName": "Escobar Herrera",
     "fullName": "Carolina Escobar Herrera",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -709,8 +663,6 @@
   },
   {
     "id": "mock-23",
-    "firstName": "Nicolás",
-    "lastName": "Salazar Ochoa",
     "fullName": "Nicolás Salazar Ochoa",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -741,8 +693,6 @@
   },
   {
     "id": "mock-24",
-    "firstName": "Alejandra",
-    "lastName": "Navarro Miranda",
     "fullName": "Alejandra Navarro Miranda",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -771,8 +721,6 @@
   },
   {
     "id": "mock-25",
-    "firstName": "Bruno",
-    "lastName": "Molina Sandoval",
     "fullName": "Bruno Molina Sandoval",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -802,8 +750,6 @@
   },
   {
     "id": "mock-26",
-    "firstName": "Julieta",
-    "lastName": "Tapia Arriaga",
     "fullName": "Julieta Tapia Arriaga",
     "title": {
       "es": "Director de Emprendimiento",
@@ -833,8 +779,6 @@
   },
   {
     "id": "mock-27",
-    "firstName": "Valentina",
-    "lastName": "Cortés Campos",
     "fullName": "Valentina Cortés Campos",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -864,8 +808,6 @@
   },
   {
     "id": "mock-28",
-    "firstName": "Mateo",
-    "lastName": "Campos Escobar",
     "fullName": "Mateo Campos Escobar",
     "title": {
       "es": "Ingeniero de Producto",
@@ -894,8 +836,6 @@
   },
   {
     "id": "mock-29",
-    "firstName": "Camila",
-    "lastName": "Cabrera Paredes",
     "fullName": "Camila Cabrera Paredes",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -926,8 +866,6 @@
   },
   {
     "id": "mock-30",
-    "firstName": "Santiago",
-    "lastName": "Arriaga Vergara",
     "fullName": "Santiago Arriaga Vergara",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -956,8 +894,6 @@
   },
   {
     "id": "mock-31",
-    "firstName": "Lucía",
-    "lastName": "Aguilar Fuentes",
     "fullName": "Lucía Aguilar Fuentes",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -987,8 +923,6 @@
   },
   {
     "id": "mock-32",
-    "firstName": "Sebastián",
-    "lastName": "Delgado Peña",
     "fullName": "Sebastián Delgado Peña",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -1018,8 +952,6 @@
   },
   {
     "id": "mock-33",
-    "firstName": "Isabella",
-    "lastName": "Ochoa Tapia",
     "fullName": "Isabella Ochoa Tapia",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -1049,8 +981,6 @@
   },
   {
     "id": "mock-34",
-    "firstName": "Diego",
-    "lastName": "Ferreira Villanueva",
     "fullName": "Diego Ferreira Villanueva",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -1079,8 +1009,6 @@
   },
   {
     "id": "mock-35",
-    "firstName": "Mariana",
-    "lastName": "Paredes Cabrera",
     "fullName": "Mariana Paredes Cabrera",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -1111,8 +1039,6 @@
   },
   {
     "id": "mock-36",
-    "firstName": "Joaquín",
-    "lastName": "Peña Salazar",
     "fullName": "Joaquín Peña Salazar",
     "title": {
       "es": "Director de Emprendimiento",
@@ -1141,8 +1067,6 @@
   },
   {
     "id": "mock-37",
-    "firstName": "Fernanda",
-    "lastName": "Ibarra Peña",
     "fullName": "Fernanda Ibarra Peña",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -1172,8 +1096,6 @@
   },
   {
     "id": "mock-38",
-    "firstName": "Emiliano",
-    "lastName": "Restrepo Bustos",
     "fullName": "Emiliano Restrepo Bustos",
     "title": {
       "es": "Ingeniero de Producto",
@@ -1203,8 +1125,6 @@
   },
   {
     "id": "mock-39",
-    "firstName": "Antonia",
-    "lastName": "Villanueva Herrera",
     "fullName": "Antonia Villanueva Herrera",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -1234,8 +1154,6 @@
   },
   {
     "id": "mock-40",
-    "firstName": "Tomás",
-    "lastName": "Sandoval Ochoa",
     "fullName": "Tomás Sandoval Ochoa",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -1264,8 +1182,6 @@
   },
   {
     "id": "mock-41",
-    "firstName": "Renata",
-    "lastName": "Zamora Miranda",
     "fullName": "Renata Zamora Miranda",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -1296,8 +1212,6 @@
   },
   {
     "id": "mock-42",
-    "firstName": "Gabriel",
-    "lastName": "Fuentes Sandoval",
     "fullName": "Gabriel Fuentes Sandoval",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -1326,8 +1240,6 @@
   },
   {
     "id": "mock-43",
-    "firstName": "Ximena",
-    "lastName": "Herrera Arriaga",
     "fullName": "Ximena Herrera Arriaga",
     "title": {
       "es": "Consultor en Innovación Social",
@@ -1357,8 +1269,6 @@
   },
   {
     "id": "mock-44",
-    "firstName": "Andrés",
-    "lastName": "Quintero Navarro",
     "fullName": "Andrés Quintero Navarro",
     "title": {
       "es": "Coordinadora de Vinculación",
@@ -1388,8 +1298,6 @@
   },
   {
     "id": "mock-45",
-    "firstName": "Paula",
-    "lastName": "Escobar Ibarra",
     "fullName": "Paula Escobar Ibarra",
     "title": {
       "es": "Estudiante de Doctorado",
@@ -1419,8 +1327,6 @@
   },
   {
     "id": "mock-46",
-    "firstName": "Rodrigo",
-    "lastName": "Salazar Cortés",
     "fullName": "Rodrigo Salazar Cortés",
     "title": {
       "es": "Director de Emprendimiento",
@@ -1449,8 +1355,6 @@
   },
   {
     "id": "mock-47",
-    "firstName": "Daniela",
-    "lastName": "Navarro Quintero",
     "fullName": "Daniela Navarro Quintero",
     "title": {
       "es": "Mtra. en Políticas Públicas",
@@ -1481,8 +1385,6 @@
   },
   {
     "id": "mock-48",
-    "firstName": "Felipe",
-    "lastName": "Molina Ferreira",
     "fullName": "Felipe Molina Ferreira",
     "title": {
       "es": "Ingeniero de Producto",
@@ -1511,8 +1413,6 @@
   },
   {
     "id": "mock-49",
-    "firstName": "Carolina",
-    "lastName": "Tapia Ríos",
     "fullName": "Carolina Tapia Ríos",
     "title": {
       "es": "Gestora de Proyectos Sociales",
@@ -1542,8 +1442,6 @@
   },
   {
     "id": "mock-50",
-    "firstName": "Nicolás",
-    "lastName": "Miranda Zamora",
     "fullName": "Nicolás Miranda Zamora",
     "title": {
       "es": "Dra. en Diseño e Innovación",
@@ -1573,8 +1471,6 @@
   },
   {
     "id": "mock-51",
-    "firstName": "Alejandra",
-    "lastName": "Ríos Aguilar",
     "fullName": "Alejandra Ríos Aguilar",
     "title": {
       "es": "Profesor de Ingeniería",
@@ -1604,8 +1500,6 @@
   },
   {
     "id": "mock-52",
-    "firstName": "Bruno",
-    "lastName": "Vergara Molina",
     "fullName": "Bruno Vergara Molina",
     "title": {
       "es": "Investigadora en Sostenibilidad",
@@ -1634,8 +1528,6 @@
   },
   {
     "id": "mock-53",
-    "firstName": "Julieta",
-    "lastName": "Bustos Restrepo",
     "fullName": "Julieta Bustos Restrepo",
     "title": {
       "es": "Consultor en Innovación Social",

@@ -101,8 +101,7 @@ for (const email of ACCOUNTS) {
  */
 const SUBMISSIONS = [
   {
-    firstName: 'Ana',
-    lastName: 'Prueba García',
+    fullName: 'Ana Prueba García',
     email: 'ana.prueba@example.org',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
@@ -116,8 +115,7 @@ const SUBMISSIONS = [
     socialUrl: 'https://linkedin.com/in/ana-prueba',
   },
   {
-    firstName: 'Bruno',
-    lastName: 'Cardoso Lima',
+    fullName: 'Bruno Cardoso Lima',
     email: 'bruno.cardoso@example.org',
     position: 'faculty',
     jobPositionName: 'Professor Adjunto',
@@ -131,8 +129,7 @@ const SUBMISSIONS = [
     socialUrl: null,
   },
   {
-    firstName: 'Carla',
-    lastName: 'Núñez Ortega',
+    fullName: 'Carla Núñez Ortega',
     email: 'carla.nunez@example.org',
     position: 'independent',
     jobPositionName: 'Consultora independiente',

@@ -8,13 +8,9 @@
 import type { IntakeSubmission, Member } from '../api/types'
 
 export function makeMember(overrides: Partial<Member> = {}): Member {
-  const firstName = overrides.firstName ?? 'Ada'
-  const lastName = overrides.lastName ?? 'Lovelace'
   return {
     id: 'm-1',
-    firstName,
-    lastName,
-    fullName: `${firstName} ${lastName}`,
+    fullName: 'Ada Lovelace',
     title: { es: 'Investigadora', en: 'Researcher', pt: 'Pesquisadora' },
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
@@ -32,8 +28,7 @@ export function makeMember(overrides: Partial<Member> = {}): Member {
 
 export function makeSubmission(overrides: Partial<IntakeSubmission> = {}): IntakeSubmission {
   return {
-    firstName: 'Ana',
-    lastName: 'Prueba García',
+    fullName: 'Ana Prueba García',
     email: 'ana.prueba@example.org',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',

@@ -10,11 +10,15 @@ import type { Localized } from './conference'
 
 export interface Member {
   id: string
-  /** Allan asked for first and last name separately. */
-  firstName: string
-  lastName: string
-  /** Derived from firstName + lastName. Kept on the record so search, sort,
-   *  and display never have to re-join the parts inconsistently. */
+  /**
+   * The member's whole name, exactly as they typed it.
+   *
+   * Deliberately NOT split into given name and surname. Spanish naming makes
+   * the boundary unknowable — "María Fernanda Gómez Ruiz" could surname at
+   * "Gómez" or at "Fernanda" — so any split is a guess, and a guess made once
+   * at intake is a guess nobody can see or correct later. Storing the whole
+   * string keeps the record faithful to what the person actually wrote.
+   */
   fullName: string
   /**
    * Curated, translated descriptor used for the card subtitle. Derived from
@@ -172,8 +176,6 @@ function buildMember(index: number): Member {
 
   return {
     id: `mock-${index}`,
-    firstName: first,
-    lastName: lastNameFull,
     fullName: `${first} ${lastNameFull}`,
     title: titles[index % titles.length],
     position,

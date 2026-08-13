@@ -25,8 +25,8 @@ import type { Localized } from '../data/conference'
 
 /** Raw shape submitted by the onboarding form. */
 export interface IntakeSubmission {
-  firstName: string
-  lastName: string
+  /** Whole name as typed. See the note on `Member.fullName` for why it is not split. */
+  fullName: string
   /**
    * How the network replies. This is the whole point of the form — Allan's
    * first move on any application is to email the person to arrange a
@@ -146,13 +146,15 @@ export function validateIntake(body: unknown): IntakeValidation {
   }
   const raw = body as Record<string, unknown>
 
-  const firstName = asString(raw.firstName)
-  const lastName = asString(raw.lastName)
+  // Collapse runs of whitespace: a name pasted from a form or a spreadsheet
+  // routinely arrives with a double space, and two records differing only by
+  // that would render identically while sorting and searching as distinct.
+  const fullName = asString(raw.fullName).replace(/\s+/g, ' ')
   const position = raw.position
-  if (!firstName || !lastName || typeof position !== 'string' || !positionTypes.includes(position as PositionType)) {
+  if (!fullName || typeof position !== 'string' || !positionTypes.includes(position as PositionType)) {
     return { ok: false, error: 'missing-required' }
   }
-  if (firstName.length > fieldLimits.firstName || lastName.length > fieldLimits.lastName) {
+  if (fullName.length > fieldLimits.fullName) {
     return { ok: false, error: 'too-long' }
   }
 
@@ -204,12 +206,9 @@ export function validateIntake(body: unknown): IntakeValidation {
     return { ok: false, error: 'invalid-url' }
   }
 
-  const fullName = `${firstName} ${lastName}`
   return {
     ok: true,
     member: {
-      firstName,
-      lastName,
       email,
       fullName,
       title: positionTitles[position as PositionType],

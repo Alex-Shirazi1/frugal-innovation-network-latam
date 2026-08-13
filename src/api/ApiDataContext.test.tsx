@@ -32,8 +32,7 @@ describe('ApiDataProvider / useApiData', () => {
     const { result } = renderHook(() => useApiData(), { wrapper: ApiDataProvider })
 
     await result.current.submitIntake({
-      firstName: 'Ada',
-      lastName: 'Lovelace',
+      fullName: 'Ada Lovelace',
       email: 'ada@example.org',
       position: 'independent',
       jobPositionName: 'Consultora',

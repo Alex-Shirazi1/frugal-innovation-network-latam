@@ -8,11 +8,10 @@ import { describe, expect, it } from 'vitest'
 import { importMembersFromCsv, mapFormResponse, parseCsv, rowToSubmission } from './memberImport'
 
 const HEADERS =
-  'Nombre,Apellido,Correo electrónico,Cargo,Puesto,Biografía,Institución,País,Región,Intereses,Áreas generales,Idiomas,LinkedIn,Consentimiento'
+  'Nombre completo,Correo electrónico,Cargo,Puesto,Biografía,Institución,País,Región,Intereses,Áreas generales,Idiomas,LinkedIn,Consentimiento'
 
 const ROW = [
-  'Ada',
-  'Lovelace',
+  'Ada Lovelace',
   'ada@example.org',
   'Investigador/a',
   'Investigadora Asociada',
@@ -69,7 +68,7 @@ describe('importMembersFromCsv', () => {
   it('imports a well-formed Spanish-headed export', () => {
     const row = importOne()
     expect(row.ok).toBe(true)
-    expect(row.member?.firstName).toBe('Ada')
+    expect(row.member?.fullName).toBe('Ada Lovelace')
     expect(row.member?.email).toBe('ada@example.org')
     expect(row.member?.affiliationId).toBe('iteso')
     expect(row.unresolved).toEqual([])
@@ -222,8 +221,7 @@ describe('importMembersFromCsv', () => {
 describe('mapFormResponse', () => {
   const RESPONSE: Record<string, string> = {
     'Marca temporal': '2026-08-11 21:04:12',
-    Nombre: 'Ada',
-    Apellido: 'Lovelace',
+    'Nombre completo': 'Ada Lovelace',
     'Correo electrónico': 'ada@example.org',
     Cargo: 'Investigador/a',
     Puesto: 'Investigadora Asociada',
@@ -263,6 +261,32 @@ describe('mapFormResponse', () => {
     expect(mapFormResponse({ alpha: '1', beta: '2' }).error).toBe('no-recognised-columns')
   })
 
+  /*
+   * Taken from the live "Formulario de Membresía". Several aliases are prefixes
+   * of longer ones, and matching on the first registered filed this question
+   * under the name field — where the name question then overwrote it, dropping the
+   * institution with nothing in `unresolved` to show a moderator. The longest
+   * alias has to win.
+   */
+  it('reads an organisation question as the affiliation, not as a first name', () => {
+    const { Institución: _replaced, ...rest } = RESPONSE
+    const result = mapFormResponse({
+      'Nombre de la organización:': 'ITESO',
+      ...rest,
+    })
+    expect(result.ok).toBe(true)
+    expect(result.member?.affiliationId).toBe('iteso')
+    expect(result.member?.fullName).toBe('Ada Lovelace')
+  })
+
+  it('still reads a bare name question as the first name', () => {
+    // The longest-match rule must not cost the plain spellings their meaning.
+    expect(mapFormResponse(RESPONSE).member?.fullName).toBe('Ada Lovelace')
+    expect(
+      mapFormResponse({ ...RESPONSE, Nombre: 'Ada Lovelace' }).member?.fullName,
+    ).toBe('Ada Lovelace')
+  })
+
   it('survives a non-string answer without throwing', () => {
     const result = mapFormResponse({ ...RESPONSE, Región: null as unknown as string })
     expect(result.ok).toBe(false)
@@ -271,9 +295,15 @@ describe('mapFormResponse', () => {
 })
 
 describe('rowToSubmission', () => {
+  /*
+   * fullName is carried through — it is what the member typed, not something
+   * the system computes. title, avatarHue and status stay off the submission so
+   * a sheet cannot dictate how a profile presents itself; the validator derives
+   * those from the position whitelist and the name.
+   */
   it('never carries a display field through from the source record', () => {
-    const { submission } = rowToSubmission({ firstName: 'Ada', lastName: 'Lovelace' })
-    expect(submission).not.toHaveProperty('fullName')
+    const { submission } = rowToSubmission({ fullName: 'Ada Lovelace' })
+    expect(submission.fullName).toBe('Ada Lovelace')
     expect(submission).not.toHaveProperty('title')
     expect(submission).not.toHaveProperty('avatarHue')
     expect(submission).not.toHaveProperty('status')

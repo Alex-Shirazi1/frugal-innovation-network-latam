@@ -30,12 +30,10 @@ describe('MemberCard', () => {
     expect(screen.getByText('Investigadora')).toBeInTheDocument()
   })
 
-  it('builds avatar initials from the first and last name fields', () => {
-    renderWithI18n(
-      <MemberCard member={makeMember({ firstName: 'Grace', lastName: 'Brewster Hopper' })} />,
-    )
-    // Initials come from the real name fields, not from splitting fullName,
-    // so a compound surname still yields one initial per field -> "GB".
+  it('builds avatar initials from the first two words of the name', () => {
+    renderWithI18n(<MemberCard member={makeMember({ fullName: 'Grace Brewster Hopper' })} />)
+    // With the name stored whole there is no surname field to read, so the
+    // first two words are used -> "GB". See src/lib/initials.ts.
     expect(screen.getByText('GB')).toBeInTheDocument()
   })
 

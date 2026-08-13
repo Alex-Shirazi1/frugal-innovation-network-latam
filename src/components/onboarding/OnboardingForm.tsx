@@ -9,8 +9,7 @@ import { isValidEmail } from '../../domain/intake'
 import type { IntakeSubmission, PositionType, ResearchInterest } from '../../api/types'
 
 type ErrorKey =
-  | 'firstName'
-  | 'lastName'
+  | 'fullName'
   | 'email'
   | 'position'
   | 'jobPositionName'
@@ -32,8 +31,7 @@ const TOTAL_STEPS = 4
 const LAST_STEP = TOTAL_STEPS - 1
 
 const emptyForm: IntakeSubmission = {
-  firstName: '',
-  lastName: '',
+  fullName: '',
   email: '',
   position: '',
   jobPositionName: '',
@@ -162,12 +160,9 @@ export function OnboardingForm() {
   function validateStep(current: number): boolean {
     const next: Errors = {}
     if (current === 0) {
-      if (!form.firstName.trim()) next.firstName = t.onboarding.errors.required
-      else if (form.firstName.trim().length > fieldLimits.firstName)
-        next.firstName = t.onboarding.errors.tooLong
-      if (!form.lastName.trim()) next.lastName = t.onboarding.errors.required
-      else if (form.lastName.trim().length > fieldLimits.lastName)
-        next.lastName = t.onboarding.errors.tooLong
+      if (!form.fullName.trim()) next.fullName = t.onboarding.errors.required
+      else if (form.fullName.trim().length > fieldLimits.fullName)
+        next.fullName = t.onboarding.errors.tooLong
       // Required, and the only field the network genuinely cannot proceed
       // without — every application is answered by email.
       if (!form.email.trim()) next.email = t.onboarding.errors.required
@@ -215,7 +210,7 @@ export function OnboardingForm() {
         socialUrl: code === 'invalid-url' ? t.onboarding.errors.url : undefined,
         consent: code === 'consent-required' ? t.onboarding.errors.consent : undefined,
         biography: code === 'too-long' ? t.onboarding.errors.tooLong : undefined,
-        firstName: code === 'missing-required' ? t.onboarding.errors.required : undefined,
+        fullName: code === 'missing-required' ? t.onboarding.errors.required : undefined,
         email: code === 'invalid-email' ? t.onboarding.errors.invalidEmail : undefined,
       })
       return
@@ -356,24 +351,15 @@ export function OnboardingForm() {
             {step === 0 ? (
               <>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label={t.onboarding.firstName} error={errors.firstName}>
+                  {/* Spans both columns: one name field, not a pair. */}
+                  <Field label={t.onboarding.fullName} error={errors.fullName}>
                     <input
                       className={inputClass}
-                      value={form.firstName}
-                      onChange={(event) => update('firstName', event.target.value)}
-                      placeholder={t.onboarding.firstNamePlaceholder}
-                      autoComplete="given-name"
-                      maxLength={fieldLimits.firstName}
-                    />
-                  </Field>
-                  <Field label={t.onboarding.lastName} error={errors.lastName}>
-                    <input
-                      className={inputClass}
-                      value={form.lastName}
-                      onChange={(event) => update('lastName', event.target.value)}
-                      placeholder={t.onboarding.lastNamePlaceholder}
-                      autoComplete="family-name"
-                      maxLength={fieldLimits.lastName}
+                      value={form.fullName}
+                      onChange={(event) => update('fullName', event.target.value)}
+                      placeholder={t.onboarding.fullNamePlaceholder}
+                      autoComplete="name"
+                      maxLength={fieldLimits.fullName}
                     />
                   </Field>
                   <Field

@@ -39,8 +39,7 @@ const regionMap = (): string => {
  * from the client would let a submitter forge their own display identity.
  */
 const CLIENT_FIELDS = [
-  'firstName',
-  'lastName',
+  'fullName',
   'email',
   'position',
   'jobPositionName',
@@ -58,8 +57,7 @@ const CLIENT_FIELDS = [
 ]
 
 const REQUIRED_FIELDS = [
-  'firstName',
-  'lastName',
+  'fullName',
   'email',
   'position',
   'country',
@@ -86,8 +84,6 @@ const REQUIRED_FIELDS = [
  * likewise not part of a published profile.
  */
 const PUBLISHED_FIELDS = [
-  'firstName',
-  'lastName',
   'fullName',
   'title',
   'position',
@@ -110,8 +106,6 @@ const PUBLISHED_FIELDS = [
  * members, so they are validated when present rather than demanded.
  */
 const PUBLISHED_REQUIRED_FIELDS = [
-  'firstName',
-  'lastName',
   'fullName',
   'title',
   'position',
@@ -215,8 +209,7 @@ service cloud.firestore {
     function validSubmission(data) {
       return data.keys().hasOnly(${list(CLIENT_FIELDS)})
         && data.keys().hasAll(${list(REQUIRED_FIELDS)})
-        && requiredText(data.firstName, ${fieldLimits.firstName})
-        && requiredText(data.lastName, ${fieldLimits.lastName})
+        && requiredText(data.fullName, ${fieldLimits.fullName})
         // Enforced here as well as in the validator: rules are the only check a
         // client cannot skip, and an application with no reply address is
         // useless to the network.
@@ -248,15 +241,15 @@ service cloud.firestore {
      * whatever it likes, or from quietly publishing their email address.
      *
      * Display fields are derived by the approval path, never typed, so they can
-     * be checked strictly here: fullName against its parts, title against the
-     * generated translations, avatarHue against the range avatarHueFor emits.
+     * be checked strictly here: title against the generated translations,
+     * avatarHue against the range avatarHueFor emits. fullName is the one field
+     * carried through verbatim — it is what the member typed — so it is length
+     * checked rather than derived.
      */
     function validMember(data) {
       return data.keys().hasOnly(${list(PUBLISHED_FIELDS)})
         && data.keys().hasAll(${list(PUBLISHED_REQUIRED_FIELDS)})
-        && requiredText(data.firstName, ${fieldLimits.firstName})
-        && requiredText(data.lastName, ${fieldLimits.lastName})
-        && requiredText(data.fullName, ${fieldLimits.firstName + fieldLimits.lastName + 1})
+        && requiredText(data.fullName, ${fieldLimits.fullName})
         && localizedTitle(data.title)
         && positionTypes().hasAny([data.position])
         && (!('jobPositionName' in data.keys())

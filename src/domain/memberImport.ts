@@ -136,8 +136,24 @@ export function parseCsv(text: string): string[][] {
  * guessed at, so a renamed question shows up as a visible gap.
  */
 const ALIASES = {
-  firstName: ['firstname', 'first name', 'nombre', 'nombres', 'nome', 'primer nombre'],
-  lastName: ['lastname', 'last name', 'apellido', 'apellidos', 'sobrenome'],
+  /*
+   * One name field. The older spellings for a split name are kept as aliases
+   * because a form that still asks "Nombre" alone should map to the whole name
+   * rather than to nothing — but a response carrying BOTH a given-name and a
+   * surname question now collapses to whichever appears last, which is why the
+   * form asks for "Nombre completo" instead.
+   */
+  fullName: [
+    'fullname',
+    'full name',
+    'nombre completo',
+    'nombre y apellidos',
+    'nombre y apellidos completos',
+    'nombre',
+    'nombres',
+    'nome',
+    'nome completo',
+  ],
   email: ['email', 'e-mail', 'correo', 'correo electronico', 'email address', 'e-mail address'],
   position: ['position', 'cargo', 'tipo de cargo', 'posicion', 'rol', 'role'],
   jobPositionName: [
@@ -208,11 +224,24 @@ function fieldForHeader(header: string): ImportField | undefined {
    * Google Forms often appends help text to a question, so headers arrive as
    * "Idiomas (selecciona todos los que apliquen)". A prefix match on the known
    * spellings catches those without matching on a single shared word.
+   *
+   * The LONGEST matching alias wins, not the first one registered. Several
+   * aliases are prefixes of others — "nombre" (fullName) leads "nombre de la
+   * organizacion" (affiliation) — and returning the first match filed a real
+   * question, "Nombre de la organización:", under the name field. It was then
+   * overwritten by the name question and the institution vanished with nothing
+   * in `unresolved` to show for it, which is precisely the silent loss this
+   * module exists to prevent.
    */
+  let best: ImportField | undefined
+  let bestLength = 0
   for (const [alias, field] of HEADER_INDEX) {
-    if (normalised.startsWith(alias)) return field
+    if (alias.length > bestLength && normalised.startsWith(alias)) {
+      best = field
+      bestLength = alias.length
+    }
   }
-  return undefined
+  return best
 }
 
 /** Labelled option lists, matched on id or on any of the three translations. */
@@ -381,8 +410,7 @@ export function rowToSubmission(record: Record<string, string>): {
 
   return {
     submission: {
-      firstName: read('firstName'),
-      lastName: read('lastName'),
+      fullName: read('fullName'),
       email: read('email'),
       position: position ?? '',
       jobPositionName: read('jobPositionName'),

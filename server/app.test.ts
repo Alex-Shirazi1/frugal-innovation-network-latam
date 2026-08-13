@@ -8,8 +8,7 @@ process.env.ADMIN_KEY = 'test-admin-key'
 const ADMIN = { 'x-admin-key': 'test-admin-key' }
 
 const validIntake: IntakeSubmission = {
-  firstName: 'Ana',
-  lastName: 'Prueba García',
+  fullName: 'Ana Prueba García',
   email: 'ana.prueba@example.org',
   position: 'researcher',
   jobPositionName: 'Investigadora Asociada',
@@ -89,8 +88,7 @@ describe('intake pipeline', () => {
   it('persists every field Allan asked for', async () => {
     const res = await request(app).post('/api/members/intake').send(validIntake)
     const m = res.body.data
-    expect(m.firstName).toBe('Ana')
-    expect(m.lastName).toBe('Prueba García')
+    expect(m.fullName).toBe('Ana Prueba García')
     expect(m.jobPositionName).toBe('Investigadora Asociada')
     expect(m.biography).toContain('salud comunitaria')
     expect(m.generalAreaIds).toEqual(['ingenieria'])
@@ -108,8 +106,7 @@ describe('intake pipeline', () => {
   })
 
   it.each([
-    ['blank first name', { firstName: '  ' }, 'missing-required'],
-    ['blank last name', { lastName: '' }, 'missing-required'],
+    ['blank name', { fullName: '  ' }, 'missing-required'],
     ['unknown position', { position: 'hacker' }, 'missing-required'],
     ['region not in country', { region: 'Lima' }, 'invalid-location'],
     ['unknown country', { country: 'Atlantis' }, 'invalid-location'],
@@ -120,7 +117,7 @@ describe('intake pipeline', () => {
     ['javascript: url', { socialUrl: 'javascript:alert(1)' }, 'invalid-url'],
     ['consent withheld', { consentToPublish: false }, 'consent-required'],
     ['overlong biography', { biography: 'x'.repeat(801) }, 'too-long'],
-    ['overlong first name', { firstName: 'x'.repeat(61) }, 'too-long'],
+    ['overlong name', { fullName: 'x'.repeat(142) }, 'too-long'],
   ])('rejects %s', async (_label, patch, code) => {
     const res = await request(app)
       .post('/api/members/intake')

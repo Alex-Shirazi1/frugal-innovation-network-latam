@@ -53,8 +53,7 @@ export interface AdminCredentials {
 /* ------------------------------------------------------------------ Firestore */
 
 interface SubmissionDocument {
-  firstName: string
-  lastName: string
+  fullName: string
   /** Contact address for the network. Never published — see toPublishedMember. */
   email: string
   position: PositionType
@@ -83,11 +82,8 @@ interface SubmissionDocument {
  * here is a deliberate act; a spread would have published it by default.
  */
 function toPublishedMember(d: SubmissionDocument): Omit<Member, 'id'> {
-  const fullName = `${d.firstName} ${d.lastName}`
   return {
-    firstName: d.firstName,
-    lastName: d.lastName,
-    fullName,
+    fullName: d.fullName,
     title: positionTitles[d.position],
     position: d.position,
     jobPositionName: d.jobPositionName,
@@ -99,7 +95,7 @@ function toPublishedMember(d: SubmissionDocument): Omit<Member, 'id'> {
     generalAreaIds: d.generalAreaIds,
     languages: d.languages,
     socialUrl: d.socialUrl ?? undefined,
-    avatarHue: avatarHueFor(fullName),
+    avatarHue: avatarHueFor(d.fullName),
   }
 }
 

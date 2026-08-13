@@ -22,8 +22,7 @@ import type { Member } from '../data/members'
 
 /** The editable surface of a profile. Derived fields are never accepted. */
 export interface MemberDraft {
-  firstName: string
-  lastName: string
+  fullName: string
   position: string
   jobPositionName: string
   biography: string
@@ -73,8 +72,7 @@ export function validateMemberDraft(draft: Partial<MemberDraft>): MemberDraftVal
 /** Turns a stored profile back into an editable draft for the edit form. */
 export function toDraft(member: Omit<Member, 'id'>): MemberDraft {
   return {
-    firstName: member.firstName,
-    lastName: member.lastName,
+    fullName: member.fullName,
     position: member.position,
     jobPositionName: member.jobPositionName,
     biography: member.biography,

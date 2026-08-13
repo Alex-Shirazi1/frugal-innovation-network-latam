@@ -8,8 +8,7 @@ import type { IntakeSubmission } from '../api/types'
 
 function makeSubmission(overrides: Partial<IntakeSubmission> = {}): IntakeSubmission {
   return {
-    firstName: 'Ada',
-    lastName: 'Lovelace',
+    fullName: 'Ada Lovelace',
     position: 'researcher',
     jobPositionName: 'Investigadora Asociada',
     biography: 'Trabaja en soluciones de bajo costo con comunidades rurales.',

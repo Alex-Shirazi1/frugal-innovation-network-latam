@@ -15,8 +15,6 @@ import type { ValidatedIntake } from '../src/domain/intake'
 const SCHEMA_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS intake_members (
      id TEXT PRIMARY KEY,
-     first_name TEXT NOT NULL,
-     last_name TEXT NOT NULL,
      email TEXT NOT NULL DEFAULT '',
      full_name TEXT NOT NULL,
      title TEXT NOT NULL,
@@ -39,8 +37,6 @@ const SCHEMA_STATEMENTS = [
 
 interface Row {
   id: string
-  first_name: string
-  last_name: string
   email: string
   full_name: string
   title: string
@@ -71,8 +67,6 @@ export interface AdminEntry extends Member {
 function rowToMember(row: Row): Member {
   return {
     id: row.id,
-    firstName: row.first_name,
-    lastName: row.last_name,
     fullName: row.full_name,
     title: JSON.parse(row.title),
     position: row.position as Member['position'],
@@ -115,14 +109,12 @@ export function openDb(path: string = process.env.RELIF_DB_PATH ?? 'server/relif
       const id = `intake-${randomUUID()}`
       db.prepare(
         `INSERT INTO intake_members
-           (id, first_name, last_name, email, full_name, title, position, job_position_name,
+           (id, email, full_name, title, position, job_position_name,
             biography, affiliation_id, country, region, interest_ids, general_area_ids,
             languages, social_url, avatar_hue, status, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
       ).run(
         id,
-        member.firstName,
-        member.lastName,
         member.email,
         member.fullName,
         // Localized { es, en, pt } object — serialized like the id arrays.
