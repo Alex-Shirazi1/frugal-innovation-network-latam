@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemberDirectory } from './MemberDirectory'
 import { I18nProvider } from '../../i18n/I18nContext'
 import { ApiDataProvider } from '../../api/ApiDataContext'
+import { seedMembers } from '../../data/members'
 
 // The directory reads members, institutions and option lists from the data
 // layer. No backend here — the bundled data is the source, same as MemberCard.
@@ -56,7 +57,7 @@ beforeEach(() => {
 describe('MemberDirectory', () => {
   it('presents the members as a carousel rather than a grid', () => {
     const { container } = renderDirectory()
-    // Allan's ask: 54 cards (and eventually 200) should never be a wall.
+    // Allan's ask: a directory of any size (eventually 200) should never be a wall.
     expect(carousel()).toBeInTheDocument()
     expect(container.querySelector('ul.grid')).not.toBeInTheDocument()
   })
@@ -75,16 +76,16 @@ describe('MemberDirectory', () => {
   it('keeps the carousel when a search narrows the list', async () => {
     const user = userEvent.setup()
     const { container } = renderDirectory()
-    expect(visibleCards()).toHaveLength(54)
+    expect(visibleCards()).toHaveLength(seedMembers.length)
 
-    await user.type(screen.getByRole('searchbox'), 'Valentina')
+    await user.type(screen.getByRole('searchbox'), 'Francisco')
 
     expect(carousel()).toBeInTheDocument()
     expect(container.querySelector('ul.grid')).not.toBeInTheDocument()
-    expect(visibleCards().length).toBeLessThan(54)
+    expect(visibleCards().length).toBeLessThan(seedMembers.length)
     expect(
       within(carousel() as HTMLElement).getAllByRole('button', {
-        name: 'Valentina Miranda Navarro',
+        name: 'Francisco Javier Álvarez Torres',
       }).length,
     ).toBeGreaterThan(0)
   })
@@ -104,10 +105,10 @@ describe('MemberDirectory', () => {
     const user = userEvent.setup()
     renderDirectory()
 
-    await user.type(screen.getByRole('searchbox'), 'Valentina')
+    await user.type(screen.getByRole('searchbox'), 'Francisco')
     await user.click(screen.getByRole('button', { name: 'Limpiar filtros' }))
 
-    expect(visibleCards()).toHaveLength(54)
+    expect(visibleCards()).toHaveLength(seedMembers.length)
   })
 
   it('drops the carousel for a message when nothing matches', async () => {
@@ -152,20 +153,20 @@ describe('MemberDirectory', () => {
     renderDirectory()
 
     const cards = within(carousel() as HTMLElement).getAllByRole('button', {
-      name: 'Valentina Miranda Navarro',
+      name: 'Francisco Javier Álvarez Torres',
     })
     await user.click(cards[0])
 
-    expect(screen.getByRole('dialog')).toHaveTextContent('Valentina Miranda Navarro')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Francisco Javier Álvarez Torres')
   })
 
   it('reports the count of whatever is currently on the strip', async () => {
     const user = userEvent.setup()
     renderDirectory()
-    expect(screen.getByRole('status')).toHaveTextContent('Mostrando 54 personas')
+    expect(screen.getByRole('status')).toHaveTextContent(`Mostrando ${seedMembers.length} personas`)
 
-    await user.type(screen.getByRole('searchbox'), 'Valentina')
+    await user.type(screen.getByRole('searchbox'), 'Francisco')
 
-    expect(screen.getByRole('status')).not.toHaveTextContent('Mostrando 54 personas')
+    expect(screen.getByRole('status')).not.toHaveTextContent(`Mostrando ${seedMembers.length} personas`)
   })
 })

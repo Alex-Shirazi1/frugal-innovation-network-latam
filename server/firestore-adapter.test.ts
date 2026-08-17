@@ -13,6 +13,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing'
 import { readFileSync } from 'node:fs'
 import type { Firestore } from 'firebase/firestore'
+import { seedMembers } from '../src/data/members'
 
 const HOST = '127.0.0.1'
 const PORT = 8080
@@ -159,12 +160,12 @@ describe.skipIf(!available)('Firestore adapter', () => {
     it('returns the bundled seed directory when nothing is approved', async () => {
       const source = createFirestoreDataSource(config)
       const members = await source.getMembers()
-      expect(members).toHaveLength(54)
+      expect(members).toHaveLength(seedMembers.length)
     })
 
     /*
      * The seed is a fallback, not an addend. Publishing one real member used to
-     * yield that person plus 54 fabricated ones, which left the mock directory on
+     * yield that person plus the whole bundled seed, which left the seed directory on
      * the public site until somebody edited the repository. Now the first real
      * profile replaces the mock set outright.
      */
@@ -187,7 +188,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       await source.submitIntake(makeSubmission())
 
       const members = await source.getMembers()
-      expect(members).toHaveLength(54)
+      expect(members).toHaveLength(seedMembers.length)
       expect(members.some((m) => m.fullName === 'Ana Prueba García')).toBe(false)
     })
 
@@ -293,7 +294,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
 
       asAnon()
       const members = await createFirestoreDataSource(config).getMembers()
-      expect(members).toHaveLength(54)
+      expect(members).toHaveLength(seedMembers.length)
     })
 
     it('approving an unknown id fails instead of publishing an empty record', async () => {
@@ -301,7 +302,7 @@ describe.skipIf(!available)('Firestore adapter', () => {
       await expect(publishSubmission('does-not-exist')).rejects.toThrow('not-found')
 
       asAnon()
-      expect(await createFirestoreDataSource(config).getMembers()).toHaveLength(54)
+      expect(await createFirestoreDataSource(config).getMembers()).toHaveLength(seedMembers.length)
     })
 
     /** The rules enforce this, but the adapter must surface it as a failure. */

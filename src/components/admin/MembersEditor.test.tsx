@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event'
 import { MembersEditor } from './MembersEditor'
 import { I18nProvider } from '../../i18n/I18nContext'
 import { mapFormResponse } from '../../domain/memberImport'
+import { seedMembers } from '../../data/members'
 
 const list = vi.fn()
 const listArrived = vi.fn()
@@ -191,8 +192,10 @@ describe('MembersEditor', () => {
     expect(screen.getByText(/Ningún perfil coincide/)).toBeInTheDocument()
   })
 
-  it('names the compiled-in sample profiles so the count gap is not a mystery', async () => {
+  it('names the compiled-in profiles so the count gap is not a mystery', async () => {
     renderTab()
-    expect(await screen.findByText(/54 perfiles de ejemplo/)).toBeInTheDocument()
+    expect(
+      await screen.findByText(new RegExp(`${seedMembers.length} perfiles incluidos en el código`)),
+    ).toBeInTheDocument()
   })
 })
