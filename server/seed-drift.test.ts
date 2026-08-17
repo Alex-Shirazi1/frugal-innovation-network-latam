@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { institutions } from '../src/data/institutions'
-import { mockMembers } from '../src/data/members'
+import { seedMembers } from '../src/data/members'
 import { resources } from '../src/data/resources'
 import {
   annualMeetingVideos,
@@ -33,7 +33,7 @@ const normalize = (value: unknown): unknown => JSON.parse(JSON.stringify(value))
 describe('server/data JSON matches src/data (run `npm run seed` if not)', () => {
   it.each([
     ['institutions', institutions],
-    ['members', mockMembers],
+    ['members', seedMembers],
     ['resources', resources],
     ['conference', { speakers, annualMeetingVideos }],
     [

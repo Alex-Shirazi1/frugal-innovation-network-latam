@@ -33,14 +33,14 @@ service cloud.firestore {
     function interestIds() { return ['metodologias', 'educacion', 'economia-circular', 'emprendimiento', 'tecnologias', 'salud', 'energia', 'agua', 'agro', 'politicas', 'diseno', 'manufactura']; }
     function areaIds() { return ['ingenieria', 'negocios', 'ciencias-sociales', 'salud-publica', 'diseno-arte', 'ciencias-naturales', 'educacion-area', 'computacion', 'derecho', 'agronomia']; }
     function languageIds() { return ['es', 'pt', 'en', 'fr', 'it', 'de']; }
-    function affiliationIds() { return ['iteso', 'javeriana', 'javeriana-cali', 'ucc', 'uca-sv', 'uca-ni', 'scu', 'up-pe', 'esan', 'ibero-cdmx', 'ibero-leon', 'ibero-puebla', 'ibero-torreon', 'ibero-tijuana', 'uas', 'uic', 'ubiobio', 'usach', 'duoc', 'ufmg', 'uarm', 'uao', 'unad', 'usb-cali', 'comillas', 'utt', 'aalto', 'up-innovation', 'frugal-lab', 'innodeva', 'acpo', 'camara-verde', 'rebrif', 'world-entrepreneurs', 'ecoins', 'captanda', 'ctic-uni']; }
+    function affiliationIds() { return ['iteso', 'javeriana', 'javeriana-cali', 'ucc', 'uca-sv', 'uca-ni', 'scu', 'up-pe', 'esan', 'ibero-cdmx', 'ibero-leon', 'ibero-puebla', 'ibero-torreon', 'ibero-tijuana', 'uas', 'uic', 'ubiobio', 'usach', 'duoc', 'ufmg', 'uarm', 'uao', 'unad', 'usb-cali', 'comillas', 'utt', 'aalto', 'up-innovation', 'frugal-lab', 'innodeva', 'acpo', 'camara-verde', 'rebrif', 'world-entrepreneurs', 'ecoins', 'captanda', 'ctic-uni', 'suyusama', 'ugto']; }
     function regionsByCountry() {
       return {
       'Argentina': ['Buenos Aires', 'Córdoba', 'Mendoza', 'Santa Fe', 'Tucumán'],
       'Bolivia': ['La Paz', 'Cochabamba', 'Santa Cruz', 'Tarija'],
       'Brasil': ['São Paulo', 'Minas Gerais', 'Rio de Janeiro', 'Bahia', 'Paraná', 'Pernambuco'],
       'Chile': ['Región Metropolitana', 'Valparaíso', 'Biobío', 'Antofagasta', 'Los Lagos'],
-      'Colombia': ['Bogotá D.C.', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Santander'],
+      'Colombia': ['Bogotá D.C.', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Santander', 'Nariño'],
       'Costa Rica': ['San José', 'Alajuela', 'Cartago', 'Heredia', 'Guanacaste'],
       'Ecuador': ['Pichincha', 'Guayas', 'Azuay', 'Manabí'],
       'El Salvador': ['San Salvador', 'Santa Ana', 'San Miguel', 'La Libertad'],

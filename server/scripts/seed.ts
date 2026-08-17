@@ -11,7 +11,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { institutions } from '../../src/data/institutions'
-import { mockMembers } from '../../src/data/members'
+import { seedMembers } from '../../src/data/members'
 import { resources } from '../../src/data/resources'
 import {
   speakers,
@@ -35,7 +35,7 @@ function dump(name: string, value: unknown): void {
 }
 
 dump('institutions', institutions)
-dump('members', mockMembers)
+dump('members', seedMembers)
 dump('resources', resources)
 dump('conference', { speakers, annualMeetingVideos })
 dump('onboarding-options', {

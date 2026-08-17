@@ -1,12 +1,15 @@
 /**
- * Loads the mock directory into Firestore, for exercising the members panel
- * against real documents.
+ * Loads the bundled directory in src/data/members.ts into Firestore.
  *
- * FOR A PREPRODUCTION PROJECT. These 54 people are fabricated — invented names,
- * job titles, biographies and social links — and the whole point of the members
- * tab is to replace them with real profiles from the incorporation form. Running
- * this against a project the public reads is putting fake people on the open web,
- * so the project id is printed and --confirm is required.
+ * This used to write 54 fabricated profiles and existed only for preproduction.
+ * It does not any more: the bundled seed now holds real, consenting members, so
+ * this is the legitimate way to populate a fresh project's directory.
+ *
+ * THE DANGER MOVED RATHER THAN WENT AWAY. This CLEARS the members collection
+ * before writing, so any profile published through the panel and not present in
+ * the bundle is destroyed — and published profiles are exactly what does not
+ * come back from the repo. Run `npm run export` first. The project id is printed
+ * and --confirm is required for that reason, not because the data is fake.
  *
  *   npm run seed:members -- --confirm
  *   npm run seed:members -- --clear --confirm     # remove every stored profile
@@ -28,20 +31,21 @@ import { cert, initializeApp, applicationDefault, getApps } from 'firebase-admin
 import { getFirestore } from 'firebase-admin/firestore'
 import { readFileSync } from 'node:fs'
 
-import { mockMembers } from '../../src/data/members'
+import { seedMembers } from '../../src/data/members'
 import { toDraft, validateMemberDraft } from '../../src/domain/memberDraft'
 
 const args = process.argv.slice(2)
 const clear = args.includes('--clear')
 const confirmed = args.includes('--confirm')
 const keyFile = args.find((a) => a.startsWith('--key='))?.slice('--key='.length)
-const projectId = process.env.FIREBASE_PROJECT_ID ?? 'raif-af800'
+const projectId = process.env.FIREBASE_PROJECT_ID ?? 'relif-s-website'
 
 if (!confirmed) {
   console.error(
-    `This writes ${mockMembers.length} FABRICATED profiles into the members collection\n` +
-      `of project "${projectId}", which the public directory renders.\n\n` +
-      'Re-run with --confirm if that is a preproduction project.\n' +
+    `This REPLACES the members collection of project "${projectId}" with the\n` +
+      `${seedMembers.length} profile(s) bundled in the repo. Any profile published through the\n` +
+      'panel and not present in the bundle is deleted and does not come back.\n\n' +
+      'Run `npm run export` first, then re-run with --confirm.\n' +
       '  npm run seed:members -- --confirm\n' +
       '  npm run seed:members -- --clear --confirm',
   )
@@ -87,7 +91,7 @@ try {
   const prepared: { id: string; data: Record<string, unknown> }[] = []
   const rejected: string[] = []
 
-  mockMembers.forEach((member, index) => {
+  seedMembers.forEach((member, index) => {
     const validation = validateMemberDraft(toDraft(member))
     if (!validation.ok || !validation.member) {
       rejected.push(`${member.fullName}: ${validation.error}`)
@@ -122,8 +126,8 @@ try {
   }
 
   console.log(`wrote ${prepared.length} profiles to members/`)
-  console.log('\nThese are fabricated. Delete them from the panel, or re-run with')
-  console.log('--clear --confirm, once real profiles exist.')
+  console.log('\nThe directory now serves these from Firestore rather than the bundle.')
+  console.log('Further members should arrive through the incorporation form, not here.')
 } catch (error: unknown) {
   const message = error instanceof Error ? error.message : String(error)
   if (message.includes('Could not load the default credentials')) {

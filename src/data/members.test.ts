@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mockMembers, institutionName } from './members'
+import { seedMembers, institutionName } from './members'
 import { institutions } from './institutions'
 import {
   cityToRegion,
@@ -13,30 +13,40 @@ import {
 const countryByName = new Map(countries.map((c) => [c.name, c]))
 
 describe('seed member data integrity', () => {
-  it('generates the full directory', () => {
-    expect(mockMembers).toHaveLength(54)
-    expect(new Set(mockMembers.map((m) => m.id)).size).toBe(54)
+  it('carries a directory with unique ids', () => {
+    expect(seedMembers.length).toBeGreaterThan(0)
+    expect(new Set(seedMembers.map((m) => m.id)).size).toBe(seedMembers.length)
   })
 
   /**
-   * Unique ids are not enough: the name pools hold 27 entries each and the
-   * directory holds 54 members, so indexing every part by `index % length` gave
-   * two people the same name. The carousel shows the whole list at once, which
-   * makes any repeat read as a rendering bug.
+   * The carousel shows the whole list at once, so a repeated name reads as a
+   * rendering bug rather than as two people.
    */
   it('gives every member a distinct name', () => {
-    const names = mockMembers.map((m) => m.fullName)
+    const names = seedMembers.map((m) => m.fullName)
     const repeated = names.filter((name, i) => names.indexOf(name) !== i)
     expect(repeated).toEqual([])
   })
 
-  it('never repeats a surname within one member’s own name', () => {
-    const doubled = mockMembers
-      // The generator emits "<given> <surname> <surname>", so the two surnames
-      // are the trailing pair of the whole name.
-      .map((m) => m.fullName.split(' ').slice(-2))
-      .filter((parts) => parts[0] === parts[1])
-    expect(doubled).toEqual([])
+  /**
+   * These are real people, and the directory is world-readable. The Member
+   * record has no email or telephone field precisely so contact details cannot
+   * ride along into the public bundle — this asserts none arrived by another
+   * route, e.g. pasted into a biography or a job title.
+   */
+  it('publishes no contact details', () => {
+    const contact = /[\w.+-]+@[\w-]+\.\w+|\+\d[\d\s()-]{7,}/
+    const leaked = seedMembers
+      .filter((m) => contact.test(`${m.biography} ${m.jobPositionName} ${m.fullName}`))
+      .map((m) => m.fullName)
+    expect(leaked).toEqual([])
+  })
+
+  it('links only to real profile URLs', () => {
+    const bad = seedMembers
+      .filter((m) => m.socialUrl !== undefined && !/^https:\/\//.test(m.socialUrl))
+      .map((m) => `${m.fullName}: ${m.socialUrl}`)
+    expect(bad).toEqual([])
   })
 
   /**
@@ -45,7 +55,7 @@ describe('seed member data integrity', () => {
    * would reject — which is how `region` ended up holding a city name.
    */
   it('every member has a country/region pair the intake validator would accept', () => {
-    const invalid = mockMembers
+    const invalid = seedMembers
       .filter((m) => !countryByName.get(m.country)?.regions.includes(m.region))
       .map((m) => `${m.fullName}: ${m.country}/${m.region}`)
     expect(invalid).toEqual([])
@@ -56,7 +66,7 @@ describe('seed member data integrity', () => {
     const areaIds = new Set(generalAreas.map((a) => a.id))
     const langIds = new Set(languageOptions.map((l) => l.id))
 
-    for (const m of mockMembers) {
+    for (const m of seedMembers) {
       expect(positionTypes).toContain(m.position)
       expect(m.interestIds.every((id) => interestIds.has(id))).toBe(true)
       expect(m.generalAreaIds.every((id) => areaIds.has(id))).toBe(true)
@@ -66,7 +76,7 @@ describe('seed member data integrity', () => {
 
   it('resolves every affiliation to a real institution, or null for independents', () => {
     const ids = new Set(institutions.map((i) => i.id))
-    for (const m of mockMembers) {
+    for (const m of seedMembers) {
       if (m.affiliationId === null) {
         expect(m.position).toBe('independent')
       } else {
@@ -76,7 +86,7 @@ describe('seed member data integrity', () => {
   })
 
   it('carries every field Allan asked for, non-empty', () => {
-    for (const m of mockMembers) {
+    for (const m of seedMembers) {
       expect(m.fullName.trim().length).toBeGreaterThan(0)
       expect(m.fullName.split(' ').length).toBeGreaterThan(1)
       expect(m.jobPositionName.length).toBeGreaterThan(0)

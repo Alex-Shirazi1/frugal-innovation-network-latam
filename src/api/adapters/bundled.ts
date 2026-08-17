@@ -7,7 +7,7 @@
  * live in page state. `persisted: false` on the result tells the UI to say so
  * instead of showing a success screen for data that went nowhere.
  */
-import { mockMembers } from '../../data/members'
+import { seedMembers } from '../../data/members'
 import { institutions } from '../../data/institutions'
 import { resources } from '../../data/resources'
 import { initiatives } from '../../data/initiatives'
@@ -49,7 +49,7 @@ export const bundledDataSource: RelifDataSource = {
   getInitiatives: async () => initiatives,
   getBibliography: async () => bibliography,
   getCongress: async () => congress,
-  getMembers: async () => mockMembers,
+  getMembers: async () => seedMembers,
   getResources: async () => resources,
   getConference: async () => ({ speakers, annualMeetingVideos }),
   getOnboardingOptions: async () => ({

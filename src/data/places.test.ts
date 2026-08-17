@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { countries, countryLabels, placeLabel, regionLabels } from './onboardingOptions'
-import { mockMembers } from './members'
+import { seedMembers } from './members'
 import { institutions } from './institutions'
 
 describe('place labels', () => {
@@ -50,7 +50,7 @@ describe('place labels', () => {
 
   it('never returns an empty label for anything a member can store', () => {
     for (const lang of ['es', 'en', 'pt'] as const) {
-      for (const member of mockMembers) {
+      for (const member of seedMembers) {
         expect(placeLabel(member.country, lang)).toBeTruthy()
         expect(placeLabel(member.region, lang)).toBeTruthy()
       }

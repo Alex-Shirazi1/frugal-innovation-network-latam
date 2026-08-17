@@ -58,6 +58,10 @@ export const institutions: Institution[] = [
   { id: 'captanda', name: 'Captanda', category: 'empresa', city: 'Santiago', country: 'Chile', url: 'https://captanda.com/', coords: [-33.46, -70.65] },
 
   { id: 'ctic-uni', name: 'CTIC-UNI', category: 'centro', city: 'Lima', country: 'Perú', url: 'https://www.ctic.uni.edu.pe/', coords: [-12.02, -77.05] },
+
+  // Affiliations of the first members admitted through the incorporation form.
+  { id: 'suyusama', name: 'Fundación Suyusama', category: 'organizacion', city: 'Pasto', country: 'Colombia', url: 'https://www.fundacionsuyusama.org/', coords: [1.21, -77.28] },
+  { id: 'ugto', name: 'Universidad de Guanajuato', category: 'universidad', city: 'Guanajuato', country: 'México', url: 'https://www.ugto.mx/', coords: [21.02, -101.26] },
 ]
 
 export const mappedInstitutions = institutions.filter(

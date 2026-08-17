@@ -19,7 +19,7 @@ import type {
   OnboardingOptions,
   Resource,
 } from './types'
-import { mockMembers } from '../data/members'
+import { seedMembers } from '../data/members'
 import { initiatives as bundledInitiatives, type Initiative } from '../data/initiatives'
 import { bibliography as bundledBibliography, type BibliographyEntry } from '../data/bibliography'
 import { congress as bundledCongress, type Congress } from '../data/congress'
@@ -80,7 +80,7 @@ export function ApiDataProvider({ children }: { children: ReactNode }) {
   // Stable for the life of the provider, so closing over it is safe.
   const dataSource = dataSourceRef.current
   const [institutions, setInstitutions] = useState<Institution[]>(bundledInstitutions)
-  const [members, setMembers] = useState<Member[]>(mockMembers)
+  const [members, setMembers] = useState<Member[]>(seedMembers)
   const [initiatives, setInitiatives] = useState<Initiative[]>(bundledInitiatives)
   const [bibliography, setBibliography] = useState<BibliographyEntry[]>(bundledBibliography)
   const [congress, setCongress] = useState<Congress>(bundledCongress)

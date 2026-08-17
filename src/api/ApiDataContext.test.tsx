@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { ApiDataProvider, useApiData } from './ApiDataContext'
-import { mockMembers } from '../data/members'
+import { seedMembers } from '../data/members'
 
 describe('ApiDataProvider / useApiData', () => {
   beforeEach(() => {
@@ -11,13 +11,13 @@ describe('ApiDataProvider / useApiData', () => {
 
   it('renders immediately from the bundled snapshot', () => {
     const { result } = renderHook(() => useApiData(), { wrapper: ApiDataProvider })
-    expect(result.current.members).toHaveLength(mockMembers.length)
+    expect(result.current.members).toHaveLength(seedMembers.length)
     expect(result.current.institutions.length).toBeGreaterThan(0)
   })
 
   it('keeps serving bundled data after the backend hydration fails', async () => {
     const { result } = renderHook(() => useApiData(), { wrapper: ApiDataProvider })
-    await waitFor(() => expect(result.current.members).toHaveLength(mockMembers.length))
+    await waitFor(() => expect(result.current.members).toHaveLength(seedMembers.length))
     expect(result.current.resources.length).toBeGreaterThan(0)
   })
 
@@ -47,7 +47,7 @@ describe('ApiDataProvider / useApiData', () => {
       consentToPublish: true,
     })
 
-    await waitFor(() => expect(result.current.members).toHaveLength(mockMembers.length))
+    await waitFor(() => expect(result.current.members).toHaveLength(seedMembers.length))
     expect(result.current.members.some((m) => m.fullName === 'Ada Lovelace')).toBe(false)
   })
 

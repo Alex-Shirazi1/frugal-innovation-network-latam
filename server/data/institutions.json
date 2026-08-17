@@ -442,5 +442,29 @@
       -12.02,
       -77.05
     ]
+  },
+  {
+    "id": "suyusama",
+    "name": "Fundación Suyusama",
+    "category": "organizacion",
+    "city": "Pasto",
+    "country": "Colombia",
+    "url": "https://www.fundacionsuyusama.org/",
+    "coords": [
+      1.21,
+      -77.28
+    ]
+  },
+  {
+    "id": "ugto",
+    "name": "Universidad de Guanajuato",
+    "category": "universidad",
+    "city": "Guanajuato",
+    "country": "México",
+    "url": "https://www.ugto.mx/",
+    "coords": [
+      21.02,
+      -101.26
+    ]
   }
 ]

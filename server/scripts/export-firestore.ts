@@ -63,7 +63,7 @@ const DEFAULT_OUT = 'firestore-backups'
 const args = process.argv.slice(2)
 const keyFile = args.find((a) => a.startsWith('--key='))?.slice('--key='.length)
 const outArg = args.find((a) => a.startsWith('--out='))?.slice('--out='.length)
-const projectId = process.env.FIREBASE_PROJECT_ID ?? 'raif-af800'
+const projectId = process.env.FIREBASE_PROJECT_ID ?? 'relif-s-website'
 
 /** `~` is expanded by the shell only when unquoted, and --out= is often quoted. */
 const outDir = resolve((outArg ?? DEFAULT_OUT).replace(/^~(?=$|\/)/, homedir()))

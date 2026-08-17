@@ -81,7 +81,7 @@ if (create && revoke) {
   process.exit(1)
 }
 
-const projectId = process.env.FIREBASE_PROJECT_ID ?? 'raif-af800'
+const projectId = process.env.FIREBASE_PROJECT_ID ?? 'relif-s-website'
 
 if (getApps().length === 0) {
   // A key file is supported as a fallback for environments without gcloud, but

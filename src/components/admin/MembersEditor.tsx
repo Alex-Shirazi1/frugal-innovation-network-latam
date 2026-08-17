@@ -17,7 +17,7 @@ import { toDraft, type MemberDraft } from '../../domain/memberDraft'
 import { MemberDraftForm } from './MemberDraftForm'
 import { rowActionClass, rowDestructiveActionClass } from './ContentEditorShell'
 import { useI18n } from '../../i18n/I18nContext'
-import { mockMembers } from '../../data/members'
+import { seedMembers } from '../../data/members'
 
 /** What the panel is currently editing, if anything. */
 type Editing =
@@ -351,7 +351,7 @@ export function MembersEditor() {
           and no panel action can touch it.
         */}
         <p className="mt-4 text-xs text-pizarra">
-          {copy.seedNotice.replace('{count}', String(mockMembers.length))}
+          {copy.seedNotice.replace('{count}', String(seedMembers.length))}
         </p>
       </section>
     </div>

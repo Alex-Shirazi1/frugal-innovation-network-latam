@@ -22,7 +22,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 
 const AUTH_HOST = '127.0.0.1:9099'
 const FIRESTORE_HOST = '127.0.0.1:8080'
-const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'raif-af800'
+const PROJECT_ID = process.env.FIREBASE_PROJECT_ID ?? 'relif-s-website'
 
 /**
  * Development credentials, and deliberately nothing like the real ones.

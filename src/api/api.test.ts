@@ -4,6 +4,7 @@ import { createHttpDataSource } from './adapters/http'
 import { createFallbackDataSource } from './fallback'
 import type { IntakeSubmission } from './types'
 import { makeSubmission } from '../test/fixtures'
+import { seedMembers } from '../data/members'
 
 const validSubmission: IntakeSubmission = makeSubmission()
 
@@ -27,7 +28,7 @@ afterEach(() => {
 
 describe('bundledDataSource', () => {
   it('serves all datasets from the bundle', async () => {
-    expect(await bundledDataSource.getMembers()).toHaveLength(54)
+    expect(await bundledDataSource.getMembers()).toHaveLength(seedMembers.length)
     expect((await bundledDataSource.getInstitutions()).length).toBeGreaterThan(30)
     expect((await bundledDataSource.getResources()).length).toBeGreaterThan(0)
     expect(Object.keys(await bundledDataSource.getConference())).toEqual(
@@ -90,7 +91,7 @@ describe('createHttpDataSource', () => {
   it('falls back to bundled data when the URL serves the SPA shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(spaShellResponse()))
     const source = createFallbackDataSource(createHttpDataSource('/api'), bundledDataSource)
-    expect(await source.getMembers()).toHaveLength(54)
+    expect(await source.getMembers()).toHaveLength(seedMembers.length)
 
     // And an intake against a non-existent backend must not claim persistence.
     const result = await source.submitIntake(validSubmission)
@@ -151,7 +152,7 @@ describe('createFallbackDataSource', () => {
     const primary = { ...bundledDataSource, getMembers: vi.fn().mockRejectedValue(new Error('down')) }
     const source = createFallbackDataSource(primary, bundledDataSource, onFallback)
 
-    expect(await source.getMembers()).toHaveLength(54)
+    expect(await source.getMembers()).toHaveLength(seedMembers.length)
     expect(onFallback).toHaveBeenCalledWith('getMembers', expect.any(Error))
   })
 
@@ -159,7 +160,7 @@ describe('createFallbackDataSource', () => {
     const fallbackSpy = { ...bundledDataSource, getMembers: vi.fn() }
     const source = createFallbackDataSource(bundledDataSource, fallbackSpy)
 
-    expect(await source.getMembers()).toHaveLength(54)
+    expect(await source.getMembers()).toHaveLength(seedMembers.length)
     expect(fallbackSpy.getMembers).not.toHaveBeenCalled()
   })
 

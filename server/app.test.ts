@@ -3,6 +3,7 @@ import request from 'supertest'
 import { createApp } from './app'
 import { openDb, type IntakeDb } from './db'
 import type { IntakeSubmission } from '../src/domain/intake'
+import { seedMembers } from '../src/data/members'
 
 process.env.ADMIN_KEY = 'test-admin-key'
 const ADMIN = { 'x-admin-key': 'test-admin-key' }
@@ -60,9 +61,9 @@ describe('public content endpoints', () => {
     )
   })
 
-  it('serves the 54 seed members', async () => {
+  it('serves the seed members', async () => {
     const res = await request(app).get('/api/members')
-    expect(res.body.data).toHaveLength(54)
+    expect(res.body.data).toHaveLength(seedMembers.length)
   })
 
   it('404s unknown API routes with the envelope', async () => {
@@ -99,7 +100,7 @@ describe('intake pipeline', () => {
   it('does not expose pending members in the public directory', async () => {
     await request(app).post('/api/members/intake').send(validIntake)
     const res = await request(app).get('/api/members')
-    expect(res.body.data).toHaveLength(54)
+    expect(res.body.data).toHaveLength(seedMembers.length)
     expect(res.body.data.some((m: { fullName: string }) => m.fullName === 'Ana Prueba García')).toBe(
       false,
     )
@@ -181,7 +182,7 @@ describe('admin approval queue', () => {
     expect(approved.body.data.status).toBe('approved')
 
     const members = await request(app).get('/api/members')
-    expect(members.body.data).toHaveLength(55)
+    expect(members.body.data).toHaveLength(seedMembers.length + 1)
     expect(members.body.data.some((m: { fullName: string }) => m.fullName === 'Ana Prueba García')).toBe(
       true,
     )
@@ -234,7 +235,7 @@ describe('admin approval queue', () => {
     const queue = await request(app).get('/api/admin/pending').set(ADMIN)
     expect(queue.body.data).toHaveLength(0)
     const members = await request(app).get('/api/members')
-    expect(members.body.data).toHaveLength(54)
+    expect(members.body.data).toHaveLength(seedMembers.length)
   })
 
   it('404s approve/reject for unknown ids', async () => {
@@ -253,6 +254,6 @@ describe('admin approval queue', () => {
     expect(second.status).toBe(404)
 
     const members = await request(app).get('/api/members')
-    expect(members.body.data).toHaveLength(55)
+    expect(members.body.data).toHaveLength(seedMembers.length + 1)
   })
 })
