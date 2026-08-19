@@ -216,6 +216,14 @@ function InitiativeForm({ initial, existingIds, nextOrder, onSaved, onCancel }: 
             onChange={(event) => set('url', event.target.value || null)}
           />
         </EditorField>
+        {/*
+          The link block carries no language tag and no translate control. A URL
+          is not prose: it is case-sensitive and the host will not answer a
+          translated path, so offering to fill in "the missing languages" here
+          would only invite a broken link. The visible label is stored once and
+          localizeText falls back to it in every language, so one value is all
+          the public card needs.
+        */}
         {draft.url ? (
           <EditorField label={copy.ctaLabel} hint={copy.ctaHint}>
             <input
