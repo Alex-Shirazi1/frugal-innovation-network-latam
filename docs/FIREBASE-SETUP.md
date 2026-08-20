@@ -1,29 +1,38 @@
 # Firebase: what is set up, and how to move it to production
 
 Companion to [DEPLOYMENT.md](DEPLOYMENT.md), which is the step-by-step guide.
-This is the **state of the world** — what exists today on `raif-af800`, who can
-change it, and what is not encoded anywhere in this repository and would
+This is the **state of the world** — what exists today on `relif-s-website`, who
+can change it, and what is not encoded anywhere in this repository and would
 therefore have to be redone by hand on a replacement project.
 
-Live project state last verified: **2026-08-10**. The collections table, the
-production checklist and the known issues were updated **2026-08-12** when the
-incorporation-form pipeline landed — those additions describe the code as
-committed, not a re-inspection of the console.
+Live project state last verified: **2026-08-20**, when the site moved off
+`raif-af800` onto the network's own project. The old project still exists and its
+credentials still work; nothing here depends on it any more.
 
 ## The project
 
 | | |
 |---|---|
-| Project ID | `raif-af800` |
-| Display name | RAIF |
-| Project number | `278114521173` |
+| Project ID | `relif-s-website` |
+| Display name | RELIF's Website |
+| Project number | `4139696496` |
 | Plan | **Spark (free)** — no billing account, deliberately |
-| Owner | `alexxshirazi@gmail.com` (`roles/owner`) |
-| Hosting | `raif-af800.web.app` · `raif-af800.firebaseapp.com` |
+| Owners | `fihcloudservices@gmail.com`, `ashirazi@scu.edu` (`roles/owner`) |
+| Editors | `danguyen@scu.edu` |
+| Firestore | `(default)`, **nam5** (US multi-region), Native mode, free tier |
+| Hosting | `relif-s-website.web.app` · `relif-s-website.firebaseapp.com` |
 
-The project sits under a personal Google account. The network should not depend
-on that long term — transferring means adding Allan as an Owner under **Project
-settings > Users and permissions**, which is free and takes a minute.
+Predecessor: `raif-af800` (display name RAIF, number 278114521173), which sat
+under a personal gmail account. It is no longer deployed to.
+
+**The Firestore location is permanent.** nam5 cannot be changed — moving means
+exporting and re-importing into a different project.
+
+Note the role boundary, because it costs a day if rediscovered the hard way:
+`roles/editor` cannot create a Firestore database (`datastore.databases.create`
+is excluded from that role) and cannot grant roles (`setIamPolicy`). The Firebase
+console reports this only as "ask a project owner for the necessary
+permissions". Anyone expected to administer the backend needs Owner.
 
 ### The Spark plan is a constraint, not a default
 
@@ -40,19 +49,30 @@ The distinction is easy to miss because the APIs share a hostname: enabling
 Identity Platform programmatically fails with `BILLING_NOT_ENABLED`, which reads
 like Firebase Auth needs billing. It does not.
 
-## Current state — all green
+## Current state
 
 | Thing | State |
 |---|---|
-| Firestore database | created, rules and indexes deployed by CI |
-| Authentication | **Email/Password enabled** |
-| Admin account | `contacto@redinnovacionfrugal.lat`, holds the `admin` claim |
-| Seed import | **done** — 7 initiatives, 43 bibliography entries |
+| Firestore database | created (nam5, Native, free tier) |
+| Rules and indexes | deployed by CI, 47 emulator tests gating |
 | Hosting | live, auto-deploys from `main` |
+| `members` | **3 real profiles**, imported from the bundle |
+| Authentication | **NOT set up** — `CONFIGURATION_NOT_FOUND` |
+| Admin account | **none** — blocked on Authentication |
+| `initiatives` / `bibliography` | **empty** — Import not yet pressed |
+| App Check | **not enabled** |
 
-Verified by reading the live project: `initiatives` and `bibliography` return
-real documents, and `submissions` correctly refuses an anonymous reader with
-`PERMISSION_DENIED`.
+Verified against the live project on 2026-08-20 by unauthenticated REST read:
+`members` and `initiatives` are readable, `submissions` and `formResponses` both
+refuse with `PERMISSION_DENIED`.
+
+**Authentication is the blocking gap.** It has never been initialized here, so
+nobody can sign in to `/admin`, which is why `initiatives` and `bibliography` are
+still empty and the site serves the bundled copies of both. Open Firebase console
+→ Authentication → Get started → enable Email/Password. Do this in the console
+rather than through the Identity Toolkit API: creating the config programmatically
+goes down the Identity Platform path, which is the paid tier (see "The Spark plan
+is a constraint" above).
 
 ### Collections
 
@@ -69,8 +89,9 @@ real documents, and `submissions` correctly refuses an anonymous reader with
 An **empty** collection makes the site fall back to the seed compiled into the
 bundle. That is why the panel has an explicit Import step, and why deleting
 every card from a section restores the original rather than blanking the page.
-It also means an empty `members` collection publishes 54 fabricated profiles —
-see "Moving to a production project" below.
+An empty `members` collection used to publish 54 fabricated profiles. It no
+longer does: the bundled seed is now three real, consenting people, and they are
+also written into Firestore, so the fallback and the database agree.
 
 `formResponses` is the most sensitive collection here: it holds a vetted
 applicant's contact address alongside every answer they gave, it is retained
@@ -165,28 +186,23 @@ and the order below is deliberate.
 
 ### Read this before anything else
 
-**A fresh project will publish 54 fabricated academics.**
+**Whatever is compiled into `src/data/members.ts` is what the public sees until
+Firestore has profiles of its own.**
 
-The `members` collection is empty on a new project, and an empty collection makes
-the site fall back to the seed compiled into the bundle — which is 54 invented
-people with invented job titles, biographies and dead `scholar.example.org`
-links. Point a real domain at a fresh project and that is what the public sees.
+An empty collection makes the site fall back to the bundled seed. That seed used
+to be 54 invented people with dead `scholar.example.org` links, and pointing a
+domain at a fresh project published all 54 with nothing erroring and nothing
+looking broken. It was the single most likely way a launch went wrong.
 
-There are two ways out and you must pick one before launch:
-
-- Publish real profiles first. The first stored record replaces the mock set
-  outright, so one real member is enough to clear all 54.
-- Or strip the mock seed from `src/data/members.ts`, which leaves the directory
-  genuinely empty until real profiles exist.
-
-This is the single most likely way a production launch goes wrong, because
-nothing errors and nothing looks broken.
+It is now three real, consenting members, so the fallback is safe — but the rule
+still holds: check what the bundle contains before pointing a domain anywhere.
 
 ### Never do these on a production project
 
-- **`npm run seed:members`** — writes those 54 fabricated profiles into
-  Firestore on purpose. It is a preproduction tool. It prints the project id and
-  demands `--confirm` for exactly this reason.
+- **`npm run seed:members` without exporting first.** It CLEARS the members
+  collection before writing the bundle, so any profile published through the
+  panel and absent from the repo is destroyed — and published profiles are
+  exactly what the repo cannot give back. Run `npm run export` first.
 - **Reusing the preproduction transport or moderator passwords.** Generate new
   ones; the old project stays alive and its credentials keep working.
 - **Hand-editing `firestore.rules`.** It is generated. Edit
@@ -194,9 +210,13 @@ nothing errors and nothing looks broken.
 
 ### The checklist
 
-1. **Create the project.** Keep it on Spark. Update the id in **five** places:
-   `.firebaserc`, the `emulators` script in `package.json`, and the defaults in
-   `server/scripts/seed-emulator.ts`, `grant-admin.ts` and `seed-members.ts`.
+0. **Get Owner on the project.** `roles/editor` cannot create the database or
+   grant roles. Budget for a wait here if the Owner is someone else.
+1. **Create the project.** Keep it on Spark. Update the id in **six** places:
+   `.firebaserc`, the `emulators` script in `package.json`, the `projectId` in
+   `.github/workflows/firebase-hosting-deploy.yml`, and the defaults in
+   `server/scripts/seed-emulator.ts`, `grant-admin.ts`, `seed-members.ts` and
+   `export-firestore.ts`.
 2. **Create the Firestore database. The location is permanent** — there is no
    move later, only an export and re-import into a new project.
 3. **Enable Email/Password** under Authentication, and add the hosting domains

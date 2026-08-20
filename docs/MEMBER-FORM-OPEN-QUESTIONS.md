@@ -144,10 +144,11 @@ No option is clean. Pick one.
 
 ## 3. Access and credentials — nobody else can supply these
 
-**3.1 `gcloud auth application-default login` as the raif-af800 owner**
-(`alexxshirazi@gmail.com`). Currently expired or on the wrong account, which
-blocks both `npm run seed:members -- --confirm` and creating the transport
-account.
+**3.1 ~~ADC as the project owner~~ — RESOLVED 2026-08-20.** `ashirazi@scu.edu`
+now holds `roles/owner` on `relif-s-website`, and `npm run seed:members --
+--confirm` has run: the three real members are in Firestore. Creating the
+transport account is still blocked, but on Authentication rather than on
+credentials — see 3.5.
 
 **3.2 Who owns the Apps Script.** It has to be installed by an account that can
 edit the form — Allan's, or an account he shares edit access with. If Allan owns
@@ -158,9 +159,16 @@ the script owner.
 --importer` needs a chosen address, and its password goes into Script properties
 and a password manager — nowhere else.
 
-**3.4 Confirm the target project is still `raif-af800`** and confirm the
-production domain, because `docs/FIREBASE-SETUP.md` lists per-project setup that
-was done by hand and would have to be redone elsewhere.
+**3.4 ~~Confirm the target project~~ — RESOLVED 2026-08-20.** The target is
+`relif-s-website` (Firestore in nam5, permanent). The production domain is still
+unconfirmed; DNS is managed in cPanel.
+
+**3.5 Firebase Authentication has never been initialized on the new project.**
+The Identity Toolkit config returns `CONFIGURATION_NOT_FOUND`, so nobody can sign
+in to `/admin`, no `admin` claim can be granted, and the transport account in 3.3
+cannot be created. Enable it in the **console** — Authentication → Get started →
+Email/Password. Not via the API: creating the config programmatically goes down
+the Identity Platform path, which is the paid tier.
 
 ---
 

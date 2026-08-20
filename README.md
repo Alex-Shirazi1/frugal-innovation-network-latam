@@ -1,6 +1,6 @@
 # Red Latinoamericana de Innovación Frugal — Redesign
 
-🚀 **Live Demo:** [https://raif-af800.firebaseapp.com/](https://raif-af800.firebaseapp.com/)
+🚀 **Live site:** [https://relif-s-website.web.app/](https://relif-s-website.web.app/)
 
 Modern React redesign of [redinnovacionfrugal.lat](https://redinnovacionfrugal.lat/), built fully **local-first** as an isolated dev environment, now with a **modular API layer** and an in-repo **prototype backend**.
 

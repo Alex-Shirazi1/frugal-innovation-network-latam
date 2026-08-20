@@ -31,7 +31,7 @@ touched. This is a parallel backend.
 
 ### 1. Confirm who owns the Firebase project
 
-The deploy workflow targets project `raif-af800`. Check whose account that sits
+The deploy workflow targets project `relif-s-website`. Check whose account that sits
 under:
 
 ```bash
@@ -59,7 +59,7 @@ Console > **Authentication** > *Get started* > **Email/Password** > enable >
 Save. Leave "Email link (passwordless sign-in)" off.
 
 Then under **Authentication > Settings > Authorized domains**, confirm your
-hosting domain is listed (`raif-af800.web.app` and any custom domain). Sign-in
+hosting domain is listed (`relif-s-website.web.app` and any custom domain). Sign-in
 silently fails from unlisted domains.
 
 Not Google sign-in. The network has one shared mailbox rather than a set of
@@ -247,15 +247,19 @@ improves on it.
 
 ## Migrating to a different Firebase project
 
-Everything below was configured by hand on `raif-af800` and has to be
+Everything below was configured by hand on `relif-s-website` and has to be
 reproduced on any replacement. The repository does not encode it.
 
 **Project**
 
-- Project id `raif-af800` (display name RAIF, number 278114521173), on the
-  **Spark** plan. Deliberately no billing account — see "Ongoing costs".
-- Set the new id in `.firebaserc`, in `npm run emulators`, and in
-  `server/scripts/seed-emulator.ts` / `grant-admin.ts`, which default to it.
+- Project id `relif-s-website` (display name RELIF's Website, number
+  4139696496), on the **Spark** plan. Deliberately no billing account — see
+  "Ongoing costs". Predecessor was `raif-af800`, no longer deployed to.
+- Creating the Firestore database needs **Owner**; `roles/editor` cannot do it.
+- Set the new id in `.firebaserc`, in `npm run emulators`, in the `projectId` of
+  `.github/workflows/firebase-hosting-deploy.yml`, and in
+  `server/scripts/seed-emulator.ts` / `grant-admin.ts` / `seed-members.ts` /
+  `export-firestore.ts`, which default to it.
 
 **Hosting** — serves `dist`, with every path rewritten to `/index.html` for the
 SPA. Config is committed in `firebase.json`; nothing to do by hand.
@@ -335,7 +339,7 @@ every rule stays in force.
    | Property | Value |
    | --- | --- |
    | `FIREBASE_API_KEY` | the web API key (publishable, same one the site ships) |
-   | `FIREBASE_PROJECT_ID` | `raif-af800` |
+   | `FIREBASE_PROJECT_ID` | `relif-s-website` |
    | `IMPORTER_EMAIL` | the account from step 1 |
    | `IMPORTER_PASSWORD` | its password |
 
