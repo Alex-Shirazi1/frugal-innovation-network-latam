@@ -221,7 +221,14 @@ export function validateIntake(body: unknown): IntakeValidation {
       interestIds,
       generalAreaIds,
       languages,
-      socialUrl: socialUrl || undefined,
+      /*
+       * Omitted entirely when blank rather than set to undefined. Firestore
+       * rejects an undefined value outright, so `socialUrl: undefined` made
+       * every member without a profile link unwritable — the panel threw on
+       * publish and the seeder refused the whole batch. `socialUrl` is optional
+       * on Member, so an absent key is the correct representation of "none".
+       */
+      ...(socialUrl ? { socialUrl } : {}),
       avatarHue: avatarHueFor(fullName),
     },
   }
