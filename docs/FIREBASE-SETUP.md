@@ -1,6 +1,8 @@
 # Firebase: what is set up, and how to move it to production
 
-Companion to [DEPLOYMENT.md](DEPLOYMENT.md), which is the step-by-step guide.
+Companion to [DEPLOYMENT.md](DEPLOYMENT.md), which is the step-by-step guide, and
+to [NEXT-STEPS.md](NEXT-STEPS.md), which is what is still outstanding and how to
+get access to do it.
 This is the **state of the world** — what exists today on `relif-s-website`, who
 can change it, and what is not encoded anywhere in this repository and would
 therefore have to be redone by hand on a replacement project.
