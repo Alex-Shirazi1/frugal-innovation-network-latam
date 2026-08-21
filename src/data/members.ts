@@ -140,7 +140,11 @@ const seed: Array<Omit<Member, 'title'>> = [
  */
 export const seedMembers: Member[] = seed.map((member) => ({
   ...member,
-  title: positionTitles[member.position],
+  title: positionTitles[member.position as PositionType] || {
+    es: member.position,
+    en: member.position,
+    pt: member.position,
+  },
 }))
 
 export function institutionName(affiliationId: string | null): string | null {

@@ -8,19 +8,16 @@
  * someone set a display name independently of their real one would be a form for
  * misrepresenting people, which is the problem the fabricated speaker list was.
  */
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { EditorField, editorInputClass } from './ContentEditorShell'
 import { useI18n } from '../../i18n/I18nContext'
 import {
-  countries,
   generalAreas,
   languageOptions,
-  positionTypes,
   researchInterests,
   fieldLimits,
 } from '../../data/onboardingOptions'
 import { institutions } from '../../data/institutions'
-import { positionTitles } from '../../domain/intake'
 import type { MemberDraft } from '../../domain/memberDraft'
 
 const EMPTY: MemberDraft = {
@@ -109,19 +106,12 @@ export function MemberDraftForm({
   onSave,
   onCancel,
 }: MemberDraftFormProps) {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const copy = t.admin.members
   const [draft, setDraft] = useState<MemberDraft>(initial ?? EMPTY)
 
   const update = <K extends keyof MemberDraft>(field: K, value: MemberDraft[K]) =>
     setDraft((current) => ({ ...current, [field]: value }))
-
-  // Only regions belonging to the chosen country, so an impossible pair cannot be
-  // assembled in the UI at all rather than being rejected on save.
-  const regions = useMemo(
-    () => countries.find((entry) => entry.name === draft.country)?.regions ?? [],
-    [draft.country],
-  )
 
   return (
     <form

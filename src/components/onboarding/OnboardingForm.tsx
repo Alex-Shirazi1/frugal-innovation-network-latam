@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useCapture } from '../../lib/analytics'
 import { useI18n } from '../../i18n/I18nContext'
 import { useApiData } from '../../api/ApiDataContext'
@@ -6,7 +6,7 @@ import { SectionHeading } from '../ui/SectionHeading'
 import { Select } from '../ui/Select'
 import { fieldLimits } from '../../data/onboardingOptions'
 import { isValidEmail } from '../../domain/intake'
-import type { IntakeSubmission, PositionType, ResearchInterest } from '../../api/types'
+import type { IntakeSubmission, ResearchInterest } from '../../api/types'
 
 type ErrorKey =
   | 'fullName'
@@ -146,11 +146,6 @@ export function OnboardingForm() {
   const [form, setForm] = useState<IntakeSubmission>(emptyForm)
   const [errors, setErrors] = useState<Errors>({})
   const [status, setStatus] = useState<Status>('idle')
-
-  const regions = useMemo(
-    () => options.countries.find((c) => c.name === form.country)?.regions ?? [],
-    [options.countries, form.country],
-  )
 
   function update<K extends keyof IntakeSubmission>(key: K, value: IntakeSubmission[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))

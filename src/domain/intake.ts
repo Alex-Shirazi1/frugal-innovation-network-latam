@@ -11,11 +11,9 @@
  * browser, in Node, and in tests.
  */
 import {
-  countries,
   fieldLimits,
   generalAreas,
   languageOptions,
-  positionTypes,
   researchInterests,
   type PositionType,
 } from '../data/onboardingOptions'
