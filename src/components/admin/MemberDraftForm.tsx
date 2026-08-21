@@ -156,9 +156,12 @@ export function MemberDraftForm({
             onChange={(event) => update('position', event.target.value)}
           >
             <option value="">—</option>
+            {draft.position && !positionTypes.includes(draft.position as any) ? (
+              <option value={draft.position}>{draft.position}</option>
+            ) : null}
             {positionTypes.map((type) => (
               <option key={type} value={type}>
-                {positionTitles[type][lang]}
+                {positionTitles[type]?.[lang] ?? type}
               </option>
             ))}
           </select>
@@ -194,13 +197,14 @@ export function MemberDraftForm({
             className={editorInputClass}
             value={draft.country}
             onChange={(event) => {
-              // Changing country invalidates the region, so clear it rather than
-              // leaving a pair the validator will refuse.
               update('country', event.target.value)
               update('region', '')
             }}
           >
             <option value="">—</option>
+            {draft.country && !countries.some((c) => c.name === draft.country) ? (
+              <option value={draft.country}>{draft.country}</option>
+            ) : null}
             {countries.map((entry) => (
               <option key={entry.name} value={entry.name}>
                 {entry.name}
@@ -212,10 +216,13 @@ export function MemberDraftForm({
           <select
             className={editorInputClass}
             value={draft.region}
-            disabled={regions.length === 0}
+            disabled={regions.length === 0 && !draft.region}
             onChange={(event) => update('region', event.target.value)}
           >
             <option value="">—</option>
+            {draft.region && !regions.includes(draft.region) ? (
+              <option value={draft.region}>{draft.region}</option>
+            ) : null}
             {regions.map((region) => (
               <option key={region} value={region}>
                 {region}
