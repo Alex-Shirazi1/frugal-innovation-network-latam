@@ -184,6 +184,7 @@ const ALIASES = {
     'intereses de investigacion',
     'temas de interes',
     'interes tecnico',
+    'areas de innovacion frugal',
   ],
   generalAreaIds: [
     'generalareaids',
