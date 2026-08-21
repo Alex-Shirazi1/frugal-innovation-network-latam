@@ -348,7 +348,7 @@ function resolvePosition(value: string): string | null {
     const title = positionTitles[type]
     return key(title.es) === target || key(title.en) === target || key(title.pt) === target
   })
-  return labelled ?? null
+  return labelled ?? value.trim()
 }
 
 /**

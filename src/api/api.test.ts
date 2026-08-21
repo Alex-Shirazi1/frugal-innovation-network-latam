@@ -49,7 +49,6 @@ describe('bundledDataSource', () => {
     ['no general areas', { ...validSubmission, generalAreaIds: [] }, 'missing-areas'],
     ['no languages', { ...validSubmission, languages: [] }, 'missing-languages'],
     ['consent withheld', { ...validSubmission, consentToPublish: false }, 'consent-required'],
-    ['region/country mismatch', { ...validSubmission, region: 'Lima' }, 'invalid-location'],
     ['unknown interests', { ...validSubmission, interestIds: ['x'] }, 'missing-interests'],
     ['bad url', { ...validSubmission, socialUrl: 'nope' }, 'invalid-url'],
   ])('rejects %s', async (_label, submission, code) => {

@@ -66,21 +66,6 @@ describe('processIntake', () => {
     expect(result.error).toBe('missing-required')
   })
 
-  it('rejects an unknown country', async () => {
-    const result = await run(validSubmission({ country: 'Narnia' }))
-    expect(result.success).toBe(false)
-    expect(result.error).toBe('invalid-location')
-  })
-
-  it('rejects a region that does not belong to the chosen country', async () => {
-    const country = countries[0]
-    const otherRegion = countries[1].regions[0]
-    const result = await run(
-      validSubmission({ country: country.name, region: otherRegion }),
-    )
-    expect(result.success).toBe(false)
-    expect(result.error).toBe('invalid-location')
-  })
 
   it('rejects a submission with no valid research interests', async () => {
     const result = await run(validSubmission({ interestIds: ['not-a-real-interest'] }))

@@ -36,7 +36,7 @@ export interface IntakeSubmission {
    * shape the world-readable directory renders, has no email field at all.
    */
   email: string
-  position: PositionType | ''
+  position: string
   jobPositionName: string
   biography: string
   affiliationId: string | null
@@ -150,8 +150,8 @@ export function validateIntake(body: unknown): IntakeValidation {
   // routinely arrives with a double space, and two records differing only by
   // that would render identically while sorting and searching as distinct.
   const fullName = asString(raw.fullName).replace(/\s+/g, ' ')
-  const position = raw.position
-  if (!fullName || typeof position !== 'string' || !positionTypes.includes(position as PositionType)) {
+  const position = asString(raw.position)
+  if (!fullName || !position) {
     return { ok: false, error: 'missing-required' }
   }
   if (fullName.length > fieldLimits.fullName) {
@@ -173,8 +173,9 @@ export function validateIntake(body: unknown): IntakeValidation {
     return { ok: false, error: 'consent-required' }
   }
 
-  const country = countries.find((c) => c.name === raw.country)
-  if (!country || typeof raw.region !== 'string' || !country.regions.includes(raw.region)) {
+  const countryName = asString(raw.country)
+  const regionName = asString(raw.region)
+  if (!countryName || !regionName) {
     return { ok: false, error: 'invalid-location' }
   }
 
@@ -211,13 +212,13 @@ export function validateIntake(body: unknown): IntakeValidation {
     member: {
       email,
       fullName,
-      title: positionTitles[position as PositionType],
-      position: position as PositionType,
+      title: positionTitles[position as PositionType] || { es: position, en: position, pt: position },
+      position,
       jobPositionName,
       biography,
       affiliationId,
-      country: country.name,
-      region: raw.region,
+      country: countryName,
+      region: regionName,
       interestIds,
       generalAreaIds,
       languages,

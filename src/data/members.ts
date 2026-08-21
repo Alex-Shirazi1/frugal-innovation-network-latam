@@ -20,7 +20,7 @@ export interface Member {
    * `position` — NOT user-authored, which is why it can be localized.
    */
   title: Localized
-  position: PositionType
+  position: string
   /** Free-text job title the member types themselves, in their own language. */
   jobPositionName: string
   /** Short self-authored bio. Single language; rendered as plain text. */

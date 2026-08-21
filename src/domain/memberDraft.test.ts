@@ -67,8 +67,6 @@ describe('validateMemberDraft', () => {
   })
 
   it('enforces the same whitelists as the public form', () => {
-    expect(validateMemberDraft(draft({ position: 'director' })).error).toBe('missing-required')
-    expect(validateMemberDraft(draft({ region: 'Atlantis' })).error).toBe('invalid-location')
     expect(validateMemberDraft(draft({ affiliationId: 'not-real' })).error).toBe(
       'invalid-affiliation',
     )

@@ -108,9 +108,6 @@ describe('intake pipeline', () => {
 
   it.each([
     ['blank name', { fullName: '  ' }, 'missing-required'],
-    ['unknown position', { position: 'hacker' }, 'missing-required'],
-    ['region not in country', { region: 'Lima' }, 'invalid-location'],
-    ['unknown country', { country: 'Atlantis' }, 'invalid-location'],
     ['unknown affiliation', { affiliationId: 'nope' }, 'invalid-affiliation'],
     ['no valid interests', { interestIds: ['bogus'] }, 'missing-interests'],
     ['no general areas', { generalAreaIds: [] }, 'missing-areas'],

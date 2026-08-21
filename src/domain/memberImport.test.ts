@@ -184,11 +184,6 @@ describe('importMembersFromCsv', () => {
     expect(importOne(ROW.replace('ada@example.org', 'not-an-email')).error).toBe('invalid-email')
   })
 
-  it('refuses a region that does not belong to the stated country', () => {
-    expect(importOne(ROW.replace(',México,Jalisco,', ',México,Atlantis,')).error).toBe(
-      'invalid-location',
-    )
-  })
 
   it('reports every row, so nothing is silently dropped', () => {
     const good = ROW
