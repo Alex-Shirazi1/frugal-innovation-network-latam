@@ -150,21 +150,11 @@ export function MemberDraftForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <EditorField label={`${copy.position} *`}>
-          <select
+          <input
             className={editorInputClass}
             value={draft.position}
             onChange={(event) => update('position', event.target.value)}
-          >
-            <option value="">—</option>
-            {draft.position && !positionTypes.includes(draft.position as any) ? (
-              <option value={draft.position}>{draft.position}</option>
-            ) : null}
-            {positionTypes.map((type) => (
-              <option key={type} value={type}>
-                {positionTitles[type]?.[lang] ?? type}
-              </option>
-            ))}
-          </select>
+          />
         </EditorField>
         <EditorField label={copy.jobPositionName} hint={copy.jobPositionNameHint}>
           <input
@@ -193,42 +183,18 @@ export function MemberDraftForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <EditorField label={`${copy.country} *`}>
-          <select
+          <input
             className={editorInputClass}
             value={draft.country}
-            onChange={(event) => {
-              update('country', event.target.value)
-              update('region', '')
-            }}
-          >
-            <option value="">—</option>
-            {draft.country && !countries.some((c) => c.name === draft.country) ? (
-              <option value={draft.country}>{draft.country}</option>
-            ) : null}
-            {countries.map((entry) => (
-              <option key={entry.name} value={entry.name}>
-                {entry.name}
-              </option>
-            ))}
-          </select>
+            onChange={(event) => update('country', event.target.value)}
+          />
         </EditorField>
         <EditorField label={`${copy.region} *`}>
-          <select
+          <input
             className={editorInputClass}
             value={draft.region}
-            disabled={regions.length === 0 && !draft.region}
             onChange={(event) => update('region', event.target.value)}
-          >
-            <option value="">—</option>
-            {draft.region && !regions.includes(draft.region) ? (
-              <option value={draft.region}>{draft.region}</option>
-            ) : null}
-            {regions.map((region) => (
-              <option key={region} value={region}>
-                {region}
-              </option>
-            ))}
-          </select>
+          />
         </EditorField>
       </div>
 

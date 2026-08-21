@@ -391,15 +391,11 @@ export function OnboardingForm() {
                 */}
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={t.onboarding.position} error={errors.position}>
-                    <Select
+                    <input
+                      className={inputClass}
                       value={form.position}
-                      onChange={(event) => update('position', event.target.value as PositionType)}
-                    >
-                      <option value="" disabled>—</option>
-                      {options.positionTypes.map((type) => (
-                        <option key={type} value={type}>{t.onboarding.positions[type]}</option>
-                      ))}
-                    </Select>
+                      onChange={(event) => update('position', event.target.value)}
+                    />
                   </Field>
                 </div>
                 <Field label={t.onboarding.jobPositionName} error={errors.jobPositionName}>
@@ -431,30 +427,18 @@ export function OnboardingForm() {
                 </Field>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field label={t.onboarding.country} error={errors.country}>
-                    <Select
+                    <input
+                      className={inputClass}
                       value={form.country}
-                      onChange={(event) => {
-                        update('country', event.target.value)
-                        update('region', '')
-                      }}
-                    >
-                      <option value="" disabled>{t.onboarding.selectCountry}</option>
-                      {options.countries.map((country) => (
-                        <option key={country.name} value={country.name}>{country.name}</option>
-                      ))}
-                    </Select>
+                      onChange={(event) => update('country', event.target.value)}
+                    />
                   </Field>
                   <Field label={t.onboarding.region} error={errors.region}>
-                    <Select
+                    <input
+                      className={inputClass}
                       value={form.region}
-                      disabled={!form.country}
                       onChange={(event) => update('region', event.target.value)}
-                    >
-                      <option value="" disabled>{t.onboarding.selectRegion}</option>
-                      {regions.map((region) => (
-                        <option key={region} value={region}>{region}</option>
-                      ))}
-                    </Select>
+                    />
                   </Field>
                 </div>
               </>
