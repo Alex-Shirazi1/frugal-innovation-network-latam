@@ -395,6 +395,7 @@ export function OnboardingForm() {
                       className={inputClass}
                       value={form.position}
                       onChange={(event) => update('position', event.target.value)}
+                      placeholder={t.onboarding.position}
                     />
                   </Field>
                 </div>
@@ -431,6 +432,7 @@ export function OnboardingForm() {
                       className={inputClass}
                       value={form.country}
                       onChange={(event) => update('country', event.target.value)}
+                      placeholder={t.onboarding.country}
                     />
                   </Field>
                   <Field label={t.onboarding.region} error={errors.region}>
@@ -438,6 +440,7 @@ export function OnboardingForm() {
                       className={inputClass}
                       value={form.region}
                       onChange={(event) => update('region', event.target.value)}
+                      placeholder={t.onboarding.region}
                     />
                   </Field>
                 </div>
