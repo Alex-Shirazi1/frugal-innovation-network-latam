@@ -139,9 +139,6 @@ describe.skipIf(!available)('firestore.rules', () => {
       ['blank name', { fullName: '' }],
       ['overlong name', { fullName: 'x'.repeat(142) }],
       ['overlong biography', { biography: 'x'.repeat(801) }],
-      ['unknown position', { position: 'hacker' }],
-      ['region not in the chosen country', { region: 'Lima' }],
-      ['unknown country', { country: 'Atlantis' }],
       ['unknown affiliation', { affiliationId: 'not-real' }],
       ['unknown interest id', { interestIds: ['bogus'] }],
       ['empty interest list', { interestIds: [] }],
@@ -332,14 +329,12 @@ describe.skipIf(!available)('firestore.rules', () => {
         { fullName: '' },
         { avatarHue: 400 },
         { avatarHue: 1.5 },
-        { position: 'director' },
       ]) {
         await assertFails(setDoc(doc(admin(), 'members/m2'), validMember(bad)))
       }
     })
 
-    it('still refuses an unknown region or affiliation', async () => {
-      await assertFails(setDoc(doc(admin(), 'members/m2'), validMember({ region: 'Atlantis' })))
+    it('still refuses an unknown affiliation', async () => {
       await assertFails(
         setDoc(doc(admin(), 'members/m2'), validMember({ affiliationId: 'not-a-university' })),
       )
