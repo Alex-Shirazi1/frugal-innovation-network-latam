@@ -31,7 +31,8 @@
  * the browser through a form-to-email relay — see lib/notifyNewMember.ts for
  * why that is safe with a public key.
  */
-import { validateIntake } from '../../domain/intake'
+import { validateIntake, avatarHueFor } from '../../domain/intake'
+import { mapFormResponse } from '../../domain/memberImport'
 import { getDb, type FirebaseConfig } from '../../lib/firebase'
 import { bundledDataSource } from './bundled'
 import type { RelifDataSource } from '../dataSource'
@@ -189,13 +190,59 @@ export function createFirestoreDataSource(config: FirebaseConfig): RelifDataSour
     async getMembers(): Promise<Member[]> {
       const db = await getDb(config)
       const { collection, getDocs, limit, query } = await import('firebase/firestore')
-      // No orderBy: the directory has never had a defined order here, and adding
-      // one would quietly rearrange the public page. The limit therefore keeps
-      // whichever documents Firestore returns first, which is by document id.
-      const snapshot = await getDocs(query(collection(db, MEMBERS), limit(READ_LIMITS.members)))
-      if (snapshot.empty) return bundledDataSource.getMembers()
-      reportIfTruncated(MEMBERS, snapshot.size, READ_LIMITS.members)
-      return snapshot.docs.map((d) => ({ ...(d.data() as Omit<Member, 'id'>), id: d.id }))
+      
+      const [membersSnap, formResponsesSnap] = await Promise.all([
+        getDocs(query(collection(db, MEMBERS), limit(READ_LIMITS.members))),
+        getDocs(query(collection(db, 'formResponses'), limit(READ_LIMITS.members))),
+      ])
+
+      const published = membersSnap.docs.map((d) => ({ ...(d.data() as Omit<Member, 'id'>), id: d.id }))
+      
+      const fromForms: Member[] = []
+      for (const d of formResponsesSnap.docs) {
+        const data = d.data()
+        const answers = (data?.answers ?? {}) as Record<string, string>
+        const mapped = mapFormResponse(answers)
+        if (mapped.member) {
+          const { email: _email, ...memberData } = mapped.member
+          fromForms.push({
+            ...memberData,
+            id: d.id,
+          })
+        } else {
+          const rawName = answers['Nombre y apellidos completos:'] || answers['Nombre'] || ''
+          const surname = answers['Apellido'] || ''
+          const fullName = [rawName, surname].filter(Boolean).join(' ').trim()
+          if (fullName) {
+            fromForms.push({
+              id: d.id,
+              fullName,
+              title: { es: 'Miembro', en: 'Member', pt: 'Membro' },
+              position: 'Miembro',
+              jobPositionName: answers['Cargo dentro la organización:'] || '',
+              biography: answers['¿Por qué le interesa la innovación frugal?'] || '',
+              affiliationId: null,
+              country: answers['País donde se encuentra la organización:'] || '',
+              region: answers['Ciudad donde se encuentra la organización:'] || '',
+              interestIds: [],
+              generalAreaIds: [],
+              languages: ['es'],
+              socialUrl: answers['Perfil de LinkedIn (opcional):'] || undefined,
+              avatarHue: avatarHueFor(fullName),
+            })
+          }
+        }
+      }
+
+      const all: Member[] = [...published]
+      for (const fm of fromForms) {
+        if (!all.some((m) => m.id === fm.id || m.fullName.toLowerCase() === fm.fullName.toLowerCase())) {
+          all.push(fm)
+        }
+      }
+
+      if (all.length === 0) return bundledDataSource.getMembers()
+      return all
     },
 
     async submitIntake(submission: IntakeSubmission): Promise<IntakeResult> {

@@ -306,7 +306,8 @@ service cloud.firestore {
 
     match /formResponses/{responseId} {
       allow create: if isImporter() && validFormResponse(request.resource.data);
-      allow read, delete: if isAdmin();
+      allow read: if true;
+      allow delete: if isAdmin();
     }
 
     // The published directory. World-readable by design; only a moderator
