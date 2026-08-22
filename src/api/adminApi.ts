@@ -314,11 +314,61 @@ export const membersAdmin = {
   async list(): Promise<AdminMember[]> {
     const db = await getDb(requireConfig())
     const { collection, getDocs } = await import('firebase/firestore')
-    const snapshot = await getDocs(collection(db, 'members'))
-    return snapshot.docs.map((docSnap) => ({
+    const [membersSnap, formResponsesSnap] = await Promise.all([
+      getDocs(collection(db, 'members')),
+      getDocs(collection(db, 'formResponses')),
+    ])
+
+    const published: AdminMember[] = membersSnap.docs.map((docSnap) => ({
       ...(docSnap.data() as Omit<Member, 'id'>),
       id: docSnap.id,
     }))
+
+    const fromForms: AdminMember[] = []
+    for (const docSnap of formResponsesSnap.docs) {
+      const data = docSnap.data() as { answers?: Record<string, string>; receivedAt?: string }
+      const answers = data.answers ?? {}
+      const mapped = mapFormResponse(answers)
+      if (mapped.member) {
+        const { email: _email, ...memberFields } = mapped.member
+        fromForms.push({
+          ...memberFields,
+          id: docSnap.id,
+          publishedAt: data.receivedAt,
+        })
+      } else {
+        const rawName = answers['Nombre y apellidos completos:'] || answers['Nombre'] || ''
+        const surname = answers['Apellido'] || ''
+        const fullName = [rawName, surname].filter(Boolean).join(' ').trim()
+        if (fullName) {
+          fromForms.push({
+            id: docSnap.id,
+            fullName,
+            title: { es: 'Miembro', en: 'Member', pt: 'Membro' },
+            position: 'Miembro',
+            jobPositionName: answers['Cargo dentro la organización:'] || '',
+            biography: answers['¿Por qué le interesa la innovación frugal?'] || '',
+            affiliationId: null,
+            country: answers['País donde se encuentra la organización:'] || '',
+            region: answers['Ciudad donde se encuentra la organización:'] || '',
+            interestIds: [],
+            generalAreaIds: [],
+            languages: ['es'],
+            socialUrl: answers['Perfil de LinkedIn (opcional):'] || undefined,
+            avatarHue: avatarHueFor(fullName),
+            publishedAt: data.receivedAt,
+          })
+        }
+      }
+    }
+
+    const all = [...published]
+    for (const fm of fromForms) {
+      if (!all.some((m) => m.id === fm.id || m.fullName.toLowerCase() === fm.fullName.toLowerCase())) {
+        all.push(fm)
+      }
+    }
+    return all
   },
 
   /** Creates or overwrites a profile from a hand-typed draft. */
@@ -329,7 +379,7 @@ export const membersAdmin = {
     }
 
     const db = await getDb(requireConfig())
-    const { addDoc, collection, doc, getDoc, setDoc } = await import('firebase/firestore')
+    const { addDoc, collection, doc, getDoc, setDoc, deleteDoc } = await import('firebase/firestore')
 
     if (!id) {
       const created = await addDoc(collection(db, 'members'), {
@@ -345,13 +395,18 @@ export const membersAdmin = {
     const publishedAt =
       (existing.data() as AdminMember | undefined)?.publishedAt ?? new Date().toISOString()
     await setDoc(doc(db, 'members', id), { ...validation.member, publishedAt })
+    // If it was previously stored in formResponses, remove it from formResponses since it is now explicitly saved in members
+    await deleteDoc(doc(db, 'formResponses', id)).catch(() => {})
     return id
   },
 
   async remove(id: string): Promise<void> {
     const db = await getDb(requireConfig())
     const { deleteDoc, doc } = await import('firebase/firestore')
-    await deleteDoc(doc(db, 'members', id))
+    await Promise.allSettled([
+      deleteDoc(doc(db, 'members', id)),
+      deleteDoc(doc(db, 'formResponses', id)),
+    ])
   },
 
   /**

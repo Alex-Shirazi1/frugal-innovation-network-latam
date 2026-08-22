@@ -12,7 +12,7 @@
  * holds the reply address that `members` deliberately does not.
  */
 import { useCallback, useEffect, useState } from 'react'
-import { membersAdmin, type AdminMember, type ArrivedResponse } from '../../api/adminApi'
+import { membersAdmin, type AdminMember } from '../../api/adminApi'
 import { toDraft, type MemberDraft } from '../../domain/memberDraft'
 import { MemberDraftForm } from './MemberDraftForm'
 import { rowActionClass, rowDestructiveActionClass } from './ContentEditorShell'
@@ -24,7 +24,6 @@ type Editing =
   | { kind: 'none' }
   | { kind: 'new' }
   | { kind: 'member'; id: string; draft: MemberDraft }
-  | { kind: 'arrived'; id: string; draft: MemberDraft; unresolved: string[] }
 
 export function MembersEditor() {
   const { t, lang } = useI18n()
@@ -41,7 +40,6 @@ export function MembersEditor() {
     return (code ? table[code] : undefined) ?? copy.errors.generic
   }
 
-  const [arrived, setArrived] = useState<ArrivedResponse[]>([])
   const [members, setMembers] = useState<AdminMember[]>([])
   const [editing, setEditing] = useState<Editing>({ kind: 'none' })
   const [search, setSearch] = useState('')
@@ -51,11 +49,7 @@ export function MembersEditor() {
 
   const refresh = useCallback(async () => {
     try {
-      const [nextArrived, nextMembers] = await Promise.all([
-        membersAdmin.listArrived(),
-        membersAdmin.list(),
-      ])
-      setArrived(nextArrived)
+      const nextMembers = await membersAdmin.list()
       setMembers(nextMembers)
       setStatus('ready')
     } catch {
@@ -122,7 +116,6 @@ export function MembersEditor() {
   }
 
   if (editing.kind !== 'none') {
-    const isArrived = editing.kind === 'arrived'
     return (
       <section>
         <h2 className="mb-3 font-display text-lg font-semibold text-carbon">
@@ -130,7 +123,6 @@ export function MembersEditor() {
         </h2>
         <MemberDraftForm
           initial={editing.kind === 'new' ? undefined : editing.draft}
-          unresolved={isArrived ? editing.unresolved : []}
           error={error ? errorMessage(error) : null}
           busy={busy}
           onCancel={() => {
@@ -139,9 +131,7 @@ export function MembersEditor() {
           }}
           onSave={(draft) =>
             run(() =>
-              isArrived
-                ? membersAdmin.publishArrived(editing.id, draft)
-                : membersAdmin.save(editing.kind === 'member' ? editing.id : null, draft),
+              membersAdmin.save(editing.kind === 'member' ? editing.id : null, draft),
             )
           }
         />
@@ -150,113 +140,7 @@ export function MembersEditor() {
   }
 
   return (
-    <div className="space-y-10">
-      {/* ---- Primary path: what the incorporation form delivered ---------- */}
-      <section>
-        <h2 className="font-display text-lg font-semibold text-carbon">{copy.arrivedTitle}</h2>
-        <p className="mt-1 text-xs text-pizarra">{copy.arrivedLede}</p>
-
-        {error && editing.kind === 'none' ? (
-          <p role="alert" className="mt-3 text-xs font-medium text-teal-deep">
-            {errorMessage(error)}
-          </p>
-        ) : null}
-
-        {arrived.length === 0 ? (
-          <p className="mt-4 rounded-2xl border border-dashed border-carbon/15 px-4 py-6 text-center text-sm text-pizarra">
-            {copy.arrivedEmpty}
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {arrived.map((response) => {
-              const { outcome } = response
-              const name = outcome.member
-                ? outcome.member.fullName
-                : (response.answers['Nombre'] ?? copy.unknownName)
-              const needsReview = !outcome.ok || outcome.unresolved.length > 0
-
-              return (
-                <li
-                  key={response.id}
-                  className="rounded-2xl border border-carbon/10 bg-white p-4 sm:flex sm:items-start sm:justify-between sm:gap-4"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-carbon">{name}</p>
-                    <p className="mt-0.5 text-xs text-pizarra">
-                      {copy.receivedOn.replace('{date}', formatDate(response.receivedAt))}
-                    </p>
-                    <p
-                      className={`mt-1.5 text-xs font-medium ${
-                        needsReview ? 'text-teal-deep' : 'text-pizarra'
-                      }`}
-                    >
-                      {outcome.ok
-                        ? outcome.unresolved.length > 0
-                          ? copy.readyWithQueries.replace(
-                              '{values}',
-                              outcome.unresolved.join(', '),
-                            )
-                          : copy.readyToPublish
-                        : errorMessage(outcome.error)}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 flex shrink-0 flex-wrap gap-2 sm:mt-0">
-                    {/*
-                      A clean response publishes in one action. Anything the
-                      mapping could not settle goes through the form first, so a
-                      moderator resolves it rather than a guess reaching the
-                      public directory.
-                    */}
-                    {outcome.ok && outcome.unresolved.length === 0 ? (
-                      <button
-                        type="button"
-                        disabled={busy}
-                        className={rowActionClass}
-                        onClick={() => run(() => membersAdmin.publishArrived(response.id))}
-                      >
-                        {copy.publish}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={busy}
-                        className={rowActionClass}
-                        onClick={() =>
-                          setEditing({
-                            kind: 'arrived',
-                            id: response.id,
-                            unresolved: outcome.unresolved,
-                            draft: outcome.member
-                              ? toDraft(outcome.member)
-                              : draftFromAnswers(response),
-                          })
-                        }
-                      >
-                        {copy.review}
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      disabled={busy}
-                      className={rowDestructiveActionClass}
-                      onClick={() => {
-                        if (window.confirm(copy.confirmDiscard)) {
-                          void run(() => membersAdmin.discardArrived(response.id))
-                        }
-                      }}
-                    >
-                      {copy.discard}
-                    </button>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </section>
-
-      {/* ---- Secondary: the directory itself ------------------------------ */}
+    <div className="space-y-6">
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -274,12 +158,12 @@ export function MembersEditor() {
           </button>
         </div>
 
-        {/*
-          Worth having from the first dozen profiles and essential past fifty.
-          Filters in the browser rather than by query: the whole collection is
-          already loaded, and a Firestore prefix query cannot match a surname in
-          the middle of a full name anyway.
-        */}
+        {error && editing.kind === 'none' ? (
+          <p role="alert" className="mt-3 text-xs font-medium text-teal-deep">
+            {errorMessage(error)}
+          </p>
+        ) : null}
+
         {members.length > 0 ? (
           <input
             type="search"
@@ -344,43 +228,10 @@ export function MembersEditor() {
           </ul>
         )}
 
-        {/*
-          The public directory is these records plus a compiled-in mock seed, so
-          the site shows far more people than this list does. Saying so here stops
-          that gap reading as a bug in the panel — the seed lives in the repository
-          and no panel action can touch it.
-        */}
         <p className="mt-4 text-xs text-pizarra">
           {copy.seedNotice.replace('{count}', String(seedMembers.length))}
         </p>
       </section>
     </div>
   )
-}
-
-/**
- * Best-effort draft for a response the mapper could not validate at all.
- *
- * Only the free-text name is lifted across; every controlled field is left
- * empty so a moderator picks from the real vocabularies rather than inheriting
- * whatever text failed to match.
- */
-function draftFromAnswers(response: ArrivedResponse): MemberDraft {
-  return {
-    fullName:
-      response.answers['Nombre completo'] ??
-      response.answers['Nombre y apellidos completos:'] ??
-      response.answers['Nombre'] ??
-      '',
-    position: '',
-    jobPositionName: '',
-    biography: '',
-    affiliationId: null,
-    country: '',
-    region: '',
-    interestIds: [],
-    generalAreaIds: [],
-    languages: [],
-    socialUrl: '',
-  }
 }

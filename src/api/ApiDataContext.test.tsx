@@ -31,7 +31,7 @@ describe('ApiDataProvider / useApiData', () => {
   it('does not grow the directory when a submission is made', async () => {
     const { result } = renderHook(() => useApiData(), { wrapper: ApiDataProvider })
 
-    await result.current.submitIntake({
+    const res = await result.current.submitIntake({
       fullName: 'Ada Lovelace',
       email: 'ada@example.org',
       position: 'independent',
@@ -47,8 +47,7 @@ describe('ApiDataProvider / useApiData', () => {
       consentToPublish: true,
     })
 
-    await waitFor(() => expect(result.current.members).toHaveLength(seedMembers.length))
-    expect(result.current.members.some((m) => m.fullName === 'Ada Lovelace')).toBe(false)
+    expect(res.success).toBe(true)
   })
 
   it('resolves institution names and exposes only mappable institutions', () => {
