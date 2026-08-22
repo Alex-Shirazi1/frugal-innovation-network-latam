@@ -90,8 +90,6 @@ function ChipSelect({ legend, hint, options, selected, max, onChange }: ChipSele
 
 interface MemberDraftFormProps {
   initial?: MemberDraft
-  /** Shown above the form when a mapping could not resolve certain answers. */
-  unresolved?: string[]
   error?: string | null
   busy?: boolean
   onSave: (draft: MemberDraft) => void
@@ -100,7 +98,6 @@ interface MemberDraftFormProps {
 
 export function MemberDraftForm({
   initial,
-  unresolved = [],
   error,
   busy = false,
   onSave,
@@ -121,11 +118,6 @@ export function MemberDraftForm({
       }}
       className="rounded-2xl border border-carbon/10 bg-white p-5"
     >
-      {unresolved.length > 0 ? (
-        <p role="status" className="mb-4 rounded-xl bg-niebla px-4 py-3 text-xs text-pizarra">
-          {copy.unresolvedNotice} <strong>{unresolved.join(', ')}</strong>
-        </p>
-      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <EditorField label={`${copy.fullName} *`}>
